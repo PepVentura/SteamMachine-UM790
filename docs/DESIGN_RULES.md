@@ -252,3 +252,15 @@ Todo commit deberá describir claramente el cambio realizado.
 # Objetivo final
 
 Construir una Steam Machine moderna que pueda imprimirse completamente en una impresora FDM doméstica, utilizando componentes comerciales fácilmente sustituibles y manteniendo un diseño limpio, modular y fácilmente ampliable.
+
+# Versionado de piezas
+
+Toda pieza deberá incluir una variable:
+
+part_version = "1.0";
+
+y un comentario indicando:
+
+- Fecha
+- Autor
+- Cambios respecto a la versión anterior
