@@ -176,11 +176,6 @@ Las mejoras, modificaciones y sugerencias son bienvenidas.
 
 Si realizas una modificación o adaptación, puedes abrir un Pull Request.
 
----
-
-## 📜 Licencia
-
-Pendiente de definir.
 
 ---
 
