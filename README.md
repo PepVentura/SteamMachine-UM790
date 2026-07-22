@@ -189,3 +189,10 @@ Pendiente de definir.
 Pep Ventura
 
 Proyecto creado para uso personal y compartido con la comunidad maker.
+
+## Licencia
+
+Este proyecto está bajo la **Licencia MIT**. Esto significa que puedes usar, modificar y distribuir el código libremente, incluso para fines comerciales. 
+
+Para más detalles, consulta el archivo [LICENSE](LICENSE) incluido en este repositorio.
+
