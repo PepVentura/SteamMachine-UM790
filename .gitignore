@@ -1,0 +1,24 @@
+# ===================================================================
+# SteamMachine UM790
+# OpenSCAD
+# ===================================================================
+
+# Archivos temporales de OpenSCAD
+*.bak
+*~
+
+# Miniaturas del sistema
+Thumbs.db
+.DS_Store
+
+# Archivos temporales del editor
+.vscode/
+.idea/
+
+# STL generados (se subirán solo las versiones oficiales)
+stl/build/
+stl/tmp/
+
+# Archivos temporales
+*.tmp
+*.temp
