@@ -6,7 +6,10 @@
 // Archivo : shapes.scad
 // Versión : 1.0
 //
-// Formas geométricas reutilizables
+// Librería de formas geométricas reutilizables.
+//
+// Todas las piezas del proyecto deberán construirse utilizando estos
+// módulos siempre que sea posible.
 //
 // ============================================================================
 
@@ -14,176 +17,262 @@ include <../00_parametros.scad>;
 
 $fn = 64;
 
-//----------------------------------------------------------
-// Placa rectangular
-//----------------------------------------------------------
 
-module plate(width, depth, thickness)
+//=============================================================================
+// PLACA RECTANGULAR
+//=============================================================================
+
+module plate(
+    width,
+    depth,
+    thickness,
+    center = false)
 {
-    cube([width, depth, thickness]);
+    cube(
+        [width, depth, thickness],
+        center = center);
 }
 
-//----------------------------------------------------------
-// Placa con chaflanes de 45°
-//----------------------------------------------------------
 
-module chamferedPlate(width,
-                      depth,
-                      thickness,
-                      chamfer = 2)
+//=============================================================================
+// PLACA CON CHAFLANES
+//=============================================================================
+
+module chamferedPlate(
+    width,
+    depth,
+    thickness,
+    chamfer = 2,
+    center = false)
 {
-    linear_extrude(height = thickness)
-    polygon([
-        [chamfer,0],
-        [width-chamfer,0],
-        [width,chamfer],
-        [width,depth-chamfer],
-        [width-chamfer,depth],
-        [chamfer,depth],
-        [0,depth-chamfer],
-        [0,chamfer]
-    ]);
+
+    module profile()
+    {
+        polygon([
+            [chamfer,0],
+            [width-chamfer,0],
+            [width,chamfer],
+            [width,depth-chamfer],
+            [width-chamfer,depth],
+            [chamfer,depth],
+            [0,depth-chamfer],
+            [0,chamfer]
+        ]);
+    }
+
+    if(center)
+    {
+        translate([-width/2,-depth/2,0])
+            linear_extrude(thickness)
+                profile();
+    }
+    else
+    {
+        linear_extrude(thickness)
+            profile();
+    }
+
 }
 
-//----------------------------------------------------------
-// Tubo
-//----------------------------------------------------------
 
-module tube(outer_d,
-            inner_d,
-            height)
+//=============================================================================
+// TUBO
+//=============================================================================
+
+module tube(
+    outerDiameter,
+    innerDiameter,
+    height,
+    center = false)
 {
+
     difference()
     {
-        cylinder(d=outer_d,h=height);
 
-        translate([0,0,-0.1])
-            cylinder(d=inner_d,h=height+0.2);
+        cylinder(
+            d = outerDiameter,
+            h = height,
+            center = center);
+
+        cylinder(
+            d = innerDiameter,
+            h = height + 0.20,
+            center = center);
+
     }
+
 }
 
-//----------------------------------------------------------
-// Poste macizo
-//----------------------------------------------------------
 
-module boss(diameter,
-            height)
+//=============================================================================
+// POSTE CILÍNDRICO
+//=============================================================================
+
+module boss(
+    diameter,
+    height,
+    center = false)
 {
+
     cylinder(
-        d=diameter,
-        h=height);
+        d = diameter,
+        h = height,
+        center = center);
+
 }
 
-//----------------------------------------------------------
-// Ranura rectangular
-//----------------------------------------------------------
 
-module slot(length,
-            width,
-            height)
+//=============================================================================
+// RANURA RECTANGULAR
+//=============================================================================
+
+module slot(
+    length,
+    width,
+    height,
+    center = true)
 {
-    translate([-length/2,-width/2,0])
 
-        cube([
-            length,
-            width,
-            height
-        ]);
+    cube(
+        [length,width,height],
+        center = center);
+
 }
 
-//----------------------------------------------------------
-// Ranura con extremos redondeados
-//----------------------------------------------------------
 
-module roundedSlot(length,
-                   diameter,
-                   height)
+//=============================================================================
+// RANURA REDONDEADA
+//=============================================================================
+
+module roundedSlot(
+    length,
+    diameter,
+    height,
+    center = true)
 {
+
+    z = center ? -height/2 : 0;
 
     hull()
     {
 
-        translate([-length/2,0,0])
+        translate([-length/2,0,z])
 
             cylinder(
-                d=diameter,
-                h=height);
+                d = diameter,
+                h = height);
 
-        translate([ length/2,0,0])
+        translate([ length/2,0,z])
 
             cylinder(
-                d=diameter,
-                h=height);
+                d = diameter,
+                h = height);
 
     }
 
 }
 
-//----------------------------------------------------------
-// Marco rectangular
-//----------------------------------------------------------
 
-module frame(width,
-             depth,
-             border,
-             thickness)
+//=============================================================================
+// MARCO RECTANGULAR
+//=============================================================================
+
+module frame(
+    width,
+    depth,
+    border,
+    thickness,
+    center = false)
 {
 
-    difference()
+    if(center)
     {
 
-        cube([
-            width,
-            depth,
-            thickness
-        ]);
+        difference()
+        {
 
-        translate([
-            border,
-            border,
-            -0.1
-        ])
+            cube(
+                [width,depth,thickness],
+                center=true);
 
-        cube([
-            width-2*border,
-            depth-2*border,
-            thickness+0.2
-        ]);
+            translate([0,0,-0.1])
+
+                cube(
+                [
+                    width-2*border,
+                    depth-2*border,
+                    thickness+0.2
+                ],
+                center=true);
+
+        }
+
+    }
+    else
+    {
+
+        difference()
+        {
+
+            cube([width,depth,thickness]);
+
+            translate([border,border,-0.1])
+
+                cube(
+                [
+                    width-2*border,
+                    depth-2*border,
+                    thickness+0.2
+                ]);
+
+        }
 
     }
 
 }
 
-//----------------------------------------------------------
-// Nervio longitudinal
-//----------------------------------------------------------
 
-module rib(length,
-           width,
-           height)
+//=============================================================================
+// NERVIO
+//=============================================================================
+
+module rib(
+    length,
+    width,
+    height,
+    center = false)
 {
 
-    cube([
-        length,
-        width,
-        height
-    ]);
+    cube(
+        [length,width,height],
+        center = center);
 
 }
 
-//----------------------------------------------------------
-// Nervio en cruz
-//----------------------------------------------------------
 
-module crossRib(length,
-                width,
-                height)
+//=============================================================================
+// NERVIO EN CRUZ
+//=============================================================================
+
+module crossRib(
+    length,
+    width,
+    height,
+    center = true)
 {
 
-    rib(length,width,height);
+    rib(
+        length,
+        width,
+        height,
+        center);
 
     rotate([0,0,90])
 
-        rib(length,width,height);
+        rib(
+            length,
+            width,
+            height,
+            center);
 
 }
