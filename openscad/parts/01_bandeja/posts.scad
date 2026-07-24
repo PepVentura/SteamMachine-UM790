@@ -23,15 +23,14 @@ include <../../lib/shapes.scad>;
 // POSTE INDIVIDUAL
 //=============================================================================
 
-module post(x, y)
+module post()
 {
 
-    translate([x, y, tray_thickness])
     difference()
     {
 
         //---------------------------------------------------------------------
-        // Cuerpo principal
+        // Poste principal
         //---------------------------------------------------------------------
 
         boss(
@@ -40,47 +39,21 @@ module post(x, y)
         );
 
         //---------------------------------------------------------------------
-        // Agujero pasante
+        // Alojamiento inserto M3
         //---------------------------------------------------------------------
 
-        translate([0,0,-0.10])
+        translate(
+        [
+            0,
+            0,
+            um790_post_height - insert_depth + 0.01
+        ])
 
-            cylinder(
-                d = um790_screw_clearance,
-                h = um790_post_height + 0.20
-            );
+        cylinder(
+            d = insert_diameter,
+            h = insert_depth + 0.20);
 
     }
-
-    //---------------------------------------------------------------------
-    // Nervio X+
-    //---------------------------------------------------------------------
-
-    translate([x,y,tray_thickness])
-
-        linear_extrude(height = um790_post_height)
-
-            polygon([
-                [0,0],
-                [4,0],
-                [0,4]
-            ]);
-
-    //---------------------------------------------------------------------
-    // Nervio X-
-    //---------------------------------------------------------------------
-
-    translate([x,y,tray_thickness])
-
-        mirror([1,0,0])
-
-            linear_extrude(height = um790_post_height)
-
-                polygon([
-                    [0,0],
-                    [4,0],
-                    [0,4]
-                ]);
 
 }
 
@@ -92,13 +65,30 @@ module post(x, y)
 module posts()
 {
 
-    sx = um790_mount_spacing_x/2;
-    sy = um790_mount_spacing_y/2;
+    sx = um790_mount_spacing_x / 2;
+    sy = um790_mount_spacing_y / 2;
 
-    post(-sx,  sy);
-    post( sx,  sy);
-    post(-sx, -sy);
-    post( sx, -sy);
+    positions =
+    [
+        [-sx,-sy],
+        [ sx,-sy],
+        [-sx, sy],
+        [ sx, sy]
+    ];
+
+    for(p = positions)
+    {
+
+        translate(
+        [
+            p[0],
+            p[1],
+            tray_thickness
+        ])
+
+        post();
+
+    }
 
 }
 
@@ -109,10 +99,10 @@ module posts()
 
 SHOW_POSTS = true;
 
-if (SHOW_POSTS)
+if(SHOW_POSTS)
 {
 
-    color("orange")
+    color([1.0,0.55,0.0])
 
         posts();
 
