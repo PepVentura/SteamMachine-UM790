@@ -3,62 +3,46 @@
 // SteamMachine UM790
 // Project Phoenix
 //
-// Archivo    : ribs.scad
-// Versión    : 1.0
+// Archivo : ribs.scad
+// Versión : 2.0
 //
-// Nervios estructurales de la bandeja.
+// Nervios estructurales
 //
 // ============================================================================
-
-
-//=============================================================================
-// INCLUDES
-//=============================================================================
 
 include <../../../00_parametros.scad>;
 
 
 //=============================================================================
-// PARÁMETROS (añadir a 00_parametros.scad si aún no existen)
-//=============================================================================
-//
-// rib_width  = 3.0;
-// rib_height = 5.0;
-//
-
-
-//=============================================================================
-// NERVIO HORIZONTAL
+// NERVIO ENTRE DOS PUNTOS
 //=============================================================================
 
-module rib_x(length)
+module rib_between(p1, p2,
+                   width  = rib_width,
+                   height = rib_height)
 {
-    cube(
-    [
-        length,
-        rib_width,
-        rib_height
-    ]);
+    dx = p2[0] - p1[0];
+    dy = p2[1] - p1[1];
+
+    len = sqrt(dx*dx + dy*dy);
+
+    angle = atan2(dy, dx);
+
+    translate([p1[0], p1[1], 0])
+
+        rotate([0,0,angle])
+
+            cube(
+            [
+                len,
+                width,
+                height
+            ]);
 }
 
 
 //=============================================================================
-// NERVIO VERTICAL
-//=============================================================================
-
-module rib_y(length)
-{
-    cube(
-    [
-        rib_width,
-        length,
-        rib_height
-    ]);
-}
-
-
-//=============================================================================
-// CONJUNTO DE NERVIOS
+// ESTRUCTURA
 //=============================================================================
 
 module ribs()
@@ -67,69 +51,33 @@ module ribs()
     sx = um790_mount_spacing_x/2;
     sy = um790_mount_spacing_y/2;
 
-    //
-    // Dos nervios horizontales
-    //
-
-    translate(
-    [
-        -sx,
-        -sy-rib_width/2,
-        0
-    ])
-        rib_x(um790_mount_spacing_x);
-
-    translate(
-    [
-        -sx,
-        sy-rib_width/2,
-        0
-    ])
-        rib_x(um790_mount_spacing_x);
+    p1=[-sx,-sy];
+    p2=[ sx,-sy];
+    p3=[ sx, sy];
+    p4=[-sx, sy];
 
     //
-    // Dos nervios verticales
+    // Marco principal
     //
 
-    translate(
-    [
-        -sx-rib_width/2,
-        -sy,
-        0
-    ])
-        rib_y(um790_mount_spacing_y);
-
-    translate(
-    [
-        sx-rib_width/2,
-        -sy,
-        0
-    ])
-        rib_y(um790_mount_spacing_y);
+    rib_between(p1,p2);
+    rib_between(p2,p3);
+    rib_between(p3,p4);
+    rib_between(p4,p1);
 
     //
-    // Nervio central longitudinal
+    // Cruz central
     //
 
-    translate(
-    [
-        -sx,
-        -rib_width/2,
-        0
-    ])
-        rib_x(um790_mount_spacing_x);
+    rib_between([-sx,0],[sx,0]);
+    rib_between([0,-sy],[0,sy]);
 
     //
-    // Nervio central transversal
+    // Diagonales
     //
 
-    translate(
-    [
-        -rib_width/2,
-        -sy,
-        0
-    ])
-        rib_y(um790_mount_spacing_y);
+    rib_between(p1,p3);
+    rib_between(p2,p4);
 
 }
 
@@ -138,12 +86,12 @@ module ribs()
 // PREVIEW
 //=============================================================================
 
-SHOW_RIBS = true;
+SHOW_RIBS=true;
 
-if (SHOW_RIBS)
+if(SHOW_RIBS)
 {
 
-    color("DodgerBlue")
+    color("SteelBlue")
 
         ribs();
 
