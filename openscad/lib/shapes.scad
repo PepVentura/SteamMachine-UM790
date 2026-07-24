@@ -4,16 +4,18 @@
 // Project Phoenix
 //
 // Archivo : shapes.scad
-// Versión : 1.0
+// Versión : 1.1
 //
 // Librería de formas geométricas reutilizables.
 //
-// Todas las piezas del proyecto deberán construirse utilizando estos
-// módulos siempre que sea posible.
+// Esta librería NO depende de ningún parámetro del proyecto.
+// Todos los valores deben recibirse como argumentos.
 //
+// Cambios v1.1
+// - Eliminada la dependencia de 00_parametros.scad.
+// - Librería completamente independiente del proyecto.
+// - Preparada para reutilización en otros diseños.
 // ============================================================================
-
-include <../00_parametros.scad>;
 
 $fn = 64;
 
