@@ -230,3 +230,6 @@ showHardware        = true;
 showGuides          = true;
 showMagnets         = true;
 showVentilation     = true;
+
+base_island_size = 20.0;
+base_bridge_width = 10.0;
