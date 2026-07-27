@@ -255,3 +255,14 @@ base_bridge_width = 10.0;
 
 rib_width = 3.0;
 rib_height = 5.0;
+
+base_thickness = 3.0;
+
+standoff_height = 6.0;
+standoff_dia = 7.0;
+
+insert_dia = 4.1;
+insert_depth = 5.0;
+
+off_x = hole_dist_x/2;
+off_y = hole_dist_y/2;
