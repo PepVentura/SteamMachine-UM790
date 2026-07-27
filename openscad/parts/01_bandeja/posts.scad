@@ -6,11 +6,11 @@
 // Archivo : posts.scad
 // Versión : 2.0
 //
-// Postes de fijación de la placa Minisforum UM790 PRO
+// Postes de fijación de la placa UM790 PRO
 //
 // ============================================================================
 
-include <../../00_parametros.scad>;
+include <../../../00_parametros.scad>;
 
 $fn = 64;
 
@@ -21,81 +21,52 @@ $fn = 64;
 
 module post()
 {
-
     difference()
     {
-
-        // Poste exterior
         cylinder(
-            d = standoff_dia,
-            h = standoff_height);
+            h = standoff_height,
+            d = standoff_dia
+        );
 
-        // Alojamiento inserto M3
-        translate(
-            [0,0,
-             standoff_height-insert_depth])
-
+        translate([0,0,standoff_height-insert_depth])
             cylinder(
-                d = insert_dia,
-                h = insert_depth + 0.20);
-
+                h = insert_depth+0.10,
+                d = insert_dia
+            );
     }
-
 }
 
 
-
 //=============================================================================
-// MATRIZ DE POSTES UM790
+// MATRIZ DE POSTES
 //=============================================================================
 
 module posts()
 {
 
-    positions =
-    [
-
-        [-off_x,-off_y],
-
-        [ off_x,-off_y],
-
-        [-off_x, off_y],
-
-        [ off_x, off_y]
-
-    ];
-
-
-    for(p = positions)
-    {
-
-        translate(
-        [
-            p[0],
-            p[1],
-            0
-        ])
-
+    translate([-off_x,-off_y,0])
         post();
 
-    }
+    translate([ off_x,-off_y,0])
+        post();
+
+    translate([-off_x, off_y,0])
+        post();
+
+    translate([ off_x, off_y,0])
+        post();
 
 }
 
 
-
 //=============================================================================
-// PREVISUALIZACIÓN
-//=============================================================================
-//
-// Permite abrir directamente este archivo
-// para comprobar únicamente los postes.
-//
-// En tray.scad se llamará igualmente
-// mediante:
-//
-//     posts();
-//
+// PREVIEW
 //=============================================================================
 
-posts();
+if ($preview)
+{
+
+    color("orange")
+        posts();
+
+}
