@@ -6,93 +6,81 @@
 // Archivo : ribs.scad
 // Versión : 2.0
 //
-// Nervios estructurales
+// Nervios estructurales de la bandeja.
 //
 // ============================================================================
 
-include <../../../00_parametros.scad>;
+include <../../00_parametros.scad>;
+
+$fn = 64;
 
 
 //=============================================================================
-// NERVIO ENTRE DOS PUNTOS
+// NERVIO HORIZONTAL
 //=============================================================================
 
-module rib_between(p1, p2,
-                   width  = rib_width,
-                   height = rib_height)
+module horizontal_rib(y_pos)
 {
-    dx = p2[0] - p1[0];
-    dy = p2[1] - p1[1];
+    translate(
+    [
+        -(um790_mount_spacing_x/2),
+        y_pos - (rib_width/2),
+        0
+    ])
 
-    len = sqrt(dx*dx + dy*dy);
-
-    angle = atan2(dy, dx);
-
-    translate([p1[0], p1[1], 0])
-
-        rotate([0,0,angle])
-
-            cube(
-            [
-                len,
-                width,
-                height
-            ]);
+    cube(
+    [
+        um790_mount_spacing_x,
+        rib_width,
+        rib_height
+    ]);
 }
 
 
 //=============================================================================
-// ESTRUCTURA
+// NERVIO VERTICAL
+//=============================================================================
+
+module vertical_rib(x_pos)
+{
+    translate(
+    [
+        x_pos - (rib_width/2),
+        -(um790_mount_spacing_y/2),
+        0
+    ])
+
+    cube(
+    [
+        rib_width,
+        um790_mount_spacing_y,
+        rib_height
+    ]);
+}
+
+
+//=============================================================================
+// CONJUNTO DE NERVIOS
 //=============================================================================
 
 module ribs()
 {
 
-    sx = um790_mount_spacing_x/2;
-    sy = um790_mount_spacing_y/2;
+    // Horizontales
 
-    p1=[-sx,-sy];
-    p2=[ sx,-sy];
-    p3=[ sx, sy];
-    p4=[-sx, sy];
+    horizontal_rib(-20);
+    horizontal_rib( 20);
 
-    //
-    // Marco principal
-    //
+    // Verticales
 
-    rib_between(p1,p2);
-    rib_between(p2,p3);
-    rib_between(p3,p4);
-    rib_between(p4,p1);
-
-    //
-    // Cruz central
-    //
-
-    rib_between([-sx,0],[sx,0]);
-    rib_between([0,-sy],[0,sy]);
-
-    //
-    // Diagonales
-    //
-
-    rib_between(p1,p3);
-    rib_between(p2,p4);
+    vertical_rib(-25);
+    vertical_rib( 25);
 
 }
 
 
 //=============================================================================
-// PREVIEW
+// PREVISUALIZACIÓN
 //=============================================================================
 
-SHOW_RIBS=true;
-
-if(SHOW_RIBS)
-{
-
-    color("SteelBlue")
-
-        ribs();
-
-}
+ribs();
