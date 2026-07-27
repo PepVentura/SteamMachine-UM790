@@ -4,9 +4,9 @@
 // Project Phoenix
 //
 // Archivo : ribs.scad
-// Versión : 2.1
+// Versión : 5.0
 //
-// Nervios estructurales de la bandeja.
+// Nervios estructurales V5
 //
 // ============================================================================
 
@@ -19,168 +19,175 @@ $fn = 64;
 // NERVIO HORIZONTAL
 //=============================================================================
 
-module rib_x(length)
+module rib_x(len)
 {
-    cube(
-        [length, rib_width, rib_height],
-        center = true
-    );
+    translate([-len/2,-rib_width/2,0])
+
+        cube(
+        [
+            len,
+            rib_width,
+            rib_height
+        ]);
 }
+
 
 
 //=============================================================================
 // NERVIO VERTICAL
 //=============================================================================
 
-module rib_y(length)
+module rib_y(len)
 {
-    cube(
-        [rib_width, length, rib_height],
-        center = true
-    );
+    translate([-rib_width/2,-len/2,0])
+
+        cube(
+        [
+            rib_width,
+            len,
+            rib_height
+        ]);
 }
 
 
+
 //=============================================================================
-// NERVIOS
+// NERVIO DIAGONAL
+//=============================================================================
+
+module rib_diag(x1,y1,x2,y2)
+{
+
+    dx=x2-x1;
+    dy=y2-y1;
+
+    L=sqrt(dx*dx+dy*dy);
+
+    A=atan2(dy,dx);
+
+    translate([x1,y1,0])
+
+        rotate([0,0,A])
+
+            cube(
+            [
+                L,
+                rib_width,
+                rib_height
+            ]);
+
+}
+
+
+
+//=============================================================================
+// BASTIDOR INTERIOR
+//=============================================================================
+
+module inner_frame()
+{
+
+    translate([0, off_y,0])
+        rib_x(um790_mount_spacing_x);
+
+    translate([0,-off_y,0])
+        rib_x(um790_mount_spacing_x);
+
+    translate([ off_x,0,0])
+        rib_y(um790_mount_spacing_y);
+
+    translate([-off_x,0,0])
+        rib_y(um790_mount_spacing_y);
+
+}
+
+
+
+//=============================================================================
+// CRUCETA CENTRAL
+//=============================================================================
+
+module center_cross()
+{
+
+    rib_x(um790_mount_spacing_x);
+
+    rib_y(um790_mount_spacing_y);
+
+}
+
+
+
+//=============================================================================
+// DIAGONALES ENTRE POSTES
+//=============================================================================
+
+module diagonals()
+{
+
+    rib_diag(
+        -off_x,
+        -off_y,
+         off_x,
+         off_y);
+
+    rib_diag(
+        -off_x,
+         off_y,
+         off_x,
+        -off_y);
+
+}
+
+
+
+//=============================================================================
+// REFUERZOS EXTERIORES
+//=============================================================================
+
+module outer_frame()
+{
+
+    m=base_frame_width+5;
+
+    translate([0, tray_depth/2-m,0])
+        rib_x(tray_width-2*m);
+
+    translate([0,-tray_depth/2+m,0])
+        rib_x(tray_width-2*m);
+
+    translate([ tray_width/2-m,0,0])
+        rib_y(tray_depth-2*m);
+
+    translate([-tray_width/2+m,0,0])
+        rib_y(tray_depth-2*m);
+
+}
+
+
+
+//=============================================================================
+// RIBS
 //=============================================================================
 
 module ribs()
 {
 
-    frame_margin = base_frame_width + 5;
+    union()
+    {
 
+        outer_frame();
 
-    //---------------------------------------------------------------------
-    // Refuerzo superior
-    //---------------------------------------------------------------------
+        inner_frame();
 
-    translate(
-    [
-        0,
-        tray_depth/2 - frame_margin,
-        rib_height/2
-    ])
-        rib_x(tray_width - frame_margin*2);
+        center_cross();
 
+        diagonals();
 
-    //---------------------------------------------------------------------
-    // Refuerzo inferior
-    //---------------------------------------------------------------------
-
-    translate(
-    [
-        0,
-       -tray_depth/2 + frame_margin,
-        rib_height/2
-    ])
-        rib_x(tray_width - frame_margin*2);
-
-
-    //---------------------------------------------------------------------
-    // Refuerzo izquierdo
-    //---------------------------------------------------------------------
-
-    translate(
-    [
-       -tray_width/2 + frame_margin,
-        0,
-        rib_height/2
-    ])
-        rib_y(tray_depth - frame_margin*2);
-
-
-    //---------------------------------------------------------------------
-    // Refuerzo derecho
-    //---------------------------------------------------------------------
-
-    translate(
-    [
-        tray_width/2 - frame_margin,
-        0,
-        rib_height/2
-    ])
-        rib_y(tray_depth - frame_margin*2);
-
-
-    //---------------------------------------------------------------------
-    // Refuerzo horizontal entre postes
-    //---------------------------------------------------------------------
-
-    translate(
-    [
-        0,
-        0,
-        rib_height/2
-    ])
-        rib_x(um790_mount_spacing_x);
-
-
-    //---------------------------------------------------------------------
-    // Refuerzo vertical entre postes
-    //---------------------------------------------------------------------
-
-    translate(
-    [
-        0,
-        0,
-        rib_height/2
-    ])
-        rib_y(um790_mount_spacing_y);
-
-
-    //---------------------------------------------------------------------
-    // Horizontal superior de postes
-    //---------------------------------------------------------------------
-
-    translate(
-    [
-        0,
-        off_y,
-        rib_height/2
-    ])
-        rib_x(um790_mount_spacing_x);
-
-
-    //---------------------------------------------------------------------
-    // Horizontal inferior de postes
-    //---------------------------------------------------------------------
-
-    translate(
-    [
-        0,
-       -off_y,
-        rib_height/2
-    ])
-        rib_x(um790_mount_spacing_x);
-
-
-    //---------------------------------------------------------------------
-    // Vertical izquierda de postes
-    //---------------------------------------------------------------------
-
-    translate(
-    [
-       -off_x,
-        0,
-        rib_height/2
-    ])
-        rib_y(um790_mount_spacing_y);
-
-
-    //---------------------------------------------------------------------
-    // Vertical derecha de postes
-    //---------------------------------------------------------------------
-
-    translate(
-    [
-        off_x,
-        0,
-        rib_height/2
-    ])
-        rib_y(um790_mount_spacing_y);
+    }
 
 }
+
 
 
 //=============================================================================
