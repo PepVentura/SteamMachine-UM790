@@ -4,9 +4,9 @@
 // Project Phoenix
 //
 // Archivo : base.scad
-// Versión : 2.0
+// Versión : 2.1
 //
-// Base estructural de la bandeja
+// Base estructural de la bandeja.
 //
 // ============================================================================
 
@@ -16,91 +16,7 @@ $fn = 64;
 
 
 //=============================================================================
-// BASE EXTERIOR
-//=============================================================================
-
-module base_plate()
-{
-    linear_extrude(height = tray_thickness)
-    hull()
-    {
-
-        translate([
-            -tray_width/2 + base_outer_chamfer,
-            -tray_depth/2 + base_outer_chamfer
-        ])
-            circle(r = base_outer_chamfer);
-
-        translate([
-             tray_width/2 - base_outer_chamfer,
-            -tray_depth/2 + base_outer_chamfer
-        ])
-            circle(r = base_outer_chamfer);
-
-        translate([
-            -tray_width/2 + base_outer_chamfer,
-             tray_depth/2 - base_outer_chamfer
-        ])
-            circle(r = base_outer_chamfer);
-
-        translate([
-             tray_width/2 - base_outer_chamfer,
-             tray_depth/2 - base_outer_chamfer
-        ])
-            circle(r = base_outer_chamfer);
-
-    }
-}
-
-
-//=============================================================================
-// VENTANA CENTRAL
-//=============================================================================
-
-module center_cutout()
-{
-
-    cut_x = tray_width - (base_frame_width * 2);
-    cut_y = tray_depth - (base_frame_width * 2);
-
-    translate([0,0,-0.1])
-
-    linear_extrude(height = tray_thickness + 0.2)
-
-    hull()
-    {
-
-        translate([
-            -cut_x/2 + base_inner_chamfer,
-            -cut_y/2 + base_inner_chamfer
-        ])
-            circle(r = base_inner_chamfer);
-
-        translate([
-             cut_x/2 - base_inner_chamfer,
-            -cut_y/2 + base_inner_chamfer
-        ])
-            circle(r = base_inner_chamfer);
-
-        translate([
-            -cut_x/2 + base_inner_chamfer,
-             cut_y/2 - base_inner_chamfer
-        ])
-            circle(r = base_inner_chamfer);
-
-        translate([
-             cut_x/2 - base_inner_chamfer,
-             cut_y/2 - base_inner_chamfer
-        ])
-            circle(r = base_inner_chamfer);
-
-    }
-
-}
-
-
-//=============================================================================
-// BASE COMPLETA
+// BASE
 //=============================================================================
 
 module base()
@@ -109,9 +25,107 @@ module base()
     difference()
     {
 
-        base_plate();
+        //---------------------------------------------------------------------
+        // Contorno exterior
+        //---------------------------------------------------------------------
 
-        center_cutout();
+        linear_extrude(height = tray_thickness)
+        hull()
+        {
+
+            translate([-tray_width/2 + 6, -tray_depth/2 + 6])
+                circle(r = 6);
+
+            translate([ tray_width/2 - 6, -tray_depth/2 + 6])
+                circle(r = 6);
+
+            translate([ tray_width/2 - 6,  tray_depth/2 - 6])
+                circle(r = 6);
+
+            translate([-tray_width/2 + 6,  tray_depth/2 - 6])
+                circle(r = 6);
+
+        }
+
+
+        //---------------------------------------------------------------------
+        // Ventana central de aligerado
+        //---------------------------------------------------------------------
+
+        translate([0,0,-0.1])
+
+        linear_extrude(height = tray_thickness + 0.2)
+        hull()
+        {
+
+            translate([-45,-35])
+                circle(r = 5);
+
+            translate([45,-35])
+                circle(r = 5);
+
+            translate([45,35])
+                circle(r = 5);
+
+            translate([-45,35])
+                circle(r = 5);
+
+        }
+
+    }
+
+
+    //---------------------------------------------------------------------
+    // Marco estructural superior
+    //---------------------------------------------------------------------
+
+    translate([0,0,tray_thickness])
+
+    difference()
+    {
+
+        linear_extrude(height = 2)
+        hull()
+        {
+
+            translate([-tray_width/2 + 6,-tray_depth/2 + 6])
+                circle(r=6);
+
+            translate([ tray_width/2 - 6,-tray_depth/2 + 6])
+                circle(r=6);
+
+            translate([ tray_width/2 - 6, tray_depth/2 - 6])
+                circle(r=6);
+
+            translate([-tray_width/2 + 6, tray_depth/2 - 6])
+                circle(r=6);
+
+        }
+
+
+        translate([0,0,-0.1])
+
+        linear_extrude(height = 2.2)
+        hull()
+        {
+
+            translate([-tray_width/2 + base_frame_width,
+                       -tray_depth/2 + base_frame_width])
+                circle(r = 5);
+
+            translate([ tray_width/2 - base_frame_width,
+                       -tray_depth/2 + base_frame_width])
+                circle(r = 5);
+
+            translate([ tray_width/2 - base_frame_width,
+                        tray_depth/2 - base_frame_width])
+                circle(r = 5);
+
+            translate([-tray_width/2 + base_frame_width,
+                        tray_depth/2 - base_frame_width])
+                circle(r = 5);
+
+        }
 
     }
 
@@ -122,10 +136,4 @@ module base()
 // PREVIEW
 //=============================================================================
 
-if($preview)
-{
-
-    color("Gainsboro")
-        base();
-
-}
+base();
