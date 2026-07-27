@@ -1,27 +1,126 @@
-SteamMachine-UM790/
+//
+// ============================================================================
+// SteamMachine UM790
+// Project Phoenix
+//
+// Archivo : 00_parametros.scad
+// Versión : 2.0
+//
+// ÚNICA fuente de parámetros del proyecto.
+//
+// NO añadir parámetros duplicados en otros archivos.
+//
+// ============================================================================
 
-00_parametros.scad      ← único origen de parámetros
+$fn = 64;
 
-openscad/
-│
-├── lib/
-│     common.scad
-│     hardware.scad
-│     magnets.scad
-│     ...
-│
-├── reference/
-│     pcb_um790.scad
-│
-├── parts/
-│     01_bandeja/
-│         base.scad
-│         posts.scad
-│         ribs.scad
-│         tray.scad
-│
-└── tests/
-      01_test_mount.scad
-      02_test_tray.scad
-      03_test_base.scad
-      ...
+//=============================================================================
+// INFORMACIÓN
+//=============================================================================
+
+project_name    = "SteamMachine UM790";
+project_version = "2.0";
+
+//=============================================================================
+// CARCASA
+//=============================================================================
+
+case_width  = 156;
+case_depth  = 162.4;
+case_height = 152;
+
+wall_thickness   = 3;
+top_thickness    = 3;
+bottom_thickness = 3;
+
+//=============================================================================
+// BANDEJA
+//=============================================================================
+
+tray_width      = 150;
+tray_depth      = 150;
+tray_thickness  = 3;
+
+base_frame_width = 10;
+
+base_outer_chamfer = 4;
+base_inner_chamfer = 4;
+
+//=============================================================================
+// PCB UM790
+//=============================================================================
+
+pcb_width      = 122.0;
+pcb_depth      = 119.5;
+pcb_thickness  = 1.60;
+
+// separación entre centros de tornillos
+um790_mount_spacing_x = 113.0;
+um790_mount_spacing_y = 99.0;
+
+//=============================================================================
+// POSTES
+//=============================================================================
+
+um790_post_height   = 6.0;
+um790_post_diameter = 7.0;
+
+insert_diameter = 4.10;
+insert_depth    = 5.00;
+
+//=============================================================================
+// DERIVADOS
+//=============================================================================
+
+off_x = um790_mount_spacing_x/2;
+off_y = um790_mount_spacing_y/2;
+
+//=============================================================================
+// NERVIOS
+//=============================================================================
+
+rib_width  = 3.0;
+rib_height = 5.0;
+
+//=============================================================================
+// VENTILACIÓN
+//=============================================================================
+
+vent_slot_width  = 4.0;
+vent_slot_length = 40.0;
+vent_spacing     = 8.0;
+
+//=============================================================================
+// IMANES
+//=============================================================================
+
+magnet_diameter = 8.0;
+magnet_height   = 3.0;
+
+//=============================================================================
+// TORNILLERÍA
+//=============================================================================
+
+mount_hole = 3.4;
+
+//=============================================================================
+// COMPATIBILIDAD CON ARCHIVOS ANTIGUOS
+//=============================================================================
+
+// PCB
+pcb_x = pcb_width;
+pcb_y = pcb_depth;
+
+// Separación de agujeros
+hole_dist_x = um790_mount_spacing_x;
+hole_dist_y = um790_mount_spacing_y;
+
+// Postes
+standoff_height = um790_post_height;
+standoff_dia    = um790_post_diameter;
+
+// Insertos
+insert_dia = insert_diameter;
+
+// Base
+base_thickness = tray_thickness;
