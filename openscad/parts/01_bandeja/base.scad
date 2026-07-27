@@ -3,40 +3,117 @@
 // SteamMachine UM790
 // Project Phoenix
 //
-// Archivo    : base.scad
-// Versión    : 1.0
+// Archivo : base.scad
+// Versión : 2.0
 //
-// Base estructural de la bandeja.
-//
-// Esta pieza genera únicamente el marco estructural principal.
-// Los postes, nervios, guías y soportes se añadirán desde módulos
-// independientes.
+// Base estructural de la bandeja
 //
 // ============================================================================
 
-
-//=============================================================================
-// INCLUDES
-//=============================================================================
-
 include <../../../00_parametros.scad>;
-include <../../lib/shapes.scad>;
+
+$fn = 64;
 
 
 //=============================================================================
-// BASE
+// BASE EXTERIOR
+//=============================================================================
+
+module base_plate()
+{
+    linear_extrude(height = tray_thickness)
+    hull()
+    {
+
+        translate([
+            -tray_width/2 + base_outer_chamfer,
+            -tray_depth/2 + base_outer_chamfer
+        ])
+            circle(r = base_outer_chamfer);
+
+        translate([
+             tray_width/2 - base_outer_chamfer,
+            -tray_depth/2 + base_outer_chamfer
+        ])
+            circle(r = base_outer_chamfer);
+
+        translate([
+            -tray_width/2 + base_outer_chamfer,
+             tray_depth/2 - base_outer_chamfer
+        ])
+            circle(r = base_outer_chamfer);
+
+        translate([
+             tray_width/2 - base_outer_chamfer,
+             tray_depth/2 - base_outer_chamfer
+        ])
+            circle(r = base_outer_chamfer);
+
+    }
+}
+
+
+//=============================================================================
+// VENTANA CENTRAL
+//=============================================================================
+
+module center_cutout()
+{
+
+    cut_x = tray_width - (base_frame_width * 2);
+    cut_y = tray_depth - (base_frame_width * 2);
+
+    translate([0,0,-0.1])
+
+    linear_extrude(height = tray_thickness + 0.2)
+
+    hull()
+    {
+
+        translate([
+            -cut_x/2 + base_inner_chamfer,
+            -cut_y/2 + base_inner_chamfer
+        ])
+            circle(r = base_inner_chamfer);
+
+        translate([
+             cut_x/2 - base_inner_chamfer,
+            -cut_y/2 + base_inner_chamfer
+        ])
+            circle(r = base_inner_chamfer);
+
+        translate([
+            -cut_x/2 + base_inner_chamfer,
+             cut_y/2 - base_inner_chamfer
+        ])
+            circle(r = base_inner_chamfer);
+
+        translate([
+             cut_x/2 - base_inner_chamfer,
+             cut_y/2 - base_inner_chamfer
+        ])
+            circle(r = base_inner_chamfer);
+
+    }
+
+}
+
+
+//=============================================================================
+// BASE COMPLETA
 //=============================================================================
 
 module base()
 {
 
-    frame(
-        width      = tray_width,
-        depth      = tray_depth,
-        border     = base_frame_width,
-        thickness  = tray_thickness,
-        center     = true
-    );
+    difference()
+    {
+
+        base_plate();
+
+        center_cutout();
+
+    }
 
 }
 
@@ -45,10 +122,10 @@ module base()
 // PREVIEW
 //=============================================================================
 
-SHOW_BASE = true;
-
-if (SHOW_BASE)
+if($preview)
 {
-    color([0.80,0.80,0.82])
+
+    color("Gainsboro")
         base();
+
 }
