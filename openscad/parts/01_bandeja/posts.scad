@@ -3,20 +3,16 @@
 // SteamMachine UM790
 // Project Phoenix
 //
-// Archivo    : posts.scad
-// Versión    : 1.0
+// Archivo : posts.scad
+// Versión : 2.0
 //
-// Postes de fijación del Minisforum UM790 Pro.
+// Postes de fijación de la placa Minisforum UM790 PRO
 //
 // ============================================================================
 
+include <../../00_parametros.scad>;
 
-//=============================================================================
-// INCLUDES
-//=============================================================================
-
-include <../../../00_parametros.scad>;
-include <../../lib/shapes.scad>;
+$fn = 64;
 
 
 //=============================================================================
@@ -29,52 +25,46 @@ module post()
     difference()
     {
 
-        //---------------------------------------------------------------------
-        // Poste principal
-        //---------------------------------------------------------------------
-
-        boss(
-            diameter = um790_post_diameter,
-            height   = um790_post_height
-        );
-
-        //---------------------------------------------------------------------
-        // Alojamiento inserto M3
-        //---------------------------------------------------------------------
-
-        translate(
-        [
-            0,
-            0,
-            um790_post_height - insert_depth + 0.01
-        ])
-
+        // Poste exterior
         cylinder(
-            d = insert_diameter,
-            h = insert_depth + 0.20);
+            d = standoff_dia,
+            h = standoff_height);
+
+        // Alojamiento inserto M3
+        translate(
+            [0,0,
+             standoff_height-insert_depth])
+
+            cylinder(
+                d = insert_dia,
+                h = insert_depth + 0.20);
 
     }
 
 }
 
 
+
 //=============================================================================
-// CONJUNTO DE POSTES
+// MATRIZ DE POSTES UM790
 //=============================================================================
 
 module posts()
 {
 
-    sx = um790_mount_spacing_x / 2;
-    sy = um790_mount_spacing_y / 2;
-
     positions =
     [
-        [-sx,-sy],
-        [ sx,-sy],
-        [-sx, sy],
-        [ sx, sy]
+
+        [-off_x,-off_y],
+
+        [ off_x,-off_y],
+
+        [-off_x, off_y],
+
+        [ off_x, off_y]
+
     ];
+
 
     for(p = positions)
     {
@@ -83,7 +73,7 @@ module posts()
         [
             p[0],
             p[1],
-            tray_thickness
+            0
         ])
 
         post();
@@ -93,17 +83,19 @@ module posts()
 }
 
 
+
 //=============================================================================
-// PREVIEW
+// PREVISUALIZACIÓN
+//=============================================================================
+//
+// Permite abrir directamente este archivo
+// para comprobar únicamente los postes.
+//
+// En tray.scad se llamará igualmente
+// mediante:
+//
+//     posts();
+//
 //=============================================================================
 
-SHOW_POSTS = true;
-
-if(SHOW_POSTS)
-{
-
-    color([1.0,0.55,0.0])
-
-        posts();
-
-}
+posts();
