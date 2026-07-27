@@ -4,15 +4,15 @@
 // Project Phoenix
 //
 // Archivo : posts.scad
-// Versión : 2.1
+// Versión : 5.0
 //
-// Postes de fijación de la placa UM790 PRO
+// Postes reforzados para la UM790 PRO
 //
 // ============================================================================
 
 include <../../../00_parametros.scad>;
 
-$fn = 64;
+$fn = 80;
 
 
 //=============================================================================
@@ -21,25 +21,68 @@ $fn = 64;
 
 module post()
 {
+
     difference()
     {
-        cylinder(
-            h = standoff_height,
-            d = standoff_dia
-        );
+
+        //--------------------------------------------------
+        // Poste exterior
+        //--------------------------------------------------
+
+        union()
+        {
+
+            // Base reforzada
+
+            cylinder(
+                h = 2,
+                d = standoff_dia + 4
+            );
+
+            // Poste principal
+
+            translate([0,0,2])
+
+                cylinder(
+                    h = standoff_height,
+                    d = standoff_dia
+                );
+
+        }
+
+
+        //--------------------------------------------------
+        // Inserto M3
+        //--------------------------------------------------
 
         translate([0,0,-0.1])
 
-        cylinder(
-            h = insert_depth + 0.2,
-            d = insert_dia
-        );
+            cylinder(
+                h = insert_depth + 0.2,
+                d = insert_dia
+            );
+
+
+        //--------------------------------------------------
+        // Chaflán superior
+        //--------------------------------------------------
+
+        translate([0,0,insert_depth-1])
+
+            cylinder(
+                h = 1.2,
+                d1 = insert_dia + 1,
+                d2 = insert_dia
+            );
+
     }
+
 }
 
 
+
 //=============================================================================
-// CONJUNTO DE POSTES
+// CONJUNTO
 //=============================================================================
 
 module posts()
@@ -58,6 +101,7 @@ module posts()
         post();
 
 }
+
 
 
 //=============================================================================
