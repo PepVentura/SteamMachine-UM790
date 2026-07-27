@@ -4,7 +4,7 @@
 // Project Phoenix
 //
 // Archivo : posts.scad
-// Versión : 2.0
+// Versión : 2.1
 //
 // Postes de fijación de la placa UM790 PRO
 //
@@ -28,17 +28,18 @@ module post()
             d = standoff_dia
         );
 
-        translate([0,0,standoff_height-insert_depth])
-            cylinder(
-                h = insert_depth+0.10,
-                d = insert_dia
-            );
+        translate([0,0,-0.1])
+
+        cylinder(
+            h = insert_depth + 0.2,
+            d = insert_dia
+        );
     }
 }
 
 
 //=============================================================================
-// MATRIZ DE POSTES
+// CONJUNTO DE POSTES
 //=============================================================================
 
 module posts()
@@ -50,10 +51,10 @@ module posts()
     translate([ off_x,-off_y,0])
         post();
 
-    translate([-off_x, off_y,0])
+    translate([ off_x, off_y,0])
         post();
 
-    translate([ off_x, off_y,0])
+    translate([-off_x, off_y,0])
         post();
 
 }
@@ -63,10 +64,4 @@ module posts()
 // PREVIEW
 //=============================================================================
 
-if ($preview)
-{
-
-    color("orange")
-        posts();
-
-}
+posts();
