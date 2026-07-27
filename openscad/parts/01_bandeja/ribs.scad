@@ -6,11 +6,11 @@
 // Archivo : ribs.scad
 // Versión : 2.0
 //
-// Nervios estructurales de la bandeja.
+// Nervios estructurales de la bandeja
 //
 // ============================================================================
 
-include <../../00_parametros.scad>;
+include <../../../00_parametros.scad>;
 
 $fn = 64;
 
@@ -19,21 +19,12 @@ $fn = 64;
 // NERVIO HORIZONTAL
 //=============================================================================
 
-module horizontal_rib(y_pos)
+module rib_x(length)
 {
-    translate(
-    [
-        -(um790_mount_spacing_x/2),
-        y_pos - (rib_width/2),
-        0
-    ])
-
     cube(
-    [
-        um790_mount_spacing_x,
-        rib_width,
-        rib_height
-    ]);
+        [length, rib_width, rib_height],
+        center = true
+    );
 }
 
 
@@ -41,46 +32,150 @@ module horizontal_rib(y_pos)
 // NERVIO VERTICAL
 //=============================================================================
 
-module vertical_rib(x_pos)
+module rib_y(length)
 {
-    translate(
-    [
-        x_pos - (rib_width/2),
-        -(um790_mount_spacing_y/2),
-        0
-    ])
-
     cube(
-    [
-        rib_width,
-        um790_mount_spacing_y,
-        rib_height
-    ]);
+        [rib_width, length, rib_height],
+        center = true
+    );
 }
 
 
 //=============================================================================
-// CONJUNTO DE NERVIOS
+// NERVIOS COMPLETOS
 //=============================================================================
 
 module ribs()
 {
 
-    // Horizontales
+    //
+    // Superior
+    //
+    translate(
+        [
+            0,
+            tray_depth/2 - base_frame_width/2,
+            tray_thickness
+        ])
+        rib_x(tray_width);
 
-    horizontal_rib(-20);
-    horizontal_rib( 20);
 
-    // Verticales
+    //
+    // Inferior
+    //
+    translate(
+        [
+            0,
+            -tray_depth/2 + base_frame_width/2,
+            tray_thickness
+        ])
+        rib_x(tray_width);
 
-    vertical_rib(-25);
-    vertical_rib( 25);
+
+    //
+    // Izquierdo
+    //
+    translate(
+        [
+            -tray_width/2 + base_frame_width/2,
+            0,
+            tray_thickness
+        ])
+        rib_y(tray_depth);
+
+
+    //
+    // Derecho
+    //
+    translate(
+        [
+            tray_width/2 - base_frame_width/2,
+            0,
+            tray_thickness
+        ])
+        rib_y(tray_depth);
+
+
+    //
+    // Refuerzo horizontal central
+    //
+    translate(
+        [
+            0,
+            0,
+            tray_thickness
+        ])
+        rib_x(hole_dist_x);
+
+
+    //
+    // Refuerzo vertical central
+    //
+    translate(
+        [
+            0,
+            0,
+            tray_thickness
+        ])
+        rib_y(hole_dist_y);
+
+
+    //
+    // Refuerzo superior postes
+    //
+    translate(
+        [
+            0,
+            off_y,
+            tray_thickness
+        ])
+        rib_x(hole_dist_x);
+
+
+    //
+    // Refuerzo inferior postes
+    //
+    translate(
+        [
+            0,
+            -off_y,
+            tray_thickness
+        ])
+        rib_x(hole_dist_x);
+
+
+    //
+    // Refuerzo izquierdo postes
+    //
+    translate(
+        [
+            -off_x,
+            0,
+            tray_thickness
+        ])
+        rib_y(hole_dist_y);
+
+
+    //
+    // Refuerzo derecho postes
+    //
+    translate(
+        [
+            off_x,
+            0,
+            tray_thickness
+        ])
+        rib_y(hole_dist_y);
 
 }
 
 
 //=============================================================================
-// PREVISUALIZACIÓN
+// PREVIEW
 //=============================================================================
 
-ribs();
+if ($preview)
+{
+    color("RoyalBlue")
+        ribs();
+}
