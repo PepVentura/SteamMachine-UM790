@@ -4,9 +4,9 @@
 // Project Phoenix
 //
 // Archivo : ribs.scad
-// Versión : 2.0
+// Versión : 2.1
 //
-// Nervios estructurales de la bandeja
+// Nervios estructurales de la bandeja.
 //
 // ============================================================================
 
@@ -42,130 +42,143 @@ module rib_y(length)
 
 
 //=============================================================================
-// NERVIOS COMPLETOS
+// NERVIOS
 //=============================================================================
 
 module ribs()
 {
 
-    //
-    // Superior
-    //
+    frame_margin = base_frame_width + 5;
+
+
+    //---------------------------------------------------------------------
+    // Refuerzo superior
+    //---------------------------------------------------------------------
+
     translate(
-        [
-            0,
-            tray_depth/2 - base_frame_width/2,
-            tray_thickness
-        ])
-        rib_x(tray_width);
+    [
+        0,
+        tray_depth/2 - frame_margin,
+        rib_height/2
+    ])
+        rib_x(tray_width - frame_margin*2);
 
 
-    //
-    // Inferior
-    //
+    //---------------------------------------------------------------------
+    // Refuerzo inferior
+    //---------------------------------------------------------------------
+
     translate(
-        [
-            0,
-            -tray_depth/2 + base_frame_width/2,
-            tray_thickness
-        ])
-        rib_x(tray_width);
+    [
+        0,
+       -tray_depth/2 + frame_margin,
+        rib_height/2
+    ])
+        rib_x(tray_width - frame_margin*2);
 
 
-    //
-    // Izquierdo
-    //
+    //---------------------------------------------------------------------
+    // Refuerzo izquierdo
+    //---------------------------------------------------------------------
+
     translate(
-        [
-            -tray_width/2 + base_frame_width/2,
-            0,
-            tray_thickness
-        ])
-        rib_y(tray_depth);
+    [
+       -tray_width/2 + frame_margin,
+        0,
+        rib_height/2
+    ])
+        rib_y(tray_depth - frame_margin*2);
 
 
-    //
-    // Derecho
-    //
+    //---------------------------------------------------------------------
+    // Refuerzo derecho
+    //---------------------------------------------------------------------
+
     translate(
-        [
-            tray_width/2 - base_frame_width/2,
-            0,
-            tray_thickness
-        ])
-        rib_y(tray_depth);
+    [
+        tray_width/2 - frame_margin,
+        0,
+        rib_height/2
+    ])
+        rib_y(tray_depth - frame_margin*2);
 
 
-    //
-    // Refuerzo horizontal central
-    //
+    //---------------------------------------------------------------------
+    // Refuerzo horizontal entre postes
+    //---------------------------------------------------------------------
+
     translate(
-        [
-            0,
-            0,
-            tray_thickness
-        ])
-        rib_x(hole_dist_x);
+    [
+        0,
+        0,
+        rib_height/2
+    ])
+        rib_x(um790_mount_spacing_x);
 
 
-    //
-    // Refuerzo vertical central
-    //
+    //---------------------------------------------------------------------
+    // Refuerzo vertical entre postes
+    //---------------------------------------------------------------------
+
     translate(
-        [
-            0,
-            0,
-            tray_thickness
-        ])
-        rib_y(hole_dist_y);
+    [
+        0,
+        0,
+        rib_height/2
+    ])
+        rib_y(um790_mount_spacing_y);
 
 
-    //
-    // Refuerzo superior postes
-    //
+    //---------------------------------------------------------------------
+    // Horizontal superior de postes
+    //---------------------------------------------------------------------
+
     translate(
-        [
-            0,
-            off_y,
-            tray_thickness
-        ])
-        rib_x(hole_dist_x);
+    [
+        0,
+        off_y,
+        rib_height/2
+    ])
+        rib_x(um790_mount_spacing_x);
 
 
-    //
-    // Refuerzo inferior postes
-    //
+    //---------------------------------------------------------------------
+    // Horizontal inferior de postes
+    //---------------------------------------------------------------------
+
     translate(
-        [
-            0,
-            -off_y,
-            tray_thickness
-        ])
-        rib_x(hole_dist_x);
+    [
+        0,
+       -off_y,
+        rib_height/2
+    ])
+        rib_x(um790_mount_spacing_x);
 
 
-    //
-    // Refuerzo izquierdo postes
-    //
+    //---------------------------------------------------------------------
+    // Vertical izquierda de postes
+    //---------------------------------------------------------------------
+
     translate(
-        [
-            -off_x,
-            0,
-            tray_thickness
-        ])
-        rib_y(hole_dist_y);
+    [
+       -off_x,
+        0,
+        rib_height/2
+    ])
+        rib_y(um790_mount_spacing_y);
 
 
-    //
-    // Refuerzo derecho postes
-    //
+    //---------------------------------------------------------------------
+    // Vertical derecha de postes
+    //---------------------------------------------------------------------
+
     translate(
-        [
-            off_x,
-            0,
-            tray_thickness
-        ])
-        rib_y(hole_dist_y);
+    [
+        off_x,
+        0,
+        rib_height/2
+    ])
+        rib_y(um790_mount_spacing_y);
 
 }
 
@@ -174,8 +187,4 @@ module ribs()
 // PREVIEW
 //=============================================================================
 
-if ($preview)
-{
-    color("RoyalBlue")
-        ribs();
-}
+ribs();
