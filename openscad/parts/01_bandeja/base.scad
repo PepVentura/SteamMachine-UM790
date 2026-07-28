@@ -80,6 +80,7 @@ module base()
             base_island_size,
             base_island_size,
             tray_thickness
+        ]
         );
 
     }
