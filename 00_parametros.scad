@@ -115,6 +115,9 @@ pcb_y = pcb_depth;
 hole_dist_x = um790_mount_spacing_x;
 hole_dist_y = um790_mount_spacing_y;
 
+off_x = hole_dist_x/2;
+off_y = hole_dist_y/2;
+
 // Postes
 standoff_height = um790_post_height;
 standoff_dia    = um790_post_diameter;
