@@ -119,8 +119,5 @@ module base()
 // PREVIEW
 //=============================================================================
 
-if ($preview)
-{
-    color("Gainsboro")
-        base();
-}
+color("Gainsboro")
+    base();
