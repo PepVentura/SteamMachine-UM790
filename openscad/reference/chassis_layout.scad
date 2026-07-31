@@ -4,9 +4,9 @@
 // Project Phoenix
 //
 // Archivo : chassis_layout.scad
-// Versión : 4.0
+// Versión : 5.0
 //
-// ENSAMBLAJE MAESTRO DEL PROYECTO
+// ENSAMBLAJE VISUAL DEL PROYECTO
 //
 // ============================================================================
 
@@ -18,32 +18,52 @@ $fn = 64;
 
 
 //=============================================================================
-// ALTURAS
+// CONFIGURACIÓN
 //=============================================================================
 
 bottom_air_gap = 12;
 
+wall = wall_thickness;
+
 
 //=============================================================================
-// CHASIS EXTERIOR (REFERENCIA)
+// CHASIS TRANSPARENTE
 //=============================================================================
 
-module case_reference()
+module chassis_reference()
 {
 
-    color([0.2,0.2,0.2,0.10])
+    color([0.75,0.75,0.75,0.12])
 
-    translate([
-        -case_width/2,
-        -case_depth/2,
-        0
-    ])
+    difference()
+    {
 
-    cube([
-        case_width,
-        case_depth,
-        case_height
-    ]);
+        translate([
+            -case_width/2,
+            -case_depth/2,
+            0
+        ])
+
+        cube([
+            case_width,
+            case_depth,
+            case_height
+        ]);
+
+
+        translate([
+            -case_width/2+wall,
+            -case_depth/2+wall,
+            wall
+        ])
+
+        cube([
+            case_width-2*wall,
+            case_depth-2*wall,
+            case_height
+        ]);
+
+    }
 
 }
 
@@ -55,13 +75,13 @@ module case_reference()
 module tray_reference()
 {
 
-    color("LightGray")
-
     translate([
         -tray_width/2,
         -tray_depth/2,
         bottom_air_gap
     ])
+
+    color("LightGray")
 
     tray();
 
@@ -75,7 +95,7 @@ module tray_reference()
 module um790_reference()
 {
 
-    color([0,0.7,0,0.40])
+    color([0.10,0.70,0.10,0.70])
 
     translate([
         -pcb_width/2,
@@ -101,7 +121,7 @@ module um790_reference()
 module fan_reference()
 {
 
-    color([0.15,0.15,0.15,0.60])
+    color([0.10,0.10,0.10,0.70])
 
     translate([
         -60,
@@ -130,7 +150,7 @@ module esp32_reference()
     translate([
         -27.5,
         -14,
-        case_height-45
+        case_height-38
     ])
 
     cube([
@@ -146,7 +166,7 @@ module esp32_reference()
 // PLACA EXPANSIÓN
 //=============================================================================
 
-module expansion_reference()
+module shield_reference()
 {
 
     color("FireBrick")
@@ -154,7 +174,7 @@ module expansion_reference()
     translate([
         -38,
         -38,
-        case_height-48
+        case_height-42
     ])
 
     cube([
@@ -167,7 +187,7 @@ module expansion_reference()
 
 
 //=============================================================================
-// LECTOR NFC
+// NFC
 //=============================================================================
 
 module nfc_reference()
@@ -178,7 +198,7 @@ module nfc_reference()
     translate([
         -30,
         -case_depth/2+5,
-        case_height-40
+        case_height-45
     ])
 
     cube([
@@ -191,10 +211,31 @@ module nfc_reference()
 
 
 //=============================================================================
+// EJES
+//=============================================================================
+
+module axis()
+{
+
+    color("Red")
+    cube([200,1,1]);
+
+    color("Green")
+    cube([1,200,1]);
+
+    color("Blue")
+    cube([1,1,200]);
+
+}
+
+
+//=============================================================================
 // ENSAMBLAJE
 //=============================================================================
 
-case_reference();
+axis();
+
+chassis_reference();
 
 tray_reference();
 
@@ -202,7 +243,7 @@ um790_reference();
 
 fan_reference();
 
-expansion_reference();
+shield_reference();
 
 esp32_reference();
 
