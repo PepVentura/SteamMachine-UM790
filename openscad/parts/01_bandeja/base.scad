@@ -4,7 +4,7 @@
 // Project Phoenix
 //
 // Archivo : base.scad
-// Versión : 6.0
+// Versión : 7.0
 //
 // Base estructural de la bandeja.
 //
@@ -13,7 +13,6 @@
 include <../../../00_parametros.scad>;
 
 $fn = 64;
-
 
 //=============================================================================
 // BASE
@@ -26,117 +25,93 @@ module base()
     {
 
         //---------------------------------------------------------------------
-        // PLACA BASE
+        // Base principal
         //---------------------------------------------------------------------
 
-        cube(
-        [
+        translate([
+            -tray_width/2,
+            -tray_depth/2,
+            0
+        ])
+        cube([
             tray_width,
             tray_depth,
             tray_thickness
         ]);
 
 
-
         //---------------------------------------------------------------------
-        // VACIADO CENTRAL
+        // Hueco central para aligerar peso
         //---------------------------------------------------------------------
 
-        translate(
-        [
-            base_frame_width,
-            base_frame_width,
+        translate([
+            -(tray_width-2*base_frame_width)/2,
+            -(tray_depth-2*base_frame_width)/2,
             -0.1
         ])
-
-        cube(
-        [
-            tray_width - base_frame_width*2,
-            tray_depth - base_frame_width*2,
-            tray_thickness + 0.2
+        cube([
+            tray_width-2*base_frame_width,
+            tray_depth-2*base_frame_width,
+            tray_thickness+0.2
         ]);
 
     }
 
 
-
     //---------------------------------------------------------------------
-    // ISLAS DE LOS POSTES
+    // Islas para los postes
     //---------------------------------------------------------------------
 
-    for(x=[-1,1])
-    for(y=[-1,1])
+    for(ix=[-1,1])
+    for(iy=[-1,1])
     {
 
-        translate(
-        [
-            tray_width/2 + x*off_x - base_island_size/2,
-            tray_depth/2 + y*off_y - base_island_size/2,
+        translate([
+            ix*off_x-base_island_size/2,
+            iy*off_y-base_island_size/2,
             0
         ])
-
-        cube(
-        [
+        cube([
             base_island_size,
             base_island_size,
             tray_thickness
-        ]
-        );
+        ]);
 
     }
 
 
-
     //---------------------------------------------------------------------
-    // PUENTE HORIZONTAL
+    // Puente horizontal
     //---------------------------------------------------------------------
 
-    translate(
-    [
-        tray_width/2-off_x,
-        tray_depth/2-base_bridge_width/2,
+    translate([
+        -off_x,
+        -base_bridge_width/2,
         0
     ])
-
-    cube(
-    [
+    cube([
         off_x*2,
         base_bridge_width,
         tray_thickness
     ]);
 
 
-
     //---------------------------------------------------------------------
-    // PUENTE VERTICAL
+    // Puente vertical
     //---------------------------------------------------------------------
 
-    translate(
-    [
-        tray_width/2-base_bridge_width/2,
-        tray_depth/2-off_y,
+    translate([
+        -base_bridge_width/2,
+        -off_y,
         0
     ])
-
-    cube(
-    [
+    cube([
         base_bridge_width,
         off_y*2,
         tray_thickness
     ]);
 
-
-
 }
-
-
-
-//=============================================================================
-// EXPORTACIÓN
-//=============================================================================
-
-base();
-
 
 
 //=============================================================================
@@ -145,8 +120,6 @@ base();
 
 if($preview)
 {
-
-    color("LightGray")
+    color("Gainsboro")
         base();
-
 }
