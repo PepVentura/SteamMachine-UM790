@@ -147,7 +147,7 @@ standoff_dia    = um790_post_diameter;
 // Insertos
 
 insert_dia   = insert_diameter;
-insert_depth = insert_depth;
+// insert_depth = insert_depth;
 
 // Base
 
