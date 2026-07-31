@@ -4,19 +4,19 @@
 // Project Phoenix
 //
 // Archivo : posts.scad
-// Versión : 5.0
+// Versión : 8.0
 //
-// Postes reforzados para la UM790 PRO
+// Postes de fijación UM790 Pro.
 //
 // ============================================================================
 
 include <../../../00_parametros.scad>;
 
-$fn = 80;
+$fn = 64;
 
 
 //=============================================================================
-// POSTE INDIVIDUAL
+// POSTE M3
 //=============================================================================
 
 module post()
@@ -25,54 +25,24 @@ module post()
     difference()
     {
 
-        //--------------------------------------------------
-        // Poste exterior
-        //--------------------------------------------------
+        //---------------------------------------------------------------------
+        // Cuerpo del poste
+        //---------------------------------------------------------------------
 
-        union()
-        {
+        cylinder(
+            h = um790_post_height,
+            d = um790_post_diameter
+        );
 
-            // Base reforzada
+        //---------------------------------------------------------------------
+        // Alojamiento del inserto M3
+        //---------------------------------------------------------------------
 
-            cylinder(
-                h = 2,
-                d = standoff_dia + 4
-            );
-
-            // Poste principal
-
-            translate([0,0,2])
-
-                cylinder(
-                    h = standoff_height,
-                    d = standoff_dia
-                );
-
-        }
-
-
-        //--------------------------------------------------
-        // Inserto M3
-        //--------------------------------------------------
-
-        translate([0,0,-0.1])
+        translate([0,0,um790_post_height-insert_depth])
 
             cylinder(
-                h = insert_depth + 0.2,
-                d = insert_dia
-            );
-
-
-        //--------------------------------------------------
-        // Chaflán superior
-        //--------------------------------------------------
-
-        translate([0,0,insert_depth-1])
-
-            cylinder(
-                h = 1.2,
-                d1 = insert_dia + 1,
-                d2 = insert_dia
+                h = insert_depth + 0.10,
+                d = insert_diameter
             );
 
     }
@@ -80,32 +50,27 @@ module post()
 }
 
 
-
 //=============================================================================
-// CONJUNTO
+// CONJUNTO DE POSTES
 //=============================================================================
 
 module posts()
 {
 
-    translate([-off_x,-off_y,0])
-        post();
+    translate([ off_x,  off_y, 0]) post();
 
-    translate([ off_x,-off_y,0])
-        post();
+    translate([-off_x,  off_y, 0]) post();
 
-    translate([ off_x, off_y,0])
-        post();
+    translate([-off_x, -off_y, 0]) post();
 
-    translate([-off_x, off_y,0])
-        post();
+    translate([ off_x, -off_y, 0]) post();
 
 }
-
 
 
 //=============================================================================
 // PREVIEW
 //=============================================================================
 
+color("Orange")
 posts();
