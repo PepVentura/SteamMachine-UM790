@@ -4,7 +4,7 @@
 // Project Phoenix
 //
 // Archivo : base.scad
-// Versión : 7.0
+// Versión : 8.0
 //
 // Base estructural de la bandeja.
 //
@@ -21,95 +21,96 @@ $fn = 64;
 module base()
 {
 
-    difference()
+    union()
     {
 
         //---------------------------------------------------------------------
-        // Base principal
+        // Marco exterior
+        //---------------------------------------------------------------------
+
+        difference()
+        {
+
+            translate([
+                -tray_width/2,
+                -tray_depth/2,
+                0
+            ])
+            cube([
+                tray_width,
+                tray_depth,
+                tray_thickness
+            ]);
+
+
+            translate([
+                -(tray_width-2*base_frame_width)/2,
+                -(tray_depth-2*base_frame_width)/2,
+                -0.1
+            ])
+            cube([
+                tray_width-2*base_frame_width,
+                tray_depth-2*base_frame_width,
+                tray_thickness+0.2
+            ]);
+
+        }
+
+
+        //---------------------------------------------------------------------
+        // Islas de apoyo de los postes
+        //---------------------------------------------------------------------
+
+        for(ix=[-1,1])
+        for(iy=[-1,1])
+        {
+
+            translate([
+                ix*off_x-base_island_size/2,
+                iy*off_y-base_island_size/2,
+                0
+            ])
+            cube([
+                base_island_size,
+                base_island_size,
+                tray_thickness
+            ]);
+
+        }
+
+
+        //---------------------------------------------------------------------
+        // Refuerzo horizontal
         //---------------------------------------------------------------------
 
         translate([
-            -tray_width/2,
-            -tray_depth/2,
+            -off_x,
+            -base_bridge_width/2,
             0
         ])
         cube([
-            tray_width,
-            tray_depth,
+            off_x*2,
+            base_bridge_width,
             tray_thickness
         ]);
 
 
         //---------------------------------------------------------------------
-        // Hueco central para aligerar peso
+        // Refuerzo vertical
         //---------------------------------------------------------------------
 
         translate([
-            -(tray_width-2*base_frame_width)/2,
-            -(tray_depth-2*base_frame_width)/2,
-            -0.1
-        ])
-        cube([
-            tray_width-2*base_frame_width,
-            tray_depth-2*base_frame_width,
-            tray_thickness+0.2
-        ]);
-
-    }
-
-
-    //---------------------------------------------------------------------
-    // Islas para los postes
-    //---------------------------------------------------------------------
-
-    for(ix=[-1,1])
-    for(iy=[-1,1])
-    {
-
-        translate([
-            ix*off_x-base_island_size/2,
-            iy*off_y-base_island_size/2,
+            -base_bridge_width/2,
+            -off_y,
             0
         ])
         cube([
-            base_island_size,
-            base_island_size,
+            base_bridge_width,
+            off_y*2,
             tray_thickness
         ]);
 
     }
-
-
-    //---------------------------------------------------------------------
-    // Puente horizontal
-    //---------------------------------------------------------------------
-
-    translate([
-        -off_x,
-        -base_bridge_width/2,
-        0
-    ])
-    cube([
-        off_x*2,
-        base_bridge_width,
-        tray_thickness
-    ]);
-
-
-    //---------------------------------------------------------------------
-    // Puente vertical
-    //---------------------------------------------------------------------
-
-    translate([
-        -base_bridge_width/2,
-        -off_y,
-        0
-    ])
-    cube([
-        base_bridge_width,
-        off_y*2,
-        tray_thickness
-    ]);
 
 }
 
@@ -118,7 +119,7 @@ module base()
 // PREVIEW
 //=============================================================================
 
-if($preview)
+if ($preview)
 {
     color("Gainsboro")
         base();
