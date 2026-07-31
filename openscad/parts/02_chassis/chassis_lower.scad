@@ -4,34 +4,32 @@
 // Project Phoenix
 //
 // Archivo : chassis_lower.scad
-// Versión : 1.0
+// Versión : 2.0
 //
-// Chasis inferior.
+// Chasis inferior
+//
+// Bloque 1:
+// - Fondo
+// - Pared izquierda
+// - Pared derecha
+// - Pared frontal
 //
 // ============================================================================
 
 include <../../../00_parametros.scad>;
 
-use <../01_bandeja/tray.scad>;
-
 $fn = 64;
 
 
 //=============================================================================
-// PARÁMETROS DEL CHASIS
+// PARÁMETROS
 //=============================================================================
 
 air_gap = 12;
 
-support_diameter = 20;
-support_height   = air_gap;
-
-floor_rib_width  = 3;
-floor_rib_height = 6;
-
 
 //=============================================================================
-// FONDO DEL CHASIS
+// FONDO
 //=============================================================================
 
 module chassis_floor()
@@ -48,44 +46,65 @@ module chassis_floor()
 
 
 //=============================================================================
-// CONTORNO EXTERIOR
+// PARED IZQUIERDA
 //=============================================================================
 
-module chassis_outline()
+module left_wall()
 {
 
-    difference()
-    {
-
-        cube(
-        [
-            case_width,
-            case_depth,
-            case_height
-        ]);
-
-
-        translate(
-        [
-            wall_thickness,
-            wall_thickness,
-            bottom_thickness
-        ])
-
-        cube(
-        [
-            case_width-(wall_thickness*2),
-            case_depth-(wall_thickness*2),
-            case_height
-        ]);
-
-    }
+    cube(
+    [
+        wall_thickness,
+        case_depth,
+        case_height
+    ]);
 
 }
 
 
 //=============================================================================
-// BASE DEL CHASIS
+// PARED DERECHA
+//=============================================================================
+
+module right_wall()
+{
+
+    translate(
+    [
+        case_width-wall_thickness,
+        0,
+        0
+    ])
+
+    cube(
+    [
+        wall_thickness,
+        case_depth,
+        case_height
+    ]);
+
+}
+
+
+//=============================================================================
+// PARED FRONTAL
+//=============================================================================
+
+module front_wall()
+{
+
+    cube(
+    [
+        case_width,
+        wall_thickness,
+        case_height
+    ]);
+
+}
+
+
+//=============================================================================
+// CHASIS
 //=============================================================================
 
 module chassis_lower()
@@ -94,18 +113,13 @@ module chassis_lower()
     union()
     {
 
-        //-----------------------------------------------------------------
-        // Fondo
-        //-----------------------------------------------------------------
-
         chassis_floor();
 
+        left_wall();
 
-        //-----------------------------------------------------------------
-        // Paredes exteriores
-        //-----------------------------------------------------------------
+        right_wall();
 
-        chassis_outline();
+        front_wall();
 
     }
 
@@ -124,5 +138,4 @@ translate(
 ])
 
 color("Gainsboro")
-
     chassis_lower();
