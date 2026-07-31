@@ -4,7 +4,7 @@
 // Project Phoenix
 //
 // Archivo : 00_parametros.scad
-// Versión : 2.0
+// Versión : 2.1
 //
 // ÚNICA fuente de parámetros del proyecto.
 //
@@ -19,32 +19,43 @@ $fn = 64;
 //=============================================================================
 
 project_name    = "SteamMachine UM790";
-project_version = "2.0";
+project_version = "2.1";
+
 
 //=============================================================================
 // CARCASA
 //=============================================================================
 
-case_width  = 156;
+case_width  = 156.0;
 case_depth  = 162.4;
-case_height = 152;
+case_height = 152.0;
 
-wall_thickness   = 3;
-top_thickness    = 3;
-bottom_thickness = 3;
+wall_thickness   = 3.0;
+top_thickness    = 3.0;
+bottom_thickness = 3.0;
+
 
 //=============================================================================
 // BANDEJA
 //=============================================================================
 
-tray_width      = 150;
-tray_depth      = 150;
-tray_thickness  = 3;
+tray_width      = 150.0;
+tray_depth      = 150.0;
+tray_thickness  = 3.0;
 
-base_frame_width = 10;
+base_frame_width    = 10.0;
 
-base_outer_chamfer = 4;
-base_inner_chamfer = 4;
+base_outer_chamfer  = 4.0;
+base_inner_chamfer  = 4.0;
+
+
+//=============================================================================
+// REFUERZOS BASE
+//=============================================================================
+
+base_island_size  = 20.0;
+base_bridge_width = 10.0;
+
 
 //=============================================================================
 // PCB UM790
@@ -54,9 +65,14 @@ pcb_width      = 122.0;
 pcb_depth      = 119.5;
 pcb_thickness  = 1.60;
 
-// separación entre centros de tornillos
+
+//=============================================================================
+// FIJACIÓN UM790
+//=============================================================================
+
 um790_mount_spacing_x = 113.0;
 um790_mount_spacing_y = 99.0;
+
 
 //=============================================================================
 // POSTES
@@ -68,12 +84,14 @@ um790_post_diameter = 7.0;
 insert_diameter = 4.10;
 insert_depth    = 5.00;
 
+
 //=============================================================================
 // DERIVADOS
 //=============================================================================
 
-off_x = um790_mount_spacing_x/2;
-off_y = um790_mount_spacing_y/2;
+off_x = um790_mount_spacing_x / 2;
+off_y = um790_mount_spacing_y / 2;
+
 
 //=============================================================================
 // NERVIOS
@@ -81,6 +99,7 @@ off_y = um790_mount_spacing_y/2;
 
 rib_width  = 3.0;
 rib_height = 5.0;
+
 
 //=============================================================================
 // VENTILACIÓN
@@ -90,6 +109,7 @@ vent_slot_width  = 4.0;
 vent_slot_length = 40.0;
 vent_spacing     = 8.0;
 
+
 //=============================================================================
 // IMANES
 //=============================================================================
@@ -97,33 +117,38 @@ vent_spacing     = 8.0;
 magnet_diameter = 8.0;
 magnet_height   = 3.0;
 
+
 //=============================================================================
 // TORNILLERÍA
 //=============================================================================
 
-mount_hole = 3.4;
+mount_hole = 3.40;
+
 
 //=============================================================================
-// COMPATIBILIDAD CON ARCHIVOS ANTIGUOS
+// COMPATIBILIDAD CON VERSIONES ANTERIORES
 //=============================================================================
 
 // PCB
+
 pcb_x = pcb_width;
 pcb_y = pcb_depth;
 
-// Separación de agujeros
+// Distancia entre agujeros
+
 hole_dist_x = um790_mount_spacing_x;
 hole_dist_y = um790_mount_spacing_y;
 
-off_x = hole_dist_x/2;
-off_y = hole_dist_y/2;
-
 // Postes
+
 standoff_height = um790_post_height;
 standoff_dia    = um790_post_diameter;
 
 // Insertos
-insert_dia = insert_diameter;
+
+insert_dia   = insert_diameter;
+insert_depth = insert_depth;
 
 // Base
+
 base_thickness = tray_thickness;
