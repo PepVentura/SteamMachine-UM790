@@ -4,167 +4,206 @@
 // Project Phoenix
 //
 // Archivo : chassis_layout.scad
-// Versión : 3.0
+// Versión : 4.0
 //
-// Layout general del chasis.
-// NO genera geometría.
-// Solo contiene posiciones de todos los módulos.
+// ENSAMBLAJE MAESTRO DEL PROYECTO
 //
 // ============================================================================
 
 include <../../00_parametros.scad>;
 
+use <../parts/01_bandeja/tray.scad>;
 
-//=============================================================================
-// DIMENSIONES DEL CHASIS
-//=============================================================================
-
-chassis_width  = case_width;
-chassis_depth  = case_depth;
-chassis_height = case_height;
+$fn = 64;
 
 
 //=============================================================================
-// CÁMARA INFERIOR
+// ALTURAS
 //=============================================================================
-
-// Espacio libre entre el fondo y la bandeja.
 
 bottom_air_gap = 12;
+
+
+//=============================================================================
+// CHASIS EXTERIOR (REFERENCIA)
+//=============================================================================
+
+module case_reference()
+{
+
+    color([0.2,0.2,0.2,0.10])
+
+    translate([
+        -case_width/2,
+        -case_depth/2,
+        0
+    ])
+
+    cube([
+        case_width,
+        case_depth,
+        case_height
+    ]);
+
+}
 
 
 //=============================================================================
 // BANDEJA
 //=============================================================================
 
-tray_pos_x = (chassis_width - tray_width)/2;
-tray_pos_y = (chassis_depth - tray_depth)/2;
-tray_pos_z = bottom_air_gap;
+module tray_reference()
+{
+
+    color("LightGray")
+
+    translate([
+        -tray_width/2,
+        -tray_depth/2,
+        bottom_air_gap
+    ])
+
+    tray();
+
+}
 
 
 //=============================================================================
 // UM790
 //=============================================================================
 
-um790_pos_x = tray_pos_x + (tray_width - pcb_width)/2;
-um790_pos_y = tray_pos_y + (tray_depth - pcb_depth)/2;
-um790_pos_z = tray_pos_z + tray_thickness;
+module um790_reference()
+{
+
+    color([0,0.7,0,0.40])
+
+    translate([
+        -pcb_width/2,
+        -pcb_depth/2,
+        bottom_air_gap
+        + tray_thickness
+        + um790_post_height
+    ])
+
+    cube([
+        pcb_width,
+        pcb_depth,
+        35
+    ]);
+
+}
 
 
 //=============================================================================
-// PANEL FRONTAL
+// VENTILADOR
 //=============================================================================
 
-// Zona inferior
+module fan_reference()
+{
 
-front_usb_height = 18;
-front_power_height = 18;
+    color([0.15,0.15,0.15,0.60])
 
-// Barra LED
+    translate([
+        -60,
+        -60,
+        case_height-15
+    ])
 
-front_led_height = 32;
-front_led_width  = 120;
+    cube([
+        120,
+        120,
+        15
+    ]);
 
-// Panel NFC
-
-front_nfc_width  = 120;
-front_nfc_height = 70;
-
-
-//=============================================================================
-// LECTOR NFC
-//=============================================================================
-
-nfc_reader_width  = 60;
-nfc_reader_height = 40;
-
-nfc_reader_pos_x = chassis_width/2;
-nfc_reader_pos_y = 8;
-nfc_reader_pos_z = chassis_height-42;
+}
 
 
 //=============================================================================
 // ESP32
 //=============================================================================
 
-esp32_width = 55;
-esp32_depth = 28;
+module esp32_reference()
+{
 
-esp32_pos_x = chassis_width/2;
-esp32_pos_y = chassis_depth/2;
-esp32_pos_z = chassis_height-30;
+    color("RoyalBlue")
 
+    translate([
+        -27.5,
+        -14,
+        case_height-45
+    ])
 
-//=============================================================================
-// PLACA DE EXPANSIÓN ESP32
-//=============================================================================
+    cube([
+        55,
+        28,
+        12
+    ]);
 
-esp_board_width = 76;
-esp_board_depth = 76;
-
-esp_board_pos_x = chassis_width/2;
-esp_board_pos_y = chassis_depth/2;
-esp_board_pos_z = chassis_height-25;
-
-
-//=============================================================================
-// VENTILADOR SUPERIOR
-//=============================================================================
-
-fan_size = 120;
-fan_depth = 15;
-
-fan_pos_x = chassis_width/2;
-fan_pos_y = chassis_depth/2;
-fan_pos_z = chassis_height-top_thickness;
+}
 
 
 //=============================================================================
-// PANEL TRASERO
+// PLACA EXPANSIÓN
 //=============================================================================
 
-rear_panel_thickness = 3;
+module expansion_reference()
+{
 
+    color("FireBrick")
 
-//=============================================================================
-// CONECTORES
-//=============================================================================
+    translate([
+        -38,
+        -38,
+        case_height-48
+    ])
 
-// Todos en el panel trasero desmontable.
+    cube([
+        76,
+        76,
+        2
+    ]);
 
-power_connector = true;
-hdmi_connector  = true;
-usb_connector   = true;
-rj45_connector  = true;
-
-
-//=============================================================================
-// MÓDULOS DESMONTABLES
-//=============================================================================
-
-top_panel_removable  = true;
-rear_panel_removable = true;
-
-left_panel_removable  = false;
-right_panel_removable = false;
-front_panel_removable = false;
+}
 
 
 //=============================================================================
-// COMPONENTES EN LA TAPA SUPERIOR
+// LECTOR NFC
 //=============================================================================
 
-top_panel_contains_fan      = true;
-top_panel_contains_esp32    = true;
-top_panel_contains_expansion= true;
+module nfc_reference()
+{
+
+    color("Gold")
+
+    translate([
+        -30,
+        -case_depth/2+5,
+        case_height-40
+    ])
+
+    cube([
+        60,
+        40,
+        2
+    ]);
+
+}
 
 
 //=============================================================================
-// COMPONENTES EN EL FRONTAL
+// ENSAMBLAJE
 //=============================================================================
 
-front_contains_usb       = true;
-front_contains_power     = true;
-front_contains_statusled = true;
-front_contains_rgb       = true;
-front_contains_nfc       = true;
+case_reference();
+
+tray_reference();
+
+um790_reference();
+
+fan_reference();
+
+expansion_reference();
+
+esp32_reference();
+
+nfc_reference();
