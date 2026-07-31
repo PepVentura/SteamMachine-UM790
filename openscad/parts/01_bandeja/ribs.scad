@@ -4,9 +4,9 @@
 // Project Phoenix
 //
 // Archivo : ribs.scad
-// Versión : 5.0
+// Versión : 8.0
 //
-// Nervios estructurales V5
+// Nervios estructurales de la bandeja.
 //
 // ============================================================================
 
@@ -16,62 +16,26 @@ $fn = 64;
 
 
 //=============================================================================
-// NERVIO HORIZONTAL
+// NERVIO ENTRE DOS PUNTOS
 //=============================================================================
 
-module rib_x(len)
-{
-    translate([-len/2,-rib_width/2,0])
-
-        cube(
-        [
-            len,
-            rib_width,
-            rib_height
-        ]);
-}
-
-
-
-//=============================================================================
-// NERVIO VERTICAL
-//=============================================================================
-
-module rib_y(len)
-{
-    translate([-rib_width/2,-len/2,0])
-
-        cube(
-        [
-            rib_width,
-            len,
-            rib_height
-        ]);
-}
-
-
-
-//=============================================================================
-// NERVIO DIAGONAL
-//=============================================================================
-
-module rib_diag(x1,y1,x2,y2)
+module rib(x1, y1, x2, y2)
 {
 
-    dx=x2-x1;
-    dy=y2-y1;
+    dx = x2 - x1;
+    dy = y2 - y1;
 
-    L=sqrt(dx*dx+dy*dy);
+    len = sqrt(dx*dx + dy*dy);
 
-    A=atan2(dy,dx);
+    angle = atan2(dy, dx);
 
-    translate([x1,y1,0])
+    translate([x1, y1, tray_thickness])
 
-        rotate([0,0,A])
+        rotate([0,0,angle])
 
             cube(
             [
-                L,
+                len,
                 rib_width,
                 rib_height
             ]);
@@ -79,119 +43,102 @@ module rib_diag(x1,y1,x2,y2)
 }
 
 
-
 //=============================================================================
-// BASTIDOR INTERIOR
-//=============================================================================
-
-module inner_frame()
-{
-
-    translate([0, off_y,0])
-        rib_x(um790_mount_spacing_x);
-
-    translate([0,-off_y,0])
-        rib_x(um790_mount_spacing_x);
-
-    translate([ off_x,0,0])
-        rib_y(um790_mount_spacing_y);
-
-    translate([-off_x,0,0])
-        rib_y(um790_mount_spacing_y);
-
-}
-
-
-
-//=============================================================================
-// CRUCETA CENTRAL
-//=============================================================================
-
-module center_cross()
-{
-
-    rib_x(um790_mount_spacing_x);
-
-    rib_y(um790_mount_spacing_y);
-
-}
-
-
-
-//=============================================================================
-// DIAGONALES ENTRE POSTES
-//=============================================================================
-
-module diagonals()
-{
-
-    rib_diag(
-        -off_x,
-        -off_y,
-         off_x,
-         off_y);
-
-    rib_diag(
-        -off_x,
-         off_y,
-         off_x,
-        -off_y);
-
-}
-
-
-
-//=============================================================================
-// REFUERZOS EXTERIORES
-//=============================================================================
-
-module outer_frame()
-{
-
-    m=base_frame_width+5;
-
-    translate([0, tray_depth/2-m,0])
-        rib_x(tray_width-2*m);
-
-    translate([0,-tray_depth/2+m,0])
-        rib_x(tray_width-2*m);
-
-    translate([ tray_width/2-m,0,0])
-        rib_y(tray_depth-2*m);
-
-    translate([-tray_width/2+m,0,0])
-        rib_y(tray_depth-2*m);
-
-}
-
-
-
-//=============================================================================
-// RIBS
+// NERVIOS
 //=============================================================================
 
 module ribs()
 {
 
-    union()
-    {
+    //---------------------------------------------------------
+    // Horizontal superior
+    //---------------------------------------------------------
 
-        outer_frame();
+    rib(
+        -off_x,
+         off_y-rib_width/2,
 
-        inner_frame();
+         off_x,
+         off_y-rib_width/2
+    );
 
-        center_cross();
 
-        diagonals();
+    //---------------------------------------------------------
+    // Horizontal inferior
+    //---------------------------------------------------------
 
-    }
+    rib(
+        -off_x,
+        -off_y-rib_width/2,
+
+         off_x,
+        -off_y-rib_width/2
+    );
+
+
+    //---------------------------------------------------------
+    // Vertical izquierdo
+    //---------------------------------------------------------
+
+    translate([-rib_width/2,0,0])
+
+    rib(
+        -off_x,
+        -off_y,
+
+        -off_x,
+         off_y
+    );
+
+
+    //---------------------------------------------------------
+    // Vertical derecho
+    //---------------------------------------------------------
+
+    translate([-rib_width/2,0,0])
+
+    rib(
+         off_x,
+        -off_y,
+
+         off_x,
+         off_y
+    );
+
+
+    //---------------------------------------------------------
+    // Cruz central horizontal
+    //---------------------------------------------------------
+
+    rib(
+        -off_x,
+        -rib_width/2,
+
+         off_x,
+        -rib_width/2
+    );
+
+
+    //---------------------------------------------------------
+    // Cruz central vertical
+    //---------------------------------------------------------
+
+    translate([-rib_width/2,0,0])
+
+    rib(
+        0,
+        -off_y,
+
+        0,
+         off_y
+    );
 
 }
-
 
 
 //=============================================================================
 // PREVIEW
 //=============================================================================
 
+color("RoyalBlue")
 ribs();
