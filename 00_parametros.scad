@@ -4,11 +4,9 @@
 // Project Phoenix
 //
 // Archivo : 00_parametros.scad
-// Versión : 2.1
+// Versión : 3.0
 //
 // ÚNICA fuente de parámetros del proyecto.
-//
-// NO añadir parámetros duplicados en otros archivos.
 //
 // ============================================================================
 
@@ -19,60 +17,49 @@ $fn = 64;
 //=============================================================================
 
 project_name    = "SteamMachine UM790";
-project_version = "2.1";
-
+project_version = "3.0";
 
 //=============================================================================
-// CARCASA
+// CARCASA EXTERIOR (Steam Machine original)
 //=============================================================================
 
 case_width  = 156.0;
 case_depth  = 162.4;
 case_height = 152.0;
 
-wall_thickness   = 3.0;
-top_thickness    = 3.0;
-bottom_thickness = 3.0;
+wall_thickness = 3.0;
 
+bottom_thickness = 3.0;
+top_thickness    = 3.0;
+
+//=============================================================================
+// CÁMARA INFERIOR
+//=============================================================================
+
+lower_air_chamber = 12.0;
 
 //=============================================================================
 // BANDEJA
 //=============================================================================
 
-tray_width      = 150.0;
-tray_depth      = 150.0;
-tray_thickness  = 3.0;
+tray_width     = 150.0;
+tray_depth     = 150.0;
+tray_thickness = 3.0;
 
-base_frame_width    = 10.0;
-
-base_outer_chamfer  = 4.0;
-base_inner_chamfer  = 4.0;
-
-
-//=============================================================================
-// REFUERZOS BASE
-//=============================================================================
-
-base_island_size  = 20.0;
-base_bridge_width = 10.0;
-
+base_frame_width   = 10.0;
+base_outer_chamfer = 4.0;
+base_inner_chamfer = 4.0;
 
 //=============================================================================
 // PCB UM790
 //=============================================================================
 
-pcb_width      = 122.0;
-pcb_depth      = 119.5;
-pcb_thickness  = 1.60;
-
-
-//=============================================================================
-// FIJACIÓN UM790
-//=============================================================================
+pcb_width     = 122.0;
+pcb_depth     = 119.5;
+pcb_thickness = 1.60;
 
 um790_mount_spacing_x = 113.0;
 um790_mount_spacing_y = 99.0;
-
 
 //=============================================================================
 // POSTES
@@ -84,14 +71,12 @@ um790_post_diameter = 7.0;
 insert_diameter = 4.10;
 insert_depth    = 5.00;
 
-
 //=============================================================================
 // DERIVADOS
 //=============================================================================
 
-off_x = um790_mount_spacing_x / 2;
-off_y = um790_mount_spacing_y / 2;
-
+off_x = um790_mount_spacing_x/2;
+off_y = um790_mount_spacing_y/2;
 
 //=============================================================================
 // NERVIOS
@@ -100,15 +85,85 @@ off_y = um790_mount_spacing_y / 2;
 rib_width  = 3.0;
 rib_height = 5.0;
 
-
 //=============================================================================
 // VENTILACIÓN
 //=============================================================================
+
+bottom_grill_margin = 12.0;
 
 vent_slot_width  = 4.0;
 vent_slot_length = 40.0;
 vent_spacing     = 8.0;
 
+//=============================================================================
+// VENTILADOR SUPERIOR
+//=============================================================================
+
+fan_size       = 120.0;
+fan_thickness  = 15.0;
+fan_hole_pitch = 105.0;
+
+//=============================================================================
+// PANEL FRONTAL
+//=============================================================================
+
+front_panel_thickness = 3.0;
+
+power_button_diameter = 8.0;
+
+//=============================================================================
+// BARRA LED
+//=============================================================================
+
+led_bar_width  = 110.0;
+led_bar_height = 8.0;
+led_bar_depth  = 3.0;
+
+//=============================================================================
+// PANEL NFC
+//=============================================================================
+
+nfc_panel_width  = 70.0;
+nfc_panel_height = 70.0;
+nfc_panel_depth  = 3.0;
+
+//=============================================================================
+// LECTOR NFC
+//=============================================================================
+
+nfc_reader_width  = 60.0;
+nfc_reader_height = 40.0;
+nfc_reader_depth  = 10.0;
+
+//=============================================================================
+// HUB USB (CJMCU-204)
+//=============================================================================
+
+usb_hub_width  = 44.1;
+usb_hub_depth  = 44.1;
+usb_hub_height = 12.0;
+
+usb_hub_mount_hole = 3.0;
+
+// Mediremos estas distancias directamente del STL
+usb_port_pitch_x = 0;
+usb_port_pitch_y = 0;
+
+//=============================================================================
+// ESP32
+//=============================================================================
+
+esp32_width  = 51.0;
+esp32_depth  = 28.0;
+esp32_height = 13.0;
+
+//=============================================================================
+// PLACA ADAPTADORA ESP32
+//=============================================================================
+
+esp32_board_width  = 76.0;
+esp32_board_depth  = 76.0;
+esp32_board_height = 15.0;
 
 //=============================================================================
 // IMANES
@@ -117,38 +172,39 @@ vent_spacing     = 8.0;
 magnet_diameter = 8.0;
 magnet_height   = 3.0;
 
-
 //=============================================================================
 // TORNILLERÍA
 //=============================================================================
 
-mount_hole = 3.40;
-
+mount_hole = 3.4;
 
 //=============================================================================
 // COMPATIBILIDAD CON VERSIONES ANTERIORES
 //=============================================================================
 
-// PCB
-
 pcb_x = pcb_width;
 pcb_y = pcb_depth;
-
-// Distancia entre agujeros
 
 hole_dist_x = um790_mount_spacing_x;
 hole_dist_y = um790_mount_spacing_y;
 
-// Postes
-
 standoff_height = um790_post_height;
 standoff_dia    = um790_post_diameter;
 
-// Insertos
-
-insert_dia   = insert_diameter;
-// insert_depth = insert_depth;
-
-// Base
+insert_dia = insert_diameter;
 
 base_thickness = tray_thickness;
+
+//=============================================================================
+// FILOSOFÍA DEL PROYECTO
+//=============================================================================
+//
+// - Chasis principal fijo.
+// - Panel trasero desmontable.
+// - Panel superior desmontable.
+// - Panel NFC intercambiable.
+// - Módulo USB + pulsador independiente y sustituible.
+// - Soporte ESP32 desmontable.
+// - Toda pieza deberá obtener sus dimensiones EXCLUSIVAMENTE
+//   desde este archivo.
+//
