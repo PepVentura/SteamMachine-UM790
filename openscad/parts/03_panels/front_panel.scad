@@ -3,11 +3,7 @@
 // SteamMachine UM790
 // Project Phoenix
 //
-// Archivo : front_panel.scad
-// Versión : 1.0
-//
-// PANEL FRONTAL
-//
+// front_panel.scad
 // PARTE 1
 //
 // ============================================================================
@@ -16,87 +12,88 @@ include <../../../00_parametros.scad>;
 
 $fn = 64;
 
-//=============================================================================
-// PARÁMETROS
-//=============================================================================
+//------------------------------------------------------------
+// Parámetros
+//------------------------------------------------------------
 
-front_width = case_width;
+panel_w = case_width;
+panel_h = case_height;
+panel_t = front_panel_thickness;
 
-front_height = case_height;
+corner_r = 6;
 
-front_thickness = front_panel_thickness;
-
-corner_radius = 6;
-
-// Margen general
-
-front_margin = 8;
-
-
-//=============================================================================
-// POSICIONES
-//=============================================================================
+//------------------------------------------------------------
+// Posiciones
+//------------------------------------------------------------
 
 // Panel NFC
 
-nfc_x = (front_width-nfc_panel_width)/2;
+nfc_w = nfc_panel_width;
+nfc_h = nfc_panel_height;
 
-nfc_y = front_height-15-nfc_panel_height;
+nfc_x = (panel_w-nfc_w)/2;
+nfc_y = panel_h-15-nfc_h;
 
 
 // Barra LED
 
-led_x = front_margin;
+led_margin = 8;
 
+led_w = panel_w-led_margin*2;
+led_h = led_bar_height;
+
+led_x = led_margin;
 led_y = nfc_y-14;
-
-led_width = front_width-front_margin*2;
 
 
 // Pulsador
 
-button_x = 22;
+button_d = 16;
 
+button_x = 24;
 button_y = 26;
 
 
 // OLED
 
-oled_x = (front_width-27)/2;
+oled_size = 27;
 
+oled_x = (panel_w-oled_size)/2;
 oled_y = 10;
 
 
-//=============================================================================
-// PANEL BASE
-//=============================================================================
+//------------------------------------------------------------
+// Panel principal
+//------------------------------------------------------------
 
-module front_plate()
+module front_panel()
 {
 
     difference()
     {
+
+        // Panel exterior
 
         minkowski()
         {
 
             cube(
             [
-                front_width-corner_radius*2,
-                front_height-corner_radius*2,
-                front_thickness
+                panel_w-corner_r*2,
+                panel_h-corner_r*2,
+                panel_t
             ]);
 
             cylinder(
-                r=corner_radius,
+                r=corner_r,
                 h=0.01
             );
 
         }
 
-        //-------------------------------------------------------------
-        // Hueco panel NFC
-        //-------------------------------------------------------------
+        //----------------------------------------------------
+        // Hueco NFC
+        //----------------------------------------------------
 
         translate(
         [
@@ -107,15 +104,15 @@ module front_plate()
 
         cube(
         [
-            nfc_panel_width,
-            nfc_panel_height,
-            front_thickness+2
+            nfc_w,
+            nfc_h,
+            panel_t+2
         ]);
 
 
-        //-------------------------------------------------------------
-        // Ventana OLED
-        //-------------------------------------------------------------
+        //----------------------------------------------------
+        // Hueco OLED
+        //----------------------------------------------------
 
         translate(
         [
@@ -126,15 +123,15 @@ module front_plate()
 
         cube(
         [
-            27,
-            27,
-            front_thickness+2
+            oled_size,
+            oled_size,
+            panel_t+2
         ]);
 
 
-        //-------------------------------------------------------------
-        // Pulsador
-        //-------------------------------------------------------------
+        //----------------------------------------------------
+        // Hueco pulsador
+        //----------------------------------------------------
 
         translate(
         [
@@ -144,8 +141,8 @@ module front_plate()
         ])
 
         cylinder(
-            d=16,
-            h=front_thickness+2
+            d=button_d,
+            h=panel_t+2
         );
 
     }
@@ -153,11 +150,11 @@ module front_plate()
 }
 
 
-//=============================================================================
-// DIFUSOR LED
-//=============================================================================
+//------------------------------------------------------------
+// Barra LED (pieza de doble color)
+//------------------------------------------------------------
 
-module led_window()
+module led_diffuser()
 {
 
     translate(
@@ -169,65 +166,20 @@ module led_window()
 
     cube(
     [
-        led_width,
-        led_bar_height,
-        front_thickness
-    );
+        led_w,
+        led_h,
+        panel_t
+    ]);
 
 }
 
 
-//=============================================================================
-// CANAL POSTERIOR PARA LA TIRA LED
-//=============================================================================
+//------------------------------------------------------------
+// Vista previa
+//------------------------------------------------------------
 
-module led_channel()
-{
+color("Black")
+front_panel();
 
-    translate(
-    [
-        led_x,
-        led_y,
-        front_thickness
-    ])
-
-    difference()
-    {
-
-        cube(
-        [
-            led_width,
-            led_bar_height,
-            5
-        ]);
-
-        translate(
-        [
-            1.5,
-            1,
-            1
-        ])
-
-        cube(
-        [
-            led_width-3,
-            led_bar_height-2,
-            5
-        ]);
-
-    }
-
-}
-
-
-//=============================================================================
-// PREVIEW
-//=============================================================================
-
-front_plate();
-
-color("White")
-led_window();
-
-color("Gray")
-led_channel();
+color([1,1,1,0.8])
+led_diffuser();
