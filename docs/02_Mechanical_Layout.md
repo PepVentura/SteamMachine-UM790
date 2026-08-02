@@ -1,3 +1,9 @@
+# SteamMachine UM790
+## Mechanical Layout
+Version: 1.0
+Status: Approved
+Date: 2026-08-02
+
 SteamMachine UM790 – Documento de Implantación Mecánica (DIM v1.0)
 1. Objetivos
 
