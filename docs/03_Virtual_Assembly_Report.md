@@ -169,16 +169,135 @@ no modifica piezas ya construidas).
 
 ---
 
-## 7. Siguientes pasos
+## 8. Patas externas (confirmado 2026-08-03)
 
-1. Reconciliar la altura de separadores en `posts.scad` y
+El usuario confirmó que las patas son **externas y miden 4 mm**,
+añadidas por debajo del cascarón — no incluidas en la altura de
+trabajo interna. Esto obligó a un recálculo:
+
+| Parámetro | Antes | Ahora |
+| --- | --- | --- |
+| `shell_height` (nuevo, altura real del cascarón) | — (se usaba `case_height`=152 directamente) | **148,0** |
+| `leg_height` (nuevo) | — | **4,0** |
+| `nfc_panel_height` | 88,5 | **84,5** |
+| `z_fan_bottom` | 134 | 130 |
+| `rc522_pos[2]` | 95,75 | 93,75 |
+| `esp32_pos[2]` / `hub_pos[2]` | 99,8 | 97,8 |
+
+`case_height` (152, con patas) NO se ha modificado — sigue siendo el
+dato exterior original de la Steam Machine. Se ha añadido
+`shell_height = case_height - leg_height` como la altura real que usa
+todo el ensamblaje y el chasis a partir de ahora.
+
+La comprobación de consistencia incorporada en `assembly_positions.scad`
+(`front_panel_zones_consistent`) detectó automáticamente que
+`nfc_panel_height` había quedado desactualizado tras el primer intento
+de este recálculo (dejaba 4 mm de solape con la barra LED) — quedó
+corregido y revalidado.
+
+**Resultado tras el recálculo**: 28/28 pares del ensamblaje sin
+colisión (sin cambios), 30/32 en la comprobación estructural del
+chasis (sin cambios; los 2 "colisiona" siguen siendo los mismos
+contactos de superficie intencionados: RC522 y ESP32 tocando su punto
+de anclaje en la pared).
+
+Patas añadidas como geometría real (no solo de referencia) en
+`openscad/parts/02_chassis/floor.scad` (`floorLegs()`): 4 patas
+cuadradas de 10×10×4 mm (estimado) en las esquinas.
+
+---
+
+## 10. Colisiones estructura-contra-estructura (2026-08-03)
+
+Hasta este punto, la verificación solo comparaba cada pieza del
+chasis contra los 8 componentes electrónicos — nunca las piezas del
+chasis **entre sí**. Un aviso del usuario sobre los pilares de la
+bandeja llevó a añadir esta comprobación
+(`openscad/parts/02_chassis/checks/run_structure_checks.py`, sección
+"ESTRUCTURA vs ESTRUCTURA"), que encontró varias colisiones de
+volumen real:
+
+- Pilares de apoyo de la bandeja macizos, y mal ubicados (zona hueca
+  de la bandeja, y luego dentro del relleno de la pared).
+- Panel trasero: Z de arranque y anchura solapando el suelo y las
+  paredes.
+- Lengüeta bandeja↔panel trasero a la altura equivocada.
+- Panel inferior: misma anchura errónea que el panel trasero.
+- Tornillos M2 (panel inferior) e imanes (panel NFC) invadiendo el
+  relleno local de la pared.
+
+Todo corregido — ver `CHANGELOG.md`, entrada [0.3.6], para el
+detalle completo de cada fallo y su corrección.
+
+**Pendiente, retirado por no resolverse a tiempo**: la fijación
+adicional pared↔panel trasero (más allá de la unión con la bandeja,
+que sí funciona) — colisionaba con el relleno de la pared de forma
+que no se resolvió limpiamente en esta sesión.
+
+---
+
+## 11. Siguientes pasos (histórico — ver sección 12 para el estado final)
+
+1. ~~Resolver la fijación pared↔panel trasero retirada~~ — resuelta
+   en una sesión posterior (`wallPadRelief()` aplicado también ahí).
+2. Reconciliar la altura de separadores en `posts.scad` y
    `docs/02_Mechanical_Layout.md` con el valor confirmado (20 mm) —
-   pendiente, no bloqueante para empezar el bastidor.
-2. Actualizar `openscad/parts/03_panels/front_panel.scad` y
-   `front_layout.scad` con las nuevas posiciones y tamaños (panel
-   inferior mínimo, barra LED real, USB doble, panel NFC máximo) —
-   siguen con su diseño anterior, no reflejan todavía este resultado.
-3. Con esto, **empezar el diseño del bastidor**
-   (`openscad/parts/02_chassis`), reutilizando directamente las
-   posiciones ya validadas de
-   `openscad/reference/components/assembly_positions.scad`.
+   sigue pendiente, no bloqueante (solo afecta a un comentario del
+   DIM, no a ninguna pieza).
+3. Guías de inserción de la bandeja y rejilla de protección de dedos
+   del ventilador: hechas.
+
+---
+
+## 12. CIERRE — Chasis validado como definitivo (2026-08-03)
+
+El usuario ha dado por bueno el chasis en su estado actual; no se
+prevén más cambios de diseño salvo que surja algún problema al
+imprimir/montar. Resumen de lo verificado antes de este cierre:
+
+### Correcciones de esta sesión (ver `CHANGELOG.md` para el detalle
+completo, entradas 0.3.0 a 0.4.1)
+
+- Chasis completo construido desde cero: suelo (ahora con rejilla en
+  prácticamente toda su superficie), paredes laterales, tapa, panel
+  trasero, bandeja (con elevación real sobre sus pilares de apoyo) y
+  los dos paneles frontales (inferior fijo + NFC extraíble).
+- Encontrados y corregidos: postes/imanes que sobresalían de las
+  paredes, patas y postes de anclaje mal posicionados, dos casos de
+  coordenadas globales usadas donde hacían falta locales (soportes de
+  la tapa "en el aire"), colisiones reales entre piezas del chasis
+  nunca comprobadas entre sí, y — el hallazgo más importante — la
+  bandeja no cabía en su recorrido de inserción aunque su posición
+  final fuera correcta (ancho reducido de 150 a 130 mm).
+
+### Verificaciones que respaldan el cierre
+
+1. **Sintaxis**: limpia en las ~30 piezas del proyecto.
+2. **Ensamblaje (28 pares)**: 28/28 sin colisión.
+3. **Estructura vs 8 componentes electrónicos (32 pares)**: 29/32 sin
+   colisión — los 3 restantes son contactos de anclaje intencionados
+   (RC522, ESP32, HUB), no colisiones.
+4. **Estructura vs estructura** (piezas del chasis entre sí): todos
+   los pares relevantes verificados — la mayoría de forma manual con
+   sondas dirigidas por la lentitud del script automático completo —
+   sin colisión real, solo contactos de diseño esperados (suelo+
+   paredes se imprimen como una pieza; tapa, panel trasero y paneles
+   frontales se apoyan/atornillan a las paredes).
+5. **Recorrido de inserción de la bandeja**: verificado en 4 alturas
+   intermedias de su trayecto de bajada (no solo en la posición
+   final) — sin obstrucción.
+
+### Limitaciones conocidas, no bloqueantes
+
+- Varias medidas quedan como estimadas, no confirmadas por el
+  usuario: diámetro de la brida del USB (35 mm), huella de las patas
+  en planta (10×10 mm).
+- El comentario de separadores en `docs/02_Mechanical_Layout.md`
+  sigue sin reconciliar con el valor real (20 mm) — solo texto, no
+  afecta a ninguna pieza.
+- No se ha verificado el recorrido de inserción de ninguna otra pieza
+  aparte de la bandeja (paneles frontales, panel trasero, tapa) — se
+  asume que sus rutas de montaje (encaje frontal/trasero por imanes o
+  tornillos, no deslizamiento vertical) no tienen el mismo tipo de
+  riesgo, pero no se ha comprobado explícitamente.
+

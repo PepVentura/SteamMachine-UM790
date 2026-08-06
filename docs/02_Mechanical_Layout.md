@@ -4,6 +4,14 @@ Version: 1.0
 Status: Approved
 Date: 2026-08-02
 
+> **Adenda (2026-08-03)**: la separación de separadores del UM790
+> (sección 3, "UM790 Pro") se ha actualizado de 8 mm a 20 mm tras la
+> verificación con el ensamblaje virtual v1, que encontró una
+> colisión real entre el pulsador/USB frontal y la PCB con el valor
+> original. Resto del documento sin cambios. Ver
+> `docs/03_Virtual_Assembly_Report.md` para el detalle completo y el
+> resultado de la checklist de la sección 8.
+
 SteamMachine UM790 – Documento de Implantación Mecánica (DIM v1.0)
 1. Objetivos
 
@@ -36,7 +44,11 @@ Conectores originales hacia el panel trasero.
 
 Separación respecto a la base:
 
-8 mm mediante separadores.
+20 mm mediante separadores (actualizado 2026-08-03 — ver
+docs/03_Virtual_Assembly_Report.md; el valor original de 8 mm no
+dejaba hueco suficiente detrás del panel frontal para el pulsador
+(M16×55) ni el USB empotrable sin chocar con la PCB o sus postes de
+anclaje).
 
 Ventilador
 
@@ -233,6 +245,16 @@ Antes de modelar el bastidor se verificará:
 ☐ Conector de alimentación UM790 ↔ Panel trasero.
 ☐ Tornillos ↔ componentes.
 ☐ Insertos ↔ nervios del bastidor.
+
+> **Adenda (2026-08-03)**: los 10 primeros puntos de esta checklist
+> están verificados — sin colisión, incluyendo "RC522 ↔ Panel NFC"
+> (con los 3 mm de separación especificados en la sección 3) y
+> "Cables USB ↔ Ventilador". Detalle completo, con las cifras exactas
+> de cada comprobación, en `docs/03_Virtual_Assembly_Report.md`. Los
+> dos últimos puntos ("Tornillos ↔ componentes", "Insertos ↔ nervios
+> del bastidor") siguen pendientes: no hay tornillos ni nervios
+> modelados todavía en el bastidor.
+
 9. Orden de desarrollo
 
 Una vez aprobado este documento:

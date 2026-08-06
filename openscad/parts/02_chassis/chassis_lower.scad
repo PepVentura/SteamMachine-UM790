@@ -14,6 +14,18 @@
 // - Pared derecha
 // - Pared frontal
 //
+// ⚠️ OBSOLETO (2026-08-03) — sustituido por, en la misma carpeta:
+//   - floor.scad (suelo, con rejilla y apoyos de la bandeja)
+//   - walls.scad (paredes laterales, con imanes y anclajes)
+//   - top.scad (tapa, no existía en este archivo)
+//   - chassis.scad (ensamblado de las tres piezas anteriores)
+//
+// Este archivo incluía una PARED FRONTAL fija que ya no corresponde
+// al diseño confirmado (el panel frontal es magnético y desmontable,
+// sin pared fija detrás — ver docs/03_Virtual_Assembly_Report.md).
+// Se conserva sin borrar como referencia histórica, pero no debe
+// usarse para imprimir.
+//
 // ============================================================================
 
 include <../../../00_parametros.scad>;

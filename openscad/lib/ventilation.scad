@@ -8,7 +8,7 @@
 // Patrones de ventilación
 // ============================================================================
 
-include <../00_parametros.scad>;
+include <../../00_parametros.scad>;
 
 $fn = 32;
 

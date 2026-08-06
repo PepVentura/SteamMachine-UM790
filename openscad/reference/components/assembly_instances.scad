@@ -99,41 +99,54 @@ module rc522InstanceFull()
 
 //=============================================================================
 // ESP32 TERMINAL ADAPTER
+//
+// Alojado en el panel lateral IZQUIERDO (docs/02_Mechanical_Layout.md),
+// montado en VERTICAL contra la cara interior de la pared — no
+// flotando en horizontal como en la v1 de este ensamblaje. La
+// dimensión de 78 mm de la placa no cabe en el hueco vertical entre
+// el disipador y el ventilador (68,4 mm); la de 63 mm sí. Por eso el
+// giro pone el ancho de la placa (78 mm) en el eje Y y la profundidad
+// (63 mm) en el eje Z.
 //=============================================================================
 
 module esp32InstanceBody()
 {
-    translate(esp32_pos) esp32Body();
+    translate(esp32_pos) rotate([0,0,90]) rotate([90,0,0]) esp32Body();
 }
 
 module esp32InstanceKeepout()
 {
-    translate(esp32_pos) esp32CableKeepout();
+    translate(esp32_pos) rotate([0,0,90]) rotate([90,0,0]) esp32CableKeepout();
 }
 
 module esp32InstanceFull()
 {
-    translate(esp32_pos) esp32();
+    translate(esp32_pos) rotate([0,0,90]) rotate([90,0,0]) esp32();
 }
 
 
 //=============================================================================
 // HUB USB
+//
+// Alojado en el panel lateral DERECHO (docs/02_Mechanical_Layout.md),
+// montado en VERTICAL contra la cara interior de la pared. Huella
+// cuadrada (44,1 x 44,1 mm), cabe sin problema en el mismo hueco
+// vertical que el ESP32.
 //=============================================================================
 
 module hubInstanceBody()
 {
-    translate(hub_pos) hubUsbBodyFull();
+    translate(hub_pos) rotate([0,-90,0]) hubUsbBodyFull();
 }
 
 module hubInstanceKeepout()
 {
-    translate(hub_pos) hubUsbCableKeepout();
+    translate(hub_pos) rotate([0,-90,0]) hubUsbCableKeepout();
 }
 
 module hubInstanceFull()
 {
-    translate(hub_pos) hubUsb();
+    translate(hub_pos) rotate([0,-90,0]) hubUsb();
 }
 
 

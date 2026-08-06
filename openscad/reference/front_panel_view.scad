@@ -84,7 +84,7 @@ module nfcZoneFillSolid()
 module upperMarginZoneSolid()
 {
     translate([-case_width/2,-1,nfc_panel_z_high])
-        cube([case_width,1,case_height-nfc_panel_z_high]);
+        cube([case_width,1,shell_height-nfc_panel_z_high]);
 }
 
 
@@ -121,9 +121,9 @@ module frontElevation()
     color([0.3,0.3,0.3,1])
     {
         translate([-case_width/2,-2,0])           cube([case_width,0.1,0.6]);
-        translate([-case_width/2,-2,case_height-0.6]) cube([case_width,0.1,0.6]);
-        translate([-case_width/2,-2,0])           cube([0.6,0.1,case_height]);
-        translate([case_width/2-0.6,-2,0])        cube([0.6,0.1,case_height]);
+        translate([-case_width/2,-2,shell_height-0.6]) cube([case_width,0.1,0.6]);
+        translate([-case_width/2,-2,0])           cube([0.6,0.1,shell_height]);
+        translate([case_width/2-0.6,-2,0])        cube([0.6,0.1,shell_height]);
     }
 
     // Marco del panel NFC (borde de la pieza extraíble)
@@ -159,7 +159,7 @@ frontElevation();
 echo(str("Panel inferior fijo (MÍNIMO): Z 0 - ", front_panel_lower_top, " (", front_panel_lower_top, " mm alto)"));
 echo(str("Barra LED (misma pieza, 2º filamento): Z ", front_panel_led_z_low, " - ", front_panel_led_z_high, " (", front_panel_led_z_high-front_panel_led_z_low, " mm alto)"));
 echo(str("Panel NFC extraíble (MÁXIMO): Z ", nfc_panel_z_low, " - ", nfc_panel_z_high, " (", nfc_panel_height, " mm alto)"));
-echo(str("Margen fijo superior del chasis: Z ", nfc_panel_z_high, " - ", case_height, " (", case_height-nfc_panel_z_high, " mm alto)"));
+echo(str("Margen fijo superior del chasis: Z ", nfc_panel_z_high, " - ", shell_height, " (", shell_height-nfc_panel_z_high, " mm alto)"));
 echo(front_panel_zones_consistent
     ? "OK: nfc_panel_height (00_parametros.scad) coincide con el cálculo de abajo hacia arriba."
     : "AVISO: nfc_panel_height (00_parametros.scad) NO coincide con el cálculo de abajo hacia arriba — revisar.");

@@ -63,10 +63,12 @@ show_fan_column = true;
 //=============================================================================
 // ENVOLVENTE EXTERIOR DE REFERENCIA
 //
-// Representa el volumen exterior real de la Steam Machine original.
-// Únicamente para comprobar que nada sobresale. NO es el chasis
-// definitivo (ese se diseñará en openscad/parts/02_chassis con su
-// propio sistema de coordenadas).
+// Representa el volumen exterior real de la Steam Machine original:
+// el cascarón (shell_height = 148 mm) más 4 patas externas de
+// leg_height = 4 mm por debajo (CONFIRMADO por el usuario,
+// 2026-08-03 — ver 00_parametros.scad). Únicamente para comprobar
+// que nada sobresale. NO es el chasis definitivo (ese se diseña en
+// openscad/parts/02_chassis con su propio sistema de coordenadas).
 //=============================================================================
 
 module caseEnvelope()
@@ -78,7 +80,7 @@ module caseEnvelope()
     {
 
         translate([-case_width/2,-case_depth/2,0])
-            cube([case_width,case_depth,case_height]);
+            cube([case_width,case_depth,shell_height]);
 
         translate([
             -case_width/2+wall_thickness,
@@ -88,7 +90,7 @@ module caseEnvelope()
             cube([
                 case_width-2*wall_thickness,
                 case_depth-2*wall_thickness,
-                case_height
+                shell_height
             ]);
 
     }
@@ -97,22 +99,36 @@ module caseEnvelope()
 
 
 //=============================================================================
-// COTA DE REFERENCIA: ALTURA SIN PATAS (148 mm)
-//
-// case_height (152.0) representa la altura CON patas. Se dibuja aquí,
-// a título informativo, el plano correspondiente a la altura SIN
-// patas (148 mm), es decir, 4 mm de patas.
+// PATAS EXTERNAS (4x, CONFIRMADAS por el usuario: externas, 4 mm,
+// por debajo del cascarón — Z negativa, ver leg_height en
+// 00_parametros.scad)
 //=============================================================================
 
-leg_height = case_height - 148;
+leg_footprint = 10.0;  // estimado, lado de cada pata cuadrada
 
-module noLegsReferencePlane()
+module externalLegs()
 {
 
-    color([1,0,0,0.25])
+    // FALLO CORREGIDO (2026-08-03): misma corrección que
+    // openscad/parts/02_chassis/floor.scad (floorLegs()) — la pata
+    // quedaba 2 mm por fuera del borde real de la carcasa.
 
-    translate([-case_width/2, -case_depth/2, leg_height])
-        cube([case_width, case_depth, 0.2]);
+    leg_edge_margin = 2.0;
+    leg_center_offset_x = case_width/2 - leg_footprint/2 - leg_edge_margin;
+    leg_center_offset_y = case_depth/2 - leg_footprint/2 - leg_edge_margin;
+
+    color([0.5,0.5,0.5,0.6])
+
+    for(ix=[-1,1])
+    for(iy=[-1,1])
+
+        translate([
+            ix*leg_center_offset_x,
+            iy*leg_center_offset_y,
+            -leg_height/2
+        ])
+
+            cube([leg_footprint, leg_footprint, leg_height], center=true);
 
 }
 
@@ -168,7 +184,7 @@ if (show_axes)
 if (show_case)
 {
     caseEnvelope();
-    noLegsReferencePlane();
+    externalLegs();
 }
 
 if (show_fan_column)
@@ -204,7 +220,7 @@ echo("=====================================================");
 echo("SteamMachine UM790 — Ensamblaje virtual v1");
 echo("=====================================================");
 echo(str("Carcasa exterior: ", case_width, " x ", case_depth, " x ", case_height, " mm (con patas)"));
-echo(str("Altura sin patas: ", case_height - leg_height, " mm"));
+echo(str("Altura sin patas (cascarón): ", shell_height, " mm"));
 echo(str("z_pcb_bottom = ", z_pcb_bottom, " mm"));
 echo(str("z_cooler_top = ", z_cooler_top, " mm"));
 echo(str("z_fan_bottom = ", z_fan_bottom, " mm  (hueco sobre el disipador: ", z_fan_bottom - z_cooler_top, " mm)"));

@@ -24,7 +24,9 @@
 //   Y: profundidad (case_depth = 162.4 mm) → -case_depth/2 (frontal,
 //      donde va el panel intercambiable) .. +case_depth/2 (trasera,
 //      donde va la IO del UM790)
-//   Z: altura (case_height = 152.0 mm, con patas) → 0 (base) .. case_height (techo)
+//   Z: altura del CASCARÓN (shell_height = 148,0 mm; las patas son
+//      externas, 4 mm, añadidas por DEBAJO de Z=0 — ver leg_height en
+//      00_parametros.scad) → 0 (base del cascarón) .. shell_height (techo)
 //
 // NOTA: parts/02_chassis y parts/01_bandeja usan convenciones de
 // origen distintas entre sí (esquina vs. centro). Este archivo define
@@ -60,7 +62,7 @@ z_pcb_top = z_pcb_bottom + pcb_thickness;
 z_cooler_top = z_pcb_top + um790_cooler_height;
 
 // Cara inferior de la tapa
-z_top_skin_bottom = case_height - top_thickness;
+z_top_skin_bottom = shell_height - top_thickness;
 
 // Cara inferior / superior del ventilador (pegado a la tapa, empuja el aire hacia arriba)
 z_fan_bottom = z_top_skin_bottom - fan_thickness;
@@ -79,9 +81,105 @@ front_inner_face_y = -case_depth/2 + front_panel_thickness;
 // Franja vertical del panel NFC (panel frontal superior intercambiable),
 // igual que en openscad/parts/03_panels/front_layout.scad.
 nfc_panel_margin_top = 12;
-nfc_panel_z_low  = case_height - nfc_panel_margin_top - nfc_panel_height;
+nfc_panel_z_low  = shell_height - nfc_panel_margin_top - nfc_panel_height;
 nfc_panel_z_high = nfc_panel_z_low + nfc_panel_height;
 nfc_panel_z_mid  = (nfc_panel_z_low + nfc_panel_z_high) / 2;
+
+
+//=============================================================================
+// ANCLAJES LATERALES (imanes del panel NFC, tornillos M2 del panel
+// inferior) — posición GLOBAL en X, fuente única.
+//
+// Los imanes/tornillos (Ø hasta 8,15 mm) son más anchos que la propia
+// pared (wall_thickness = 3 mm) — hallazgo del usuario, ver
+// docs/03_Virtual_Assembly_Report.md. openscad/parts/02_chassis/walls.scad
+// añade un relleno local (side_boss_depth) por el lado NO visto y
+// recentra el alojamiento dentro de ese grosor extra.
+//
+// Esta misma fórmula la deben usar TAMBIÉN los paneles
+// (openscad/parts/03_panels/nfc_panel.scad, lower_panel.scad) para
+// que sus imanes/taladros coincidan exactamente en X con los de la
+// pared — si cada archivo calculase su propia posición por separado,
+// se desincronizarían (ya ocurrió: el imán del panel NFC y el de la
+// pared llevaban desalineados desde que se creó ese archivo).
+//=============================================================================
+
+side_boss_margin = 1.0;   // margen entre el borde del alojamiento y la cara vista de la pared
+side_boss_depth  = 10.0;  // grosor local total en los puntos de imán/tornillo
+side_boss_size   = 14.0;  // lado del relleno cuadrado, en Y/Z (compartido con los paneles frontales, para la muesca de alivio)
+
+// Posición X GLOBAL del anclaje del lado DERECHO, para un radio de
+// corte dado (diámetro del imán o del tornillo, entre 2). El lado
+// izquierdo es el mismo valor en negativo (simetría).
+function sideMountGlobalX(radius) = case_width/2 - side_boss_margin - radius;
+
+// FALLO CORREGIDO (2026-08-03, captura del usuario): sideMountGlobalX()
+// posiciona cosas con margen respecto a la cara EXTERIOR de la pared
+// (que llega hasta X=case_width/2=78) — válido para insertos dentro
+// de la propia pared, pero los paneles frontal/inferior/trasero solo
+// llegan hasta X=(case_width-2*wall_thickness)/2=75. Con
+// sideMountGlobalX(), el agujero/avellanado se salía por el borde
+// real del panel. panelMountX() calcula la posición con margen
+// respecto al borde REAL del panel — para usar en cualquier corte
+// que deba caber entero dentro de un panel de anchura
+// (case_width-2*wall_thickness), tanto en la pared (el inserto) como
+// en el panel (el agujero), para que coincidan exactamente.
+function panelMountX(radius, margin=1.5) = (case_width-2*wall_thickness)/2 - margin - radius;
+
+// Radios de los avellanados — compartidos entre walls.scad (para
+// calcular la X del inserto con panelMountX()) y los paneles (para
+// el propio avellanado) — deben ser el mismo valor en los dos sitios.
+lower_panel_csk_radius = 4.5/2;  // M2
+rear_csk_radius        = 6.0/2;  // M3
+
+// Fijación del panel trasero a la pared — compartido entre
+// openscad/parts/02_chassis/walls.scad (rearBossPad/rearWallScrewCuts)
+// y openscad/parts/01_bandeja/rear_panel.scad (rearWallScrewHoles).
+//
+// rear_wall_screw_z_low — CORREGIDO (2026-08-03): a Z=15 colisionaba
+// con la lengüeta de unión bandeja-panel trasero (rearBridgeTabs(),
+// también a Z=15-18) — confirmado con el modelo real, no solo
+// contacto de borde. Subido a 27: lejos de la lengüeta (15-18) y del
+// recorte de la IO trasera (37,6-61,6).
+rear_wall_screw_diameter = insert_diameter;
+rear_wall_screw_z_low    = 27.0;
+rear_wall_screw_z_high   = 130.0;
+
+// Muesca de alivio del relleno de la pared (openscad/parts/02_chassis/walls.scad,
+// sideBossPad()) — CORREGIDO (2026-08-03): el relleno (14x14 mm) es
+// mucho más ancho que un simple taladro de paso; el material del
+// panel alrededor del taladro invadía el relleno (colisión real,
+// confirmada exportando a STL). Cualquier panel que se atornille o
+// imante a la pared en un punto con relleno debe restar esta muesca
+// (misma X que ocupa el relleno en la pared), no solo el taladro.
+// Se usa con front_panel_thickness como grosor del corte: los paneles
+// que la llaman deben estar a wall_thickness o front_panel_thickness
+// de grosor (ambos 3 mm, mismo valor).
+module wallPadRelief(z, panelY, panelThickness)
+{
+
+    reliefXwidth = side_boss_depth - wall_thickness;
+
+    for(ix=[-1,1])
+
+        translate([
+            ix>0 ? (case_width/2 - side_boss_depth) : -(case_width/2 - wall_thickness),
+            panelY,
+            z - side_boss_size/2
+        ])
+            cube([reliefXwidth, panelThickness, side_boss_size]);
+
+}
+
+
+//=============================================================================
+// FIJACIÓN DEL PANEL TRASERO A LAS PAREDES LATERALES — RETIRADA (2026-08-03)
+//
+// Se intentó (docs/03_Virtual_Assembly_Report.md), pero colisionaba
+// con el relleno local de la pared. El panel trasero sigue fijado a
+// la bandeja (openscad/parts/01_bandeja/rear_panel.scad,
+// rearBridgeTabs()), ya verificado sin colisión.
+//=============================================================================
 
 
 //=============================================================================
@@ -115,37 +213,43 @@ rc522_rear_edge_y = rc522_pos[1] + nfc_reader_depth;
 
 //=============================================================================
 // ESP32 TERMINAL ADAPTER — lateral IZQUIERDO (docs/02_Mechanical_Layout.md,
-// sección ESP32: "Situado en el lateral izquierdo", cerca del RC522, el
-// OLED y la barra LED). Montado en una repisa por encima del disipador
-// y por debajo del ventilador, igual que el resto de electrónica
-// suspendida en la cámara intermedia.
+// sección ESP32: "Situado en el lateral izquierdo"), alojado en el
+// panel lateral: montado en VERTICAL contra la cara interior de la
+// pared izquierda (no flotando en horizontal, como en un primer
+// intento de este ensamblaje).
+//
+// El ancho de la placa (78 mm) no cabe en el hueco vertical entre el
+// disipador y el ventilador (68,4 mm); la profundidad (63 mm) sí. La
+// rotación aplicada en assembly_instances.scad pone por tanto el
+// ancho de la placa en el eje Y y la profundidad en el eje Z.
 //=============================================================================
 
-shelf_clearance = 7.0;  // margen de todas las repisas sobre la cara superior del disipador
-side_margin     = 3.0;  // margen de todos los componentes laterales respecto a la pared interior
-front_margin    = 6.0;  // margen respecto al borde trasero del RC522
+side_wall_standoff = 2.0;  // separación entre la pared y la cara de montaje de la placa
+side_margin        = 3.0;  // (heredado) margen de componentes laterales respecto a la pared interior
+
+// Centro de la franja vertical seguro entre el disipador y el ventilador.
+side_mount_z = (z_cooler_top + z_fan_bottom) / 2;
 
 esp32_pos = [
-    -(case_width/2 - wall_thickness - esp32_adapter_width/2 - side_margin),
-    rc522_rear_edge_y + front_margin + esp32_adapter_depth/2,
-    z_cooler_top + shelf_clearance
+    -(case_width/2 - wall_thickness) + side_wall_standoff,
+    0,
+    side_mount_z
 ];
 
 
 //=============================================================================
-// HUB USB — lateral DERECHO, no alineado con el frontal
-// (docs/02_Mechanical_Layout.md, sección HUB USB: "Situado en el
-// lateral derecho. No alineado con el frontal."). Se mantiene en el
-// mismo lado que los USB frontales para que el cableado sea corto,
-// pero desplazado hacia el centro de la profundidad del chasis.
+// HUB USB — lateral DERECHO (docs/02_Mechanical_Layout.md, sección
+// HUB USB: "Situado en el lateral derecho. No alineado con el
+// frontal."), alojado en el panel lateral: montado en VERTICAL contra
+// la cara interior de la pared derecha. Huella cuadrada
+// (44,1 x 44,1 mm), cabe sin problema en la misma franja vertical que
+// el ESP32.
 //=============================================================================
 
-hub_rear_offset = 20.0;  // desplazamiento respecto al centro de profundidad (no alineado con el frontal)
-
 hub_pos = [
-    +(case_width/2 - wall_thickness - usb_hub_width/2 - side_margin),
-    hub_rear_offset,
-    z_cooler_top + shelf_clearance
+    +(case_width/2 - wall_thickness) - side_wall_standoff,
+    0,
+    side_mount_z
 ];
 
 
@@ -257,6 +361,15 @@ front_panel_cluster_z_high = max(
 );
 
 front_panel_lower_top = front_panel_cluster_z_high + front_panel_edge_margin;
+
+// Tornillos M2 del panel inferior (sin imanes, ver
+// openscad/parts/02_chassis/walls.scad y
+// openscad/parts/03_panels/lower_panel.scad — comparten estas Z, el
+// diámetro y la profundidad para no desincronizarse).
+lower_panel_screw_z_low    = 10.0;
+lower_panel_screw_z_high   = front_panel_lower_top - 10.0;
+lower_panel_screw_diameter = 6.0;   // mínimo razonable para M2
+lower_panel_screw_depth    = 4.0;
 
 front_panel_led_z_low  = front_panel_lower_top;
 front_panel_led_z_high = front_panel_led_z_low + led_bar_height;

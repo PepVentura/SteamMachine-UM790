@@ -8,6 +8,17 @@
 // Plano de distribución del frontal.
 // NO es una pieza imprimible.
 //
+// ⚠️ OBSOLETO (2026-08-03) — sustituido por:
+//   - openscad/reference/front_panel_view.scad (alzado 2D con las
+//     posiciones ya validadas y verificadas)
+//   - openscad/parts/03_panels/lower_panel.scad y nfc_panel.scad
+//     (piezas imprimibles reales)
+//
+// Las posiciones de este archivo (USB de Ø12 mm a modo de boceto,
+// panel NFC de 70 mm de ancho) quedaron desactualizadas tras el
+// ensamblaje virtual v1 — ver docs/03_Virtual_Assembly_Report.md. Se
+// conserva sin borrar como referencia histórica.
+//
 // ============================================================================
 
 include <../../../00_parametros.scad>;

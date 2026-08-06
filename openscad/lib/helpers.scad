@@ -8,7 +8,7 @@
 // Funciones auxiliares
 // ============================================================================
 
-include <../00_parametros.scad>;
+include <../../00_parametros.scad>;
 
 $fn = 64;
 
