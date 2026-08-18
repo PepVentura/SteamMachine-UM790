@@ -48,8 +48,18 @@ part_version = "1.0";
 // M2 sobre insertos térmicos."). Corregido: la primera versión de
 // esta pieza ponía un imán en Z=25, dentro de la zona del panel
 // inferior (0-39,5 mm), que NO lleva imanes.
-front_magnet_z_low  = nfc_panel_z_low + 15;
-front_magnet_z_high = nfc_panel_z_high - 15;
+//
+// FALLO CORREGIDO (2026-08-03, pregunta del usuario: "¿has tenido en
+// cuenta la ubicación de los imanes?"): estas dos posiciones se
+// calculaban a partir de nfc_panel_z_low/z_high — al ampliar la
+// altura del panel NFC 12mm (0.9.0 y rondas posteriores),
+// front_magnet_z_high se desplazó automáticamente de Z=121 a Z=133,
+// un desajuste de 12mm frente a la pared REAL ya impresa (que tiene
+// el imán fijo en Z=121, posición inmutable). Fijados ahora a
+// valores absolutos, independientes de la altura del panel — deben
+// coincidir exactamente con nfc_magnet_z_low/high en nfc_panel.scad.
+front_magnet_z_low  = 66.5;
+front_magnet_z_high = 121.0;
 front_magnet_inset  = magnet_height + 0.6;  // profundidad del alojamiento, con margen de pared
 
 // Insertos térmicos M2 del panel inferior atornillado (no magnético).
@@ -71,8 +81,8 @@ front_magnet_inset  = magnet_height + 0.6;  // profundidad del alojamiento, con 
 // frontales — ver sideMountGlobalX() y wallPadRelief() ahí).
 
 // Poste de anclaje M3 para el brazo del soporte del RC522.
-rc522_mount_diameter = 10.0;  // mínimo 10mm de diámetro para M3, según docs/DESIGN_RULES.md
-rc522_mount_depth    = 6.0;
+// rc522_mount_diameter/depth: ver assembly_positions.scad
+// (compartidos también con openscad/parts/03_panels/rc522_bracket.scad)
 
 // Postes de anclaje M3 para el ESP32 y el HUB, montados en vertical
 // contra la pared (ver assembly_instances.scad: esp32InstanceBody,
@@ -269,9 +279,8 @@ module esp32MountBosses(wallInnerX)
 module hubMountBosses(wallInnerX)
 {
 
-    inset = 4;
-    h = usb_hub_width/2  - inset;
-    d = usb_hub_depth/2  - inset;
+    h = usb_hub_width/2  - usb_hub_mount_inset_z;
+    d = usb_hub_depth/2  - usb_hub_mount_inset_y;
 
     for(iy=[-1,1])
     for(iz=[-1,1])
@@ -294,12 +303,17 @@ module hubMountBosses(wallInnerX)
 
 
 //=============================================================================
-// INSERTOS M2 DEL PANEL INFERIOR (atornillado, no magnético)
+// INSERTOS M3 DEL PANEL INFERIOR (atornillado, no magnético)
+//
+// FALLO CORREGIDO (2026-08-14, aviso del usuario): estaban
+// dimensionados para M2 — corregido a M3. Las paredes YA IMPRESAS
+// quedan con el alojamiento M2 antiguo (desactualizadas); este
+// cambio es para futuras impresiones propias o de otros usuarios.
 //
 // Reutiliza magnetSocket() como recorte cilíndrico genérico (no
 // porque el panel inferior lleve imanes — no los lleva, ver DIM
 // sección 6 — sino porque el módulo ya hace exactamente el corte
-// cilíndrico recesado que necesita un inserto térmico M2).
+// cilíndrico recesado que necesita un inserto térmico M3).
 //=============================================================================
 
 module lowerPanelScrewCuts(dir)
