@@ -19,7 +19,7 @@ $fn = 64;
 // NERVIO ENTRE DOS PUNTOS
 //=============================================================================
 
-module rib(x1, y1, x2, y2)
+module rib(x1, y1, x2, y2, width=rib_width, height=rib_height)
 {
 
     dx = x2 - x1;
@@ -36,8 +36,8 @@ module rib(x1, y1, x2, y2)
             cube(
             [
                 len,
-                rib_width,
-                rib_height
+                width,
+                height
             ]);
 
 }
@@ -52,6 +52,10 @@ module ribs()
 
     //---------------------------------------------------------
     // Horizontal superior
+    //
+    // PEDIDO POR EL USUARIO (2026-08-03, marcado en una captura de
+    // su laminador): toca el disipador inferior del UM790 — altura
+    // rebajada 3mm (5 → 2mm).
     //---------------------------------------------------------
 
     rib(
@@ -59,55 +63,81 @@ module ribs()
          off_y-rib_width/2,
 
          off_x,
-         off_y-rib_width/2
+         off_y-rib_width/2,
+
+         rib_width,
+         rib_height - 3
     );
 
 
     //---------------------------------------------------------
-    // Horizontal inferior
+    // Horizontal inferior — ELIMINADO (2026-08-03, petición del
+    // usuario, marcado en una captura de su laminador): chocaba con
+    // el conector USB interno y el pulsador de la placa UM790. Es el
+    // mismo nervio que ya se había identificado por la proximidad
+    // con el disipador tras el desplazamiento de los postes.
     //---------------------------------------------------------
-
-    rib(
-        -off_x,
-        -off_y-rib_width/2,
-
-         off_x,
-        -off_y-rib_width/2
-    );
 
 
     //---------------------------------------------------------
     // Vertical izquierdo
+    //
+    // FALLO CORREGIDO (2026-08-03, aviso del usuario: "mover tray y
+    // posts para que no tapen los orificios de sujeción"): con el
+    // ancho normal (3mm), el borde de este nervio quedaba a solo
+    // 0,5mm del taladro de paso al pilar del suelo — el nervio, al
+    // ser 5mm más alto que el taladro, tapaba parcialmente el acceso
+    // en ángulo con el destornillador. Estrechado a 1,7mm y
+    // reposicionado; sigue conectando con la isla (que llega hasta
+    // mucho más allá), dejando ~2mm de separación real con el
+    // taladro. Verificado con la geometría exportada, no solo
+    // calculado — los valores exactos de ancho/desplazamiento de un
+    // nervio rotado no son intuitivos.
     //---------------------------------------------------------
 
-    translate([-rib_width/2,0,0])
+    translate([1.7,0,0])
 
     rib(
         -off_x,
         -off_y,
 
         -off_x,
-         off_y
+         off_y,
+         1.7
     );
 
 
     //---------------------------------------------------------
     // Vertical derecho
+    //
+    // FALLO CORREGIDO (2026-08-03, aviso del usuario: "mover tray y
+    // posts para que no tapen los orificios de sujeción"): con el
+    // ancho normal (3mm), el borde de este nervio quedaba a solo
+    // 0,5mm del taladro de paso al pilar del suelo — el nervio, al
+    // ser 5mm más alto que el taladro, tapaba parcialmente el acceso
+    // en ángulo con el destornillador. Estrechado a 1,7mm; sigue
+    // conectando con la isla (que llega hasta mucho más allá),
+    // dejando ~1,8mm de separación real con el taladro. Verificado
+    // con la geometría exportada, no solo calculado.
     //---------------------------------------------------------
-
-    translate([-rib_width/2,0,0])
 
     rib(
          off_x,
         -off_y,
 
          off_x,
-         off_y
+         off_y,
+         1.7
     );
 
 
     //---------------------------------------------------------
     // Cruz central horizontal
+    //
+    // PEDIDO POR EL USUARIO (2026-08-03, tras imprimir la bandeja
+    // real): toca la parte inferior del UM790 — rebajada a la misma
+    // altura que el horizontal superior (2mm), la pieza equivalente
+    // más cercana a la parte trasera.
     //---------------------------------------------------------
 
     rib(
@@ -115,12 +145,19 @@ module ribs()
         -rib_width/2,
 
          off_x,
-        -rib_width/2
+        -rib_width/2,
+
+         rib_width,
+         rib_height - 3
     );
 
 
     //---------------------------------------------------------
     // Cruz central vertical
+    //
+    // PEDIDO POR EL USUARIO (2026-08-03, marcado en una captura de
+    // su laminador): toca el disipador inferior del UM790 — altura
+    // rebajada 3mm (5 → 2mm), igual que el horizontal superior.
     //---------------------------------------------------------
 
     translate([-rib_width/2,0,0])
@@ -130,7 +167,10 @@ module ribs()
         -off_y,
 
         0,
-         off_y
+         off_y,
+
+         rib_width,
+         rib_height - 3
     );
 
 }

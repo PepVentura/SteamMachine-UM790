@@ -54,16 +54,28 @@ module post()
 // CONJUNTO DE POSTES
 //=============================================================================
 
+// PEDIDO POR EL USUARIO (2026-08-03): "desplazar los pilares que
+// sujetan el UM790 para aproximar esta al panel posterior" — la
+// placa quedaba 21,45mm corta respecto al panel trasero (confirmado
+// por el usuario con la placa real montada, ~2cm de hueco). Se
+// desplazan los 4 postes hacia atrás (+Y) la misma cantidad,
+// manteniendo intacta la separación entre ellos (viene fija por los
+// agujeros reales de la placa, no se puede tocar). Deja ~3,45mm de
+// hueco restante hasta el panel — razonable para tolerancia y el
+// propio grosor de los conectores. (um790_post_y_offset definido en
+// 00_parametros.scad, compartido con base.scad para las islas de
+// apoyo y con assembly_positions.scad para um790_pos).
+
 module posts()
 {
 
-    translate([ off_x,  off_y, 0]) post();
+    translate([ off_x,  off_y + um790_post_y_offset, 0]) post();
 
-    translate([-off_x,  off_y, 0]) post();
+    translate([-off_x,  off_y + um790_post_y_offset, 0]) post();
 
-    translate([-off_x, -off_y, 0]) post();
+    translate([-off_x, -off_y + um790_post_y_offset, 0]) post();
 
-    translate([ off_x, -off_y, 0]) post();
+    translate([ off_x, -off_y + um790_post_y_offset, 0]) post();
 
 }
 
