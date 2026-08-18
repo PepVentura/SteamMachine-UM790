@@ -147,6 +147,18 @@ top_insert_pad_depth = 8.0;  // grosor local en los insertos de la tapa (>= inse
 off_x = um790_mount_spacing_x/2;
 off_y = um790_mount_spacing_y/2;
 
+// PEDIDO POR EL USUARIO (2026-08-03): "desplazar los pilares que
+// sujetan el UM790 para aproximar esta al panel posterior" — la
+// placa quedaba 21,45mm corta respecto al panel trasero (confirmado
+// por el usuario con la placa real montada, ~2cm de hueco). Se
+// desplaza hacia atrás (+Y): los 4 postes (posts.scad), las islas de
+// apoyo bajo ellos (base.scad) y la posición de referencia de la
+// placa (um790_pos, assembly_positions.scad) — deja ~3,45mm de hueco
+// restante hasta el panel, razonable para tolerancia y el grosor de
+// los conectores. NO afecta a los nervios/marco exterior de la
+// bandeja (siguen en su sitio, estructura distinta).
+um790_post_y_offset = 18.0;
+
 //=============================================================================
 // NERVIOS
 //=============================================================================
@@ -195,6 +207,17 @@ fan_hole_pitch = 105.0;
 
 front_panel_thickness = 3.0;
 
+// Marco elevado en la cara frontal de los paneles NFC/inferior — PEDIDO
+// POR EL USUARIO (2026-08-03, foto de referencia de la Steam Machine
+// original: "profundidad de unos 5mm" en el borde del panel frontal).
+// Puramente AÑADIDO hacia fuera (no toca front_panel_thickness, que
+// la pared ya impresa usa para calcular dónde reculan sus imanes y
+// tornillos — cambiar ese valor habría desalineado la pieza real ya
+// fabricada). Con 2mm de bisel + 3mm de grosor base = ~5mm de
+// profundidad visible en el borde, igual que en la foto.
+front_bezel_depth  = 2.0;  // ESTIMADO — cuánto sobresale el marco hacia fuera
+front_bezel_border  = 4.0;  // ESTIMADO — anchura visible del marco
+
 power_button_diameter = 8.0;
 
 //=============================================================================
@@ -218,7 +241,29 @@ led_bar_depth  = 3.0;
 // debe llegar exactamente ahí para apoyar sobre ellos.
 // docs/02_Mechanical_Layout.md, sección 3, Panel NFC: "Ocupará
 // prácticamente todo el ancho frontal."
-nfc_panel_width  = case_width - 2*wall_thickness;  // 150,0
+// PEDIDO POR EL USUARIO (2026-08-03): "Los paneles inferior y
+// exterior no tienen el mismo ancho" — el panel inferior ya tenía
+// +1mm de sobredimensionado (lower_panel_width_oversize, para
+// compensar la merma de impresión FDM, confirmado con una impresión
+// real) que este panel no tenía. Igualado a 151mm para que ambos
+// coincidan.
+//
+// AJUSTADO (2026-08-16, confirmado con probeta impresa real): a
+// 151mm, el panel real medía 150mm (1mm de merma) — pero el hueco
+// interior real del chasis medía solo 149mm (también con merma
+// propia), así que el panel real quedaba MÁS ANCHO que el hueco.
+// Una segunda probeta a 149mm de diseño salió en 149mm real (0mm de
+// merma esta vez — la merma no es constante entre impresiones).
+// Ajustado a 149mm, confirmado por el usuario tras la prueba física.
+nfc_panel_width  = 149.0;  // antes 151,0 — confirmado con probeta real (ver historial arriba)
+
+// Ancho del panel trasero — mismo criterio que nfc_panel_width y
+// lower_panel_width_oversize, confirmado con probeta real (2026-08-16):
+// el hueco interior real del chasis mide 149mm, no 150mm. Definido
+// aquí (no en rear_panel.scad) para que probeta_panel_trasero.scad
+// pueda reutilizar el mismo valor sin depender de un `use` a ese
+// archivo (las variables no se exponen con `use`, solo los módulos).
+rear_panel_width = case_width - 2*wall_thickness - 1.0;  // 149mm — antes 150mm
 
 // Ventana funcional del tag NFC (más pequeña, centrada en el panel).
 // Dato real confirmado por el usuario (2026-08-03).
@@ -244,7 +289,7 @@ nfc_window_height = 40.0;
 // 88.5 (dejaba el panel NFC solapado 4 mm con la barra LED — lo
 // detectó front_panel_zones_consistent en
 // assembly_positions.scad).
-nfc_panel_height = 84.5;
+nfc_panel_height = 96.5;  // antes 84.5 — ampliado 12mm (ver nfc_panel_margin_top en assembly_positions.scad) para llegar al borde superior del chasis
 
 nfc_panel_depth  = 3.0;
 
@@ -260,11 +305,28 @@ nfc_reader_depth  = 10.0;
 // HUB USB (CJMCU-204)
 //=============================================================================
 
+// FALLO CORREGIDO (2026-08-15, aviso del usuario con fotos del hub
+// montado en la pared real): la separación VERTICAL entre postes
+// (eje Z en la pared — ver hubMountBosses() en walls.scad) estaba
+// mal, calculaba 36,1mm entre los postes de arriba y abajo, cuando
+// la separación real es 21mm (los dos postes de abajo, ya
+// atornillados en la pieza real, estaban bien; los de arriba no).
+// La separación horizontal (36,1mm, entre columnas de USB) es
+// correcta, confirmada por el usuario.
+//
+// USB_HUB_WIDTH define TAMBIÉN el tamaño físico exterior de la
+// placa (usado en hub_usb.scad para el cuerpo/keepout) — no se debe
+// tocar solo para ajustar la separación de postes, o se encogería
+// la placa entera por error. La separación de postes en el eje
+// vertical se ajusta con un inset distinto en hubMountBosses() y
+// hubUsbMountHoles() (usb_hub_mount_inset_z), no aquí.
 usb_hub_width  = 44.1;
 usb_hub_depth  = 44.1;
 usb_hub_height = 12.0;
 
 usb_hub_mount_hole = 3.0;
+usb_hub_mount_inset_z = 11.55;  // separación vertical real entre postes = 21mm (44.1/2 - 11.55 = 10.5, x2 = 21)
+usb_hub_mount_inset_y = 4.0;    // separación horizontal = 36.1mm, sin cambios (confirmada correcta por el usuario)
 
 // Mediremos estas distancias directamente del STL
 usb_port_pitch_x = 0;
@@ -362,7 +424,7 @@ um790_cooler_height = 26.0;   // Estimado
 um790_rearIO_width  = 90.0;   // Estimado, ancho del bloque de conectores traseros
 um790_rearIO_height = 20.0;   // Estimado, altura del conjunto de puertos traseros
 um790_rearIO_depth  =
-    case_depth/2 - wall_thickness - pcb_depth/2;   // Calculado: hueco hasta el panel trasero
+    case_depth/2 - wall_thickness - pcb_depth/2 - um790_post_y_offset;   // Calculado: hueco REAL hasta el panel trasero, descontado el desplazamiento de los postes (antes 21,45mm, ahora ~3,45mm)
 
 um790_cable_margin = 15.0;    // Margen del volumen de seguridad de cableado alrededor de la PCB
 
@@ -410,7 +472,14 @@ oled_module_pin_height = 6.0;   // Estimado, pines/soldadura por detrás del mó
 // Pulsador M16 x 55 mm
 //-----------------------------------------------------------------------
 
-pushbutton_thread_diameter = 16.0;
+// PEDIDO POR EL USUARIO (2026-08-03, tras probar la impresión real):
+// "el pulsador de encendido no acaba de entrar, habría que darle un
+// poco más de margen". Antes 16.0 (la medida exacta de la rosca, sin
+// ninguna holgura) — con la merma típica de impresión FDM, un
+// agujero justo a medida suele quedar más pequeño de lo real.
+// Aumentado a 16.5 (0,5mm de holgura). Si sigue sin entrar bien,
+// puede subirse más.
+pushbutton_thread_diameter = 16.5;
 pushbutton_cap_diameter    = 19.5;  // Estimado, diámetro del embellecedor visible en el panel
 pushbutton_total_length    = 55.0;  // Dato real proporcionado (rosca + cuerpo del mecanismo)
 
@@ -422,7 +491,7 @@ pushbutton_total_length    = 55.0;  // Dato real proporcionado (rosca + cuerpo d
 // unidades independientes (usb_front_pair_spacing, obsoleto).
 //-----------------------------------------------------------------------
 
-usb_front_hole_diameter   = 29.0;  // Dato real confirmado por el usuario (2026-08-03)
+usb_front_hole_diameter   = 30.0;  // Dato real confirmado por el usuario (2026-08-03) — corregido de 29 a 30
 usb_front_flange_diameter = 35.0;  // Estimado, brida/rosca (algo mayor que la versión de un puerto, aloja 2 USB-A)
 usb_front_body_length     = 30.0;  // Dato real confirmado por el usuario (2026-08-03). Antes: 22.0 (estimado)
 usb_front_cable_diameter  = 5.0;   // Estimado, cada uno de los 2 cables flexibles

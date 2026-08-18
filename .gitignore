@@ -22,3 +22,6 @@ stl/tmp/
 # Archivos temporales
 *.tmp
 *.temp
+
+# Artefactos generados por el verificador de colisiones del ensamblaje virtual
+openscad/reference/checks/_generated/
