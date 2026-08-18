@@ -80,7 +80,12 @@ front_inner_face_y = -case_depth/2 + front_panel_thickness;
 
 // Franja vertical del panel NFC (panel frontal superior intercambiable),
 // igual que en openscad/parts/03_panels/front_layout.scad.
-nfc_panel_margin_top = 12;
+// PEDIDO POR EL USUARIO (2026-08-03): "El panel superior no llega
+// hasta el borde superior, le faltan unos 12mm" — quitado el margen,
+// el panel ahora crece 12mm hacia arriba (nfc_panel_height ajustada
+// en 00_parametros.scad) manteniendo fijo el borde inferior, que
+// conecta con lower_panel.
+nfc_panel_margin_top = 0;
 nfc_panel_z_low  = shell_height - nfc_panel_margin_top - nfc_panel_height;
 nfc_panel_z_high = nfc_panel_z_low + nfc_panel_height;
 nfc_panel_z_mid  = (nfc_panel_z_low + nfc_panel_z_high) / 2;
@@ -129,7 +134,14 @@ function panelMountX(radius, margin=1.5) = (case_width-2*wall_thickness)/2 - mar
 // Radios de los avellanados — compartidos entre walls.scad (para
 // calcular la X del inserto con panelMountX()) y los paneles (para
 // el propio avellanado) — deben ser el mismo valor en los dos sitios.
-lower_panel_csk_radius = 4.5/2;  // M2
+// FALLO CORREGIDO (2026-08-14, aviso del usuario): este avellanado
+// estaba dimensionado para M2 — el panel inferior necesita M3 (las
+// paredes ya impresas con el alojamiento M2 antiguo quedan
+// desactualizadas; este cambio es para futuras impresiones propias
+// o de otros usuarios). Ahora usa el mismo valor ya establecido para
+// M3 en el panel trasero (rear_csk_radius), para que sea consistente
+// en todo el proyecto.
+lower_panel_csk_radius = 6.0/2;  // M3 (antes 4.5/2, M2)
 rear_csk_radius        = 6.0/2;  // M3
 
 // Fijación del panel trasero a la pared — compartido entre
@@ -187,7 +199,7 @@ module wallPadRelief(z, panelY, panelThickness)
 //=============================================================================
 
 // Centrado en X/Y sobre la bandeja.
-um790_pos = [0, 0, z_pcb_bottom];
+um790_pos = [0, um790_post_y_offset, z_pcb_bottom];  // Y desplazado hacia atrás (ver um790_post_y_offset en 00_parametros.scad) para que coincida con los postes reales
 
 
 //=============================================================================
@@ -206,9 +218,24 @@ fan_pos = [um790_pos[0], um790_pos[1], z_fan_bottom];
 
 rc522_panel_gap = 3.0;
 
-rc522_pos = [0, front_inner_face_y + rc522_panel_gap, nfc_panel_z_mid];
+// FALLO CORREGIDO (2026-08-03, pregunta del usuario: "¿el hueco para
+// el llavero NFC sigue estando alineado con su lector?"): la Z de
+// esta posición usaba nfc_panel_z_mid — al ampliar la altura del
+// panel NFC 12mm, ese valor se desplazó de 93,75 a 99,75 (6mm). El
+// soporte del lector (openscad/parts/04_soportes/rc522_bracket.scad)
+// YA ESTÁ IMPRESO con la posición antigua — fijado a 93,75 (valor
+// absoluto, no recalculado) para que coincida. DEBE coincidir
+// siempre con la Z del hueco del tag en nfc_panel.scad
+// (nfcTagPocket()).
+rc522_pos = [0, front_inner_face_y + rc522_panel_gap, 93.75];
 
 rc522_rear_edge_y = rc522_pos[1] + nfc_reader_depth;
+
+// Poste de anclaje M3 del RC522 a la pared — compartido entre
+// openscad/parts/02_chassis/walls.scad (rc522MountBoss()) y
+// openscad/parts/03_panels/rc522_bracket.scad (taladro de paso).
+rc522_mount_diameter = 10.0;  // mínimo 10mm de diámetro para M3, según docs/DESIGN_RULES.md
+rc522_mount_depth    = 6.0;
 
 
 //=============================================================================
@@ -302,10 +329,16 @@ usb_front_min_dx = usb_front_flange_diameter/2 + um790_post_diameter/2 + usb_fro
 
 usb_front_x = off_x - usb_front_min_dx;
 
+// PEDIDO POR EL USUARIO (2026-08-03): subir el USB 2mm respecto al
+// resto del cluster (pulsador/OLED, que se quedan igual) — verificado
+// que deja margen de sobra respecto al techo del cluster
+// (front_panel_led_z_low) y al resto de elementos.
+usb_front_z_offset = 2.0;
+
 usb_front_pos = [
     usb_front_x,
     front_inner_face_y,
-    front_cluster_z
+    front_cluster_z + usb_front_z_offset
 ];
 
 // OLED — en el hueco que queda entre el pulsador y el USB. Ya no
@@ -362,14 +395,30 @@ front_panel_cluster_z_high = max(
 
 front_panel_lower_top = front_panel_cluster_z_high + front_panel_edge_margin;
 
-// Tornillos M2 del panel inferior (sin imanes, ver
+// Tornillos M3 del panel inferior (sin imanes, ver
 // openscad/parts/02_chassis/walls.scad y
 // openscad/parts/03_panels/lower_panel.scad — comparten estas Z, el
 // diámetro y la profundidad para no desincronizarse).
+//
+// FALLO CORREGIDO (2026-08-14, aviso del usuario): "las diseñaste
+// como si fuesen para imanes... configúralas para insertos de
+// métrica 3" — estaban dimensionadas para M2. Las paredes YA
+// IMPRESAS quedan con el alojamiento M2 antiguo (desactualizadas);
+// este cambio es para futuras impresiones propias o de otros
+// usuarios, no para las paredes actuales.
+//
+// SEGUNDO FALLO CORREGIDO (2026-08-15, aviso del usuario: "los
+// encajes para los insertos no parecen ser para métrica 3"): el
+// primer arreglo usaba un valor ESTIMADO propio (6,5mm) en vez de
+// reutilizar insert_diameter/insert_depth (00_parametros.scad),
+// que YA es el valor establecido y usado en todo el resto del
+// proyecto para insertos M3 (panel trasero, tapa superior) — ahora
+// coincide exactamente con esos, en vez de tener un tercer valor
+// distinto e inventado.
 lower_panel_screw_z_low    = 10.0;
 lower_panel_screw_z_high   = front_panel_lower_top - 10.0;
-lower_panel_screw_diameter = 6.0;   // mínimo razonable para M2
-lower_panel_screw_depth    = 4.0;
+lower_panel_screw_diameter = insert_diameter;   // antes 6.5 (estimado propio) — ahora el mismo valor M3 (4,10mm) que usan el panel trasero y la tapa
+lower_panel_screw_depth    = insert_depth;   // antes 5.0 (estimado propio, coincidía por casualidad) — ahora referenciado al mismo valor compartido (5,00mm), para que no se puedan desincronizar
 
 front_panel_led_z_low  = front_panel_lower_top;
 front_panel_led_z_high = front_panel_led_z_low + led_bar_height;

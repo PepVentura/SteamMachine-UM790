@@ -76,10 +76,8 @@ module hubUsbBody()
 module hubUsbMountHoles()
 {
 
-    inset = 4;
-
-    hx = usb_hub_width/2  - inset;
-    hy = usb_hub_depth/2  - inset;
+    hx = usb_hub_width/2  - usb_hub_mount_inset_z;
+    hy = usb_hub_depth/2  - usb_hub_mount_inset_y;
 
     for(ix=[-1,1])
     for(iy=[-1,1])
