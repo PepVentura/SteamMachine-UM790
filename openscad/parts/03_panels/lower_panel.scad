@@ -226,7 +226,7 @@ module lowerPanelScrewHoles()
     screwX = panelMountX(lower_panel_csk_radius);
 
     for(ix=[-1,1])
-    for(z=[lower_panel_screw_z_low, lower_panel_screw_z_high])
+    for(z=[lower_panel_hole_z_low, lower_panel_hole_z_high])
     {
 
         // Taladro de paso, todo el grosor del panel + el marco (el
@@ -300,6 +300,56 @@ module ledDiffuserZone()
 
 
 //=============================================================================
+// ADELGAZAMIENTO REAL DE LA FRANJA DEL DIFUSOR
+//
+// PEDIDO POR EL USUARIO (2026-08-17): "debido al grosor de la capa
+// de la franja translúcida... la luz no puede traspasar tal tamaño
+// de pared, deberíamos reducir su grosor a 1mm en esa franja, pero
+// manteniendo el grosor del marco perimetral" — hasta ahora
+// ledDiffuserZone() solo definía la zona para la vista previa de
+// color (el panel impreso tenía grosor uniforme en toda su
+// superficie, 3mm, el mismo que el resto). Este módulo SÍ recorta
+// material de verdad: se quita la mitad trasera de la franja
+// (dejando el mismo margen de 8mm respecto al borde que
+// ledDiffuserZone(), sin invadir el marco de 4mm de ancho), dejando
+// solo 1mm de "piel" en la cara frontal, por donde pasa la luz.
+//=============================================================================
+
+led_diffuser_skin_thickness = 1.0;  // ESTIMADO — grosor que queda en la cara frontal de la franja, a falta de confirmar cuánto necesita realmente la luz para pasar bien
+
+module ledDiffuserThinCut()
+{
+
+    bezelTopZLow = front_panel_led_z_high - front_bezel_border;
+    zoneCenter   = (front_panel_led_z_low + bezelTopZLow) / 2;
+
+    // FALLO CORREGIDO: sin este pequeño margen extra (thin_cut_eps),
+    // el recorte dejaba la pieza no watertight — confirmado
+    // comparando con/sin el recorte (con él, aristas problemáticas;
+    // sin él, watertight). Coincidencia geométrica exacta con algo
+    // más (probablemente las paredes del canal LED, que arrancan en
+    // la misma cara trasera del panel) — mismo tipo de problema ya
+    // visto antes en este proyecto (islas de la bandeja, marco
+    // delantero). Se amplía ligeramente el recorte en Z para que
+    // solape con claridad, sin llegar a invadir el marco.
+    thin_cut_eps = 0.1;
+
+    translate([
+        -case_width/2 + 8,
+        -case_depth/2 + led_diffuser_skin_thickness,
+        zoneCenter - led_diffuser_width/2 - thin_cut_eps
+    ])
+
+        cube([
+            case_width - 16,
+            front_panel_thickness - led_diffuser_skin_thickness + 0.1,
+            led_diffuser_width + 2*thin_cut_eps
+        ]);
+
+}
+
+
+//=============================================================================
 // SEGUNDA PARED DEL CANAL DE LA TIRA LED
 //
 // PEDIDO POR EL USUARIO (2026-08-03, con foto de referencia): la
@@ -339,6 +389,49 @@ module ledChannelWalls()
             channelWidth,
             led_channel_wall_thickness,
             led_channel_wall_height
+        ]);
+
+    // PEDIDO POR EL USUARIO (2026-08-18): "se trata de añadir otra
+    // pared larga ancha de lado a lado conectada al final de la
+    // existente y bajando a 90 grados, para que al pegar la tira en
+    // su interior esta esté enfrentada al panel" — la pared de
+    // arriba es horizontal (su cara ancha mira hacia Z, no hacia el
+    // panel); no ofrece una superficie donde pegar la tira LED
+    // mirando al panel. Esta segunda pared se conecta al extremo más
+    // alejado del panel (el borde exterior de la pared existente) y
+    // baja en Z, con su cara ancha mirando hacia Y (hacia el panel)
+    // — ahí es donde se pega la tira, con los LEDs enfrentados
+    // directamente a la franja del difusor.
+    ledChannelBackWall();
+
+}
+
+led_channel_backwall_thickness = 2.0;  // ESTIMADO — grosor de la nueva pared, más fina que la existente (10mm) por no necesitar tanto cuerpo
+led_channel_backwall_margin    = 2.0;  // ESTIMADO — margen por debajo de la franja del difusor (40,5mm), para cubrirla entera con holgura
+
+module ledChannelBackWall()
+{
+
+    channelWidth = case_width - 2*led_channel_x_margin;
+    channelZ     = (front_panel_led_z_low + front_panel_led_z_high)/2 - led_channel_wall_height/2;
+
+    // Y del borde exterior de la pared existente (el "final" al que
+    // se conecta esta, según pidió el usuario) — el borde más
+    // alejado del panel.
+    outerWallY = -case_depth/2 + front_panel_thickness + led_bar_strip_width + led_channel_wall_thickness;
+
+    wallBottomZ = front_panel_led_z_low - led_channel_backwall_margin;
+
+    translate([
+        -channelWidth/2,
+        outerWallY - led_channel_backwall_thickness,
+        wallBottomZ
+    ])
+
+        cube([
+            channelWidth,
+            led_channel_backwall_thickness,
+            (channelZ + led_channel_wall_height) - wallBottomZ
         ]);
 
 }
@@ -382,9 +475,15 @@ module ledChannelSupports()
 
 
 //=============================================================================
-// PANEL INFERIOR COMPLETO (solo el cuerpo estructural — la zona LED
-// se imprime en el mismo volumen con el 2º filamento, ver
-// ledDiffuserZone() para la vista previa con color distinto)
+// PANEL INFERIOR COMPLETO
+//
+// La zona LED se imprime en el mismo volumen con el 2º filamento
+// (ver ledDiffuserZone() para la vista previa con color distinto) —
+// pero desde 2026-08-17 también lleva un recorte real
+// (ledDiffuserThinCut()) que adelgaza esa franja a 1mm de grosor,
+// para que la luz de la tira LED la atraviese mejor (antes tenía el
+// mismo grosor que el resto del panel, 3mm — el usuario confirmó
+// tras imprimirlo que era demasiado grueso).
 //=============================================================================
 
 module lowerPanel()
@@ -409,6 +508,8 @@ module lowerPanel()
             usbFrontCut();
 
             lowerPanelScrewHoles();
+
+            ledDiffuserThinCut();
 
         }
 
