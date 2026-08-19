@@ -6,13 +6,19 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 CHASSIS = HERE.parent
-BANDEJA = CHASSIS.parent / "01_bandeja"
+PANELS = CHASSIS.parent / "03_panels"
 
 STRUCTURES = {
     "chassisFloor":     (CHASSIS / "floor.scad", "chassisFloor"),
     "chassisSideWalls": (CHASSIS / "walls.scad", "chassisSideWalls"),
     "chassisTop":       (CHASSIS / "top.scad", "chassisTop"),
-    "rearPanel":        (BANDEJA / "rear_panel.scad", "rearPanel"),
+    "rearPanel":        (PANELS / "rear_panel.scad", "rearPanel"),
+    # NOTA (2026-08-17): rear_panel.scad se movió de 01_bandeja a
+    # 03_panels (petición del usuario, encajaba conceptualmente mejor
+    # ahí, junto al resto de paneles) — ruta actualizada. También se
+    # le quitaron las lengüetas de unión con la bandeja
+    # (rearBridgeTabs()) en la misma ronda; el panel trasero ahora se
+    # sujeta solo con tornillos a las paredes laterales.
 }
 # NOTA (2026-08-03): openscad/parts/03_panels/lower_panel.scad y
 # nfc_panel.scad NO están aquí — añadirlos dispara el tiempo de

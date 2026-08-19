@@ -151,9 +151,12 @@ function sideBossCutX(dir, radius) =
 // más ancho que el grosor del panel trasero (wall_thickness = 3 mm),
 // y el material del panel alrededor del taladro de paso invadía el
 // relleno. Requiere una muesca de alivio en el panel para resolverse
-// bien; pendiente de una futura revisión. El panel trasero sigue
-// fijado a la bandeja (ver openscad/parts/01_bandeja/rear_panel.scad,
-// rearBridgeTabs()), ya verificado sin colisión.
+// bien; pendiente de una futura revisión. El panel trasero se
+// sujetaba también a la bandeja mediante unas lengüetas
+// (rearBridgeTabs(), openscad/parts/03_panels/rear_panel.scad) —
+// ELIMINADAS (2026-08-17, petición del usuario). Se sujeta ahora
+// solo con los tornillos a las paredes laterales
+// (rearWallScrewHoles(), ya verificados sin colisión).
 //=============================================================================
 
 
@@ -350,12 +353,16 @@ module lowerPanelScrewCuts(dir)
 //=============================================================================
 // FIJACIÓN DEL PANEL TRASERO A LA PARED
 //
-// Además de la unión con la bandeja (openscad/parts/01_bandeja/rear_panel.scad,
-// rearBridgeTabs()), el panel trasero se atornilla también a ambas
-// paredes (aviso del usuario: un panel de 148 mm de alto solo sujeto
-// por la bandeja quedaba poco firme). Mismo patrón de relleno +
-// recorte ya usado para los imanes/tornillos frontales — el inserto
+// Además de la unión con la bandeja que tenía originalmente (unas
+// lengüetas, rearBridgeTabs() — ELIMINADAS 2026-08-17, petición del
+// usuario), el panel trasero se atornilla también a ambas paredes
+// (aviso del usuario: un panel de 148 mm de alto solo sujeto por la
+// bandeja quedaba poco firme). Mismo patrón de relleno + recorte ya
+// usado para los imanes/tornillos frontales — el inserto
 // (insert_diameter = 4,10 mm) también es más ancho que la pared.
+//
+// Tras la eliminación de las lengüetas, estos tornillos a la pared
+// son ahora la ÚNICA fijación del panel trasero.
 //
 // NOTA: un primer intento de esto (mismo día) se retiró por no
 // resolverse a tiempo, y quedó documentado como "retirado" en el
@@ -365,7 +372,7 @@ module lowerPanelScrewCuts(dir)
 //=============================================================================
 
 // rear_wall_screw_diameter/z_low/z_high: ver assembly_positions.scad
-// (compartidos también con openscad/parts/01_bandeja/rear_panel.scad)
+// (compartidos también con openscad/parts/03_panels/rear_panel.scad)
 
 module rearBossPad(dir, z)
 {
