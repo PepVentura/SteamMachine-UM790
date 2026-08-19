@@ -536,10 +536,6 @@ Hyperspin
 
 
 
-Aplicaciones Windows
-
-
-
 \---
 
 
