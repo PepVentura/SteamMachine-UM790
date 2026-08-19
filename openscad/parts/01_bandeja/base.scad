@@ -154,15 +154,16 @@ module base()
 
 
         //---------------------------------------------------------------------
-        // Insertos de unión con el panel trasero
-        // (openscad/parts/01_bandeja/rear_panel.scad, rearBridgeTabs()/
-        // rearBridgeScrewHoles() — deben coincidir en X con
-        // rear_bridge_x_inset y en Z con rear_insert_z de ese archivo).
+        // Insertos de unión con el panel trasero — ELIMINADOS
+        //
+        // PEDIDO POR EL USUARIO (2026-08-17): "Elimina los insertos
+        // sobrantes de la bandeja" — tras eliminar las lengüetas del
+        // panel trasero que roscaban aquí (rearBridgeTabs()/
+        // rearBridgeScrewHoles(), ahora en
+        // openscad/parts/03_panels/rear_panel.scad), estos insertos
+        // (trayRearBridgeInserts()/trayRearBridgeInsertPads()) se
+        // quedaron sin ningún tornillo real que rosque en ellos.
         //---------------------------------------------------------------------
-
-        trayRearBridgeInserts();
-
-        trayRearBridgeInsertPads();
 
     }
 
@@ -214,40 +215,17 @@ module traySupportHolePads()
 
 
 //=============================================================================
-// REFUERZO DEL INSERTO DE UNIÓN CON EL PANEL TRASERO
+// REFUERZO E INSERTOS DE UNIÓN CON EL PANEL TRASERO — ELIMINADOS
 //
-// FALLO CORREGIDO (2026-08-03, captura del usuario): el inserto
-// (X=±63, Ø10mm) sobresalía 3mm más allá del propio borde de la
-// bandeja (que termina en X=±65) — la parte exterior del inserto
-// quedaba sin apoyo, fuera del marco de la bandeja. Se añade un
-// parche que extiende el marco hasta cubrir el inserto entero, con
-// margen de sobra respecto a la pared (7mm disponibles antes de
-// llegar a ella).
+// PEDIDO POR EL USUARIO (2026-08-17): "Elimina los insertos
+// sobrantes de la bandeja" — tras eliminar las lengüetas del panel
+// trasero que roscaban aquí (rearBridgeTabs()/rearBridgeScrewHoles(),
+// ahora en openscad/parts/03_panels/rear_panel.scad), estos insertos
+// (trayRearBridgeInsertPads(), trayRearBridgeInserts()) se quedaron
+// sin ningún tornillo real que rosque en ellos. Eliminados junto con
+// sus variables (rear_bridge_x_inset_local, rear_bridge_insert_diameter,
+// rear_bridge_post_height), solo usadas dentro de estos dos módulos.
 //=============================================================================
-
-module trayRearBridgeInsertPads()
-{
-
-    padMargin = 1.0;
-    postCenterX = case_width/2 - rear_bridge_x_inset_local;
-    postOuterX  = postCenterX + rear_bridge_insert_diameter/2 + padMargin;
-    padWidth    = postOuterX - tray_width/2;
-
-    for(ix=[-1,1])
-
-        translate([
-            ix>0 ? tray_width/2 : -postOuterX,
-            tray_depth/2 - rear_bridge_insert_diameter - padMargin,
-            0
-        ])
-
-            cube([
-                padWidth,
-                rear_bridge_insert_diameter + 2*padMargin,
-                tray_thickness
-            ]);
-
-}
 
 
 //=============================================================================
@@ -273,41 +251,6 @@ module trayScrewClearanceHoles()
         ])
 
             cylinder(d = tray_screw_clearance, h = tray_thickness+0.2);
-
-}
-
-
-//=============================================================================
-// INSERTOS DE UNIÓN CON EL PANEL TRASERO
-//=============================================================================
-
-rear_bridge_x_inset_local = 15.0;  // = rear_bridge_x_inset en rear_panel.scad
-rear_bridge_insert_diameter = 10.0;
-rear_bridge_post_height = insert_depth + 1.0;  // sobresale del grosor de la bandeja (3mm < 5mm de inserto)
-
-module trayRearBridgeInserts()
-{
-
-    for(ix=[-1,1])
-
-        translate([
-            ix*(case_width/2 - rear_bridge_x_inset_local),
-            tray_depth/2 - rear_bridge_insert_diameter/2,
-            0
-        ])
-
-            difference()
-            {
-
-                cylinder(
-                    d = rear_bridge_insert_diameter,
-                    h = rear_bridge_post_height
-                );
-
-                translate([0,0,rear_bridge_post_height-insert_depth])
-                    cylinder(d = insert_diameter, h = insert_depth+0.1);
-
-            }
 
 }
 
