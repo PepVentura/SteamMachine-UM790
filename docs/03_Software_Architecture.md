@@ -258,10 +258,6 @@ RPCS3 → Rojo
 
 
 
-Windows → Blanco
-
-
-
 \---
 
 
