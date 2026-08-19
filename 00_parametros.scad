@@ -289,7 +289,17 @@ nfc_window_height = 40.0;
 // 88.5 (dejaba el panel NFC solapado 4 mm con la barra LED — lo
 // detectó front_panel_zones_consistent en
 // assembly_positions.scad).
-nfc_panel_height = 96.5;  // antes 84.5 — ampliado 12mm (ver nfc_panel_margin_top en assembly_positions.scad) para llegar al borde superior del chasis
+// AJUSTADO (2026-08-17, medidas reales del usuario): "el espacio
+// total de la altura interior del chasis es de 145mm, y los paneles
+// miden 50mm el inferior y 96mm el superior... le quitaría 2mm de
+// altura [al panel superior]" — la suma real (146mm) superaba el
+// interior real (145mm) en 1mm. Reducido 2mm (96,5 → 94,5) para
+// dejar margen de seguridad. El borde inferior del panel se mantiene
+// fijo (sigue conectando igual con el panel inferior); el recorte es
+// por arriba. Verificado: imanes (nfc_magnet_z_low/high) y hueco del
+// tag NFC (nfc_tag_pocket_z) son valores absolutos fijos, no
+// dependen de esta altura — siguen intactos.
+nfc_panel_height = 94.5;  // antes 96.5
 
 nfc_panel_depth  = 3.0;
 

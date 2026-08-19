@@ -6,7 +6,253 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
-## [1.0.7] - 2026-08-16 — Conector DC cuadrado (no redondo), ancho del panel trasero a 149mm, tornillos M3 verificados
+## [1.1.2] - 2026-08-18 — Segunda pared del canal LED, en L, para que la tira quede enfrentada al panel
+
+### Encontrado
+
+- El usuario señaló (con dos capturas, la primera descartada por él
+  mismo) que el soporte de la tira LED no ofrecía una superficie
+  donde pegarla mirando hacia el panel: la pared existente
+  (`ledChannelWalls()`) es horizontal, con su cara ancha mirando en
+  Z, no en Y — no hay dónde pegar la tira para que sus LEDs miren
+  directamente a la franja del difusor.
+
+### Añadido
+
+- `ledChannelBackWall()` — segunda pared, conectada al borde más
+  alejado del panel de la pared existente ("el final de la
+  existente"), doblada 90° hacia abajo (perfil en L). Su cara
+  interior mira hacia el panel (eje Y) — ahí se pega la tira LED,
+  con los LEDs enfrentados directamente a la franja del difusor.
+  Confirmado el diseño con el usuario mediante un render de la
+  sección transversal antes de darlo por definitivo.
+- `led_channel_backwall_thickness = 2.0mm` (ESTIMADO) y
+  `led_channel_backwall_margin = 2.0mm` (ESTIMADO, cuánto baja por
+  debajo del borde inferior de la franja del difusor) — pendientes
+  de confirmar con la pieza impresa.
+
+### Verificado
+
+- Pieza completa: "Simple: yes" (2-manifold válido, misma
+  comprobación robusta de siempre).
+- Confirmado visualmente por render de sección transversal (antes de
+  aplicar el cambio) y por render del panel completo (después).
+- Ensamblaje: 28/28 sin colisión (sin cambios).
+
+---
+
+
+
+### Encontrado — mismo patrón que otros ajustes con la pared ya impresa
+
+- El usuario mandó una foto del montaje real: el taladro de paso del
+  panel queda claramente por encima del inserto real de la pared
+  (ya impresa, fija). "Los agujeros de fijación en el panel interior
+  están altos. Hay que bajarlos 3mm".
+- `lower_panel_screw_z_low/high` las comparte TANTO la pared (el
+  inserto real, `sideBossPad()` en `walls.scad`) COMO el panel (el
+  taladro de paso, `lower_panel.scad`) — no se podían bajar
+  directamente sin mover también la definición de la pared, que no
+  puede cambiar (ya impresa).
+
+### Cambiado
+
+- Nuevas variables `lower_panel_hole_z_low`/`lower_panel_hole_z_high`
+  (`assembly_positions.scad`), específicas del panel, calculadas
+  como `lower_panel_screw_z_low/high - 3.0` — la pared se queda con
+  su valor original (10, 29.5), sin tocar.
+- `lower_panel.scad` (`lowerPanelScrewHoles()`) actualizado para
+  usar las nuevas variables en vez de las compartidas con la pared.
+
+### Verificado
+
+- Valores confirmados por variables exportadas: pared sin cambios
+  (10, 29.5), panel en (7, 26.5) — ambos dentro del rango del panel
+  (0 a 51,5mm), sin riesgo de salirse por el borde inferior.
+- Sin colisión con los huecos del OLED, el pulsador ni el USB
+  frontal en la nueva posición.
+- Ensamblaje: 28/28 sin colisión (sin cambios).
+
+---
+
+
+
+### Cambiado
+
+- `nfc_panel_height`: 96,5 → 94,5mm — el usuario midió el chasis
+  real: interior=145mm, panel inferior=50mm, panel NFC=96mm, suma
+  146mm, superando el interior real en 1mm. Reducido 2mm para dejar
+  margen de seguridad.
+
+### Corregido — fallo propio detectado antes de dar el cambio por bueno
+
+- El primer intento (solo cambiar `nfc_panel_height`) recortaba por
+  la parte de ABAJO del panel (con `nfc_panel_margin_top=0`, la
+  fórmula sube `nfc_panel_z_low` en vez de bajar `nfc_panel_z_high`)
+  — habría abierto un hueco de 2mm entre el panel NFC y el panel
+  inferior, justo la unión que debía quedarse fija. Corregido
+  restaurando `nfc_panel_margin_top=2`, para que el recorte salga
+  por ARRIBA (más margen frente al techo del chasis) y el borde
+  inferior se mantenga en 51,5mm, sin cambios.
+
+### Verificado
+
+- `nfc_panel_z_low` confirmado sin cambios (51,5mm); `nfc_panel_z_high`
+  confirmado en 146mm (2mm menos).
+- Imanes (`nfc_magnet_z_low/high`, valores absolutos desde una
+  corrección anterior) y hueco del tag NFC (`nfc_tag_pocket_z`,
+  también absoluto) confirmados dentro del panel con margen amplio
+  (25mm hasta el nuevo techo) — no dependen de la altura del panel,
+  no necesitaron ningún ajuste.
+- Los 3 paneles temáticos (Steam, RetroBat, TeknoParrot) y el panel
+  en blanco (con el logo de TeknoParrot) siguen compilando
+  correctamente. Confirmado visualmente por render: logo y texto de
+  Steam dentro de los límites, nada cortado.
+- Ensamblaje: 28/28 sin colisión (sin cambios).
+
+---
+
+## [1.0.10] - 2026-08-17 — Franja del difusor LED adelgazada a 1mm (la luz no atravesaba bien 3mm)
+
+### Añadido
+
+- `ledDiffuserThinCut()` (`lower_panel.scad`) — recorte real desde
+  la cara trasera de la franja del difusor (antes solo existía
+  `ledDiffuserZone()`, una zona de referencia para la vista previa
+  de color, sin ningún recorte real — el panel impreso tenía el
+  mismo grosor uniforme, 3mm, en toda su superficie). El usuario
+  confirmó tras imprimirlo que ese grosor no dejaba pasar bien la
+  luz de la tira LED.
+- `led_diffuser_skin_thickness = 1.0mm` — grosor que queda en la
+  cara frontal de la franja, por donde pasa la luz. El resto del
+  panel (incluido el marco perimetral) mantiene los 3mm originales,
+  sin tocar.
+
+### Verificado
+
+- Grosor real confirmado por sonda geométrica directa: exactamente
+  1mm dentro de la franja del difusor, exactamente 3mm fuera de
+  ella (marco y resto del panel).
+- OpenSCAD confirma la pieza como "Simple: yes" (2-manifold válido,
+  la misma comprobación robusta usada en todo el proyecto) — un
+  aviso inicial de "no watertight" de una herramienta externa
+  (trimesh) resultó ser un artefacto de su comprobación más
+  estricta en los bordes propios del panel, no un problema real de
+  impresión.
+- Ensamblaje: 28/28 sin colisión (sin cambios).
+
+---
+
+## [1.0.9.1] - 2026-08-17 — Logo TeknoParrot integrado en nfc_panel_blank.scad, a escala reducida
+
+### Cambiado
+
+- `nfc_panel_blank.scad`: añadido el logo de TeknoParrot (mismos
+  datos de contorno ya verificados en `nfc_panel_teknoparrot.scad`
+  — un único polígono cerrado, sin auto-intersecciones), a una
+  escala reducida (0,1487, frente a 0,2173 en el panel temático
+  completo) y centrado verticalmente en el panel, no pegado al
+  marco — para que ocupe "gran parte pero no toda" la superficie,
+  según pidió el usuario. Deja ~14mm de margen visible arriba y
+  abajo.
+- El archivo sigue llamándose "blank" aunque ya no está vacío — el
+  usuario pidió integrar el logo en este fichero concreto, no crear
+  uno nuevo.
+
+### Corregido
+
+- Centrado vertical real corregido: la fórmula ingenua dejaba el
+  resultado 5mm más arriba de lo previsto (la silueta del logo no
+  es simétrica respecto a su propio origen, mismo tipo de ajuste ya
+  visto con el logo de Steam) — corregido con un offset verificado
+  por geometría exportada, centro real confirmado en Z=92,75.
+
+### Verificado
+
+- Centrado confirmado por coordenadas exportadas tras la
+  corrección.
+- Ensamblaje: 28/28 sin colisión (sin cambios).
+
+---
+
+## [1.0.9] - 2026-08-17 — Insertos sobrantes de la bandeja eliminados (petición del usuario)
+
+### Eliminado
+
+- `trayRearBridgeInserts()` y `trayRearBridgeInsertPads()`
+  (`openscad/parts/01_bandeja/base.scad`) — los postes cilíndricos
+  donde roscaban las lengüetas del panel trasero, ya eliminadas en
+  la ronda anterior (1.0.8). El usuario confirmó que se quitaran
+  también: "Elimina los insertos sobrantes de la bandeja".
+- Variables asociadas eliminadas junto con los módulos
+  (`rear_bridge_x_inset_local`, `rear_bridge_insert_diameter`,
+  `rear_bridge_post_height`) — solo se usaban ahí.
+
+### Verificado
+
+- `base.scad` y `tray.scad` siguen compilando correctamente.
+- La bandeja completa sigue siendo watertight y una sola pieza.
+- Confirmado por sonda directa: cero material por encima del
+  grosor base de la bandeja en la posición exacta donde estaban los
+  postes cilíndricos.
+- Sin referencias sueltas a los módulos eliminados en ningún otro
+  archivo del proyecto (solo comentarios informativos).
+- Ensamblaje: 28/28 sin colisión (sin cambios).
+
+---
+
+
+
+### Eliminado
+
+- **Lengüetas de unión con la bandeja** (`rearBridgeTab()`,
+  `rearBridgeTabs()`, `rearBridgeScrewHoles()`) — el usuario las
+  marcó directamente en una captura de su render: "sobran estos
+  soportes, no son necesarios". El panel trasero se sujeta ahora
+  **solo** con los tornillos M3 a las paredes laterales
+  (`rearWallScrewHoles()`, ya verificados en rondas anteriores).
+
+### Movido
+
+- `rear_panel.scad` y su probeta (`probeta_panel_trasero.scad`):
+  `openscad/parts/01_bandeja/` → `openscad/parts/03_panels/`
+  (petición del usuario: encajaba conceptualmente mejor junto al
+  resto de paneles, no con las piezas de la bandeja). Las rutas
+  relativas de `include` no necesitaron ningún cambio (misma
+  profundidad de carpeta).
+
+### Actualizado — referencias en otros archivos
+
+- Comentarios desactualizados corregidos en `assembly_positions.scad`,
+  `walls.scad` y `base.scad` (rutas antiguas y menciones a las
+  lengüetas ya eliminadas).
+- `openscad/parts/02_chassis/checks/run_structure_checks.py`: ruta
+  de `rear_panel.scad` actualizada a `03_panels` (el script en sí
+  sigue sin mantenerse activamente, solo se corrigió la ruta para
+  que no quede rota).
+
+### Pendiente de confirmar por el usuario
+
+- La bandeja (`base.scad`) conserva los insertos correspondientes
+  (`trayRearBridgeInserts()`, `trayRearBridgeInsertPads()`) — no se
+  pidió quitarlos explícitamente y no causan ningún problema (siguen
+  siendo material sólido de apoyo), pero ya no tienen ningún
+  tornillo real que rosque en ellos. Avisar si se quieren eliminar
+  también.
+
+### Verificado
+
+- Panel trasero: sigue compilando correctamente tras quitar las
+  lengüetas (2 volúmenes, igual que antes — los recortes de
+  conectores). Confirmado visualmente por render: rectángulo liso,
+  sin salientes laterales.
+- Probeta: sigue watertight, un único cuerpo, tras la mudanza de
+  carpeta.
+- Ensamblaje: 28/28 sin colisión (sin cambios).
+
+---
+
+
 
 ### Corregido — fallo propio de interpretación del CAD
 
