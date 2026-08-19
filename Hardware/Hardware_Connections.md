@@ -1,14 +1,14 @@
-# SteamMachine UM790 — Hardware Connections
+content = """# SteamMachine UM790 — Conexiones de hardware
 
-> **Status:** Definitive hardware connection reference  
-> **Project:** SteamMachine-UM790  
-> **Controller:** ESP32
+> **Estado:** Referencia definitiva de conexiones de hardware  
+> **Proyecto:** SteamMachine-UM790  
+> **Controlador:** ESP32
 
-This document is the current reference for the ESP32, RC522, OLED, 74AHCT125 and WS2812B wiring.
+Este documento es la referencia actual para el cableado de los componentes ESP32, RC522, OLED, 74AHCT125 y WS2812B.
 
-## 1. ESP32 pin allocation
+## 1. Asignación de pines del ESP32
 
-| ESP32 | Function |
+| ESP32 | Función |
 |---:|---|
 | GPIO5 | RC522 SDA/SS |
 | GPIO18 | RC522 SCK |
@@ -17,10 +17,10 @@ This document is the current reference for the ESP32, RC522, OLED, 74AHCT125 and
 | GPIO27 | RC522 RST |
 | GPIO21 | OLED SDA |
 | GPIO22 | OLED SCL |
-| GPIO25 | WS2812B data source |
-| 3V3 | RC522 + OLED supply |
-| VIN (~4.68 V measured) | 74AHCT125 + WS2812B supply |
-| GND | Common ground |
+| GPIO25 | Fuente de datos WS2812B |
+| 3V3 | Alimentación RC522 + OLED |
+| VIN (~4.68 V medidos) | Alimentación 74AHCT125 + WS2812B |
+| GND | Tierra común |
 
 ## 2. ESP32 → RC522
 
@@ -34,7 +34,7 @@ This document is the current reference for the ESP32, RC522, OLED, 74AHCT125 and
 | MISO | GPIO19 |
 | RST | GPIO27 |
 
-**Do not connect the RC522 to 5 V.**
+**No conectes el RC522 a 5 V.**
 
 ![RC522](images/rc522_esp32.svg)
 
@@ -51,105 +51,105 @@ This document is the current reference for the ESP32, RC522, OLED, 74AHCT125 and
 
 ## 4. ESP32 → 74AHCT125 → WS2812B
 
-Only channel 1 of the 74AHCT125 is used.
+Solo se utiliza el canal 1 del 74AHCT125.
 
-| 74AHCT125 | Connection |
+| 74AHCT125 | Conexión |
 |---:|---|
-| Pin 14 — VCC | ESP32 VIN (~4.68 V measured) |
-| Pin 7 — GND | Common GND |
+| Pin 14 — VCC | ESP32 VIN (~4.68 V medidos) |
+| Pin 7 — GND | GND común |
 | Pin 2 — 1A | ESP32 GPIO25 |
 | Pin 1 — /1OE | GND |
 | Pin 3 — 1Y | 330 Ω → WS2812B DIN |
 
-Data path:
+Ruta de datos:
 
 `GPIO25 → 74AHCT125 1A → 74AHCT125 1Y → 330 Ω → WS2812B DIN`
 
 ![74AHCT125](images/74ahct125_ws2812b.svg)
 
-## 5. 74AHCT125 decoupling
+## 5. Desacoplamiento del 74AHCT125
 
-Fit **one 100 nF ceramic capacitor** directly between:
+Coloca **un condensador cerámico de 100 nF** directamente entre:
 
 - Pin 14 (VCC)
 - Pin 7 (GND)
 
-The capacitor has no polarity and should be physically close to the IC.
+El condensador no tiene polaridad y debe colocarse físicamente cerca del circuito integrado.
 
 ![100 nF](images/74ahct125_100nf.svg)
 
 ## 6. WS2812B
 
-The project uses approximately **15 cm of strip (~9 LEDs)**.
+El proyecto utiliza aproximadamente **15 cm de tira (~9 LEDs)**.
 
-The current strip wiring has been checked and the **green wire is DIN/data**.
+Se ha verificado el cableado actual de la tira y **el cable verde es DIN/datos**.
 
-| WS2812B | Connection |
+| WS2812B | Conexión |
 |---|---|
-| +5V | ESP32 VIN (~4.68 V measured) |
-| DIN | 330 Ω from 74AHCT125 1Y |
-| GND | Common GND |
+| +5V | ESP32 VIN (~4.68 V medidos) |
+| DIN | 330 Ω desde 74AHCT125 1Y |
+| GND | GND común |
 
-Follow the arrow printed on the strip and connect to its **DIN/input side**.
+Sigue la flecha impresa en la tira y conéctalo en su **lado de entrada/DIN**.
 
 ![WS2812B](images/ws2812b_connection.svg)
 
-## 7. WS2812B bulk capacitor
+## 7. Condensador de desacoplamiento para WS2812B
 
-Fit **470–1000 µF electrolytic, rated ≥10 V**, close to the beginning of the strip.
+Coloca un **condensador electrolítico de 470–1000 µF, de ≥10 V**, cerca del inicio de la tira.
 
-- Capacitor `+` → WS2812B +5V
-- Capacitor `−` → WS2812B GND
+- Condensador `+` → WS2812B +5V
+- Condensador `−` → WS2812B GND
 
-![Bulk capacitor](images/ws2812b_bulk_capacitor.svg)
+![Condensador de desacoplamiento](images/ws2812b_bulk_capacitor.svg)
 
-## 8. Complete wiring
+## 8. Cableado completo
 
-![Complete wiring](images/complete_hardware_wiring.svg)
+![Cableado completo](images/complete_hardware_wiring.svg)
 
-### Common ground
+### Tierra común
 
-All ESP32-controlled electronics share GND:
+Toda la electrónica controlada por el ESP32 comparte la misma línea GND:
 
 - RC522 GND
 - OLED GND
 - 74AHCT125 GND
 - WS2812B GND
 
-## 9. UM790 power-button interface
+## 9. Interfaz del botón de encendido del UM790
 
-The ESP32 **does not power the UM790**.
+El ESP32 **no alimenta al UM790**.
 
-The project button interfaces with the **original UM790 power-button contacts**. Do not connect ESP32 VIN or 3V3 directly to the UM790 power-button supply circuitry.
+El botón del proyecto se conecta directamente con los **contactos del botón de encendido original del UM790**. No conectes las líneas VIN o 3V3 del ESP32 a la circuitería de alimentación del botón del UM790.
 
-## 10. Components
+## 10. Componentes
 
-| Qty | Component | Purpose |
+| Cant. | Componente | Propósito |
 |---:|---|---|
-| 1 | 74AHCT125 | 3.3 V → 5 V logic buffer |
-| 1 | 330 Ω resistor | WS2812B DIN series resistor |
-| 1 | 100 nF ceramic capacitor | 74AHCT125 decoupling |
-| 1 | 470–1000 µF electrolytic ≥10 V | WS2812B supply smoothing |
-| ~15 cm | WS2812B strip | Front lighting |
+| 1 | 74AHCT125 | Adaptador de nivel lógico de 3.3 V a 5 V |
+| 1 | Resistencia de 330 Ω | Resistencia en serie para WS2812B DIN |
+| 1 | Condensador cerámico de 100 nF | Desacoplamiento para 74AHCT125 |
+| 1 | Condensador electrolítico de 470–1000 µF ≥10 V | Estabilización de alimentación para WS2812B |
+| ~15 cm | Tira WS2812B | Iluminación frontal |
 
-## 11. Verification checklist
+## 11. Lista de verificación
 
-- [ ] RC522 at 3.3 V.
-- [ ] OLED at 3.3 V.
-- [ ] VIN measured at approximately 4.68 V.
-- [ ] 74AHCT125 pin 14 → VIN.
-- [ ] 74AHCT125 pin 7 → GND.
-- [ ] 100 nF between pins 14 and 7.
+- [ ] RC522 a 3.3 V.
+- [ ] OLED a 3.3 V.
+- [ ] VIN medido en aproximadamente 4.68 V.
+- [ ] Pin 14 del 74AHCT125 → VIN.
+- [ ] Pin 7 del 74AHCT125 → GND.
+- [ ] 100 nF entre los pines 14 y 7.
 - [ ] Pin 1 (/1OE) → GND.
 - [ ] GPIO25 → pin 2 (1A).
 - [ ] Pin 3 (1Y) → 330 Ω → WS2812B DIN.
-- [ ] WS2812B green wire confirmed as DIN.
-- [ ] WS2812B polarity checked.
-- [ ] 470–1000 µF polarity checked.
-- [ ] Common GND checked.
-- [ ] Unused 74AHCT125 channels must not have floating inputs; finalize their connections before permanent assembly.
+- [ ] Cable verde del WS2812B confirmado como DIN.
+- [ ] Polaridad del WS2812B verificada.
+- [ ] Polaridad del condensador de 470–1000 µF verificada.
+- [ ] GND común verificado.
+- [ ] Los canales no utilizados del 74AHCT125 no deben quedar flotantes; define sus conexiones antes del ensamblaje permanente.
 
-## 12. Firmware pin reference
+## 12. Referencia de pines en el firmware
 
 ```python
 RC522_SS   = 5
@@ -162,7 +162,3 @@ OLED_SDA = 21
 OLED_SCL = 22
 
 WS2812B_DATA = 25
-```
-
-This pinout must remain synchronized with `07_Hardware_Specification.md`, `08_Software_API.md`, `09_Coding_Standards.md`, `10_Test_Plan.md`, `11_Assembly_Manual.md` and `06_Development_Roadmap.md`.
-
