@@ -85,7 +85,17 @@ front_inner_face_y = -case_depth/2 + front_panel_thickness;
 // el panel ahora crece 12mm hacia arriba (nfc_panel_height ajustada
 // en 00_parametros.scad) manteniendo fijo el borde inferior, que
 // conecta con lower_panel.
-nfc_panel_margin_top = 0;
+//
+// FALLO CORREGIDO (2026-08-17, medidas reales del usuario): al
+// reducir nfc_panel_height 2mm (96,5 → 94,5) para no superar la
+// altura interior real del chasis, dejar margin_top=0 hacía que la
+// fórmula recortara por ABAJO (subía nfc_panel_z_low), abriendo un
+// hueco de 2mm entre este panel y el panel inferior — justo la unión
+// que debía quedarse fija. Corregido: margin_top=2 (igual al recorte
+// de altura), para que el hueco salga por ARRIBA (nfc_panel_z_high
+// baja a 146, dejando margen frente al techo del chasis) y
+// nfc_panel_z_low se mantenga en 51,5, sin cambios.
+nfc_panel_margin_top = 2;
 nfc_panel_z_low  = shell_height - nfc_panel_margin_top - nfc_panel_height;
 nfc_panel_z_high = nfc_panel_z_low + nfc_panel_height;
 nfc_panel_z_mid  = (nfc_panel_z_low + nfc_panel_z_high) / 2;
@@ -146,13 +156,20 @@ rear_csk_radius        = 6.0/2;  // M3
 
 // Fijación del panel trasero a la pared — compartido entre
 // openscad/parts/02_chassis/walls.scad (rearBossPad/rearWallScrewCuts)
-// y openscad/parts/01_bandeja/rear_panel.scad (rearWallScrewHoles).
+// y openscad/parts/03_panels/rear_panel.scad (rearWallScrewHoles).
 //
 // rear_wall_screw_z_low — CORREGIDO (2026-08-03): a Z=15 colisionaba
-// con la lengüeta de unión bandeja-panel trasero (rearBridgeTabs(),
-// también a Z=15-18) — confirmado con el modelo real, no solo
-// contacto de borde. Subido a 27: lejos de la lengüeta (15-18) y del
-// recorte de la IO trasera (37,6-61,6).
+// con la lengüeta de unión bandeja-panel trasero (a Z=15-18 en su
+// momento) — confirmado con el modelo real, no solo contacto de
+// borde. Subido a 27: lejos de la lengüeta (15-18) y del recorte de
+// la IO trasera (37,6-61,6).
+//
+// NOTA (2026-08-17): esa lengüeta de unión (rearBridgeTabs()) se ha
+// eliminado del todo (petición del usuario, ver rear_panel.scad,
+// openscad/parts/03_panels/ tras el traslado) — el panel trasero
+// ahora se sujeta solo con estos tornillos a la pared. El valor de
+// rear_wall_screw_z_low (27) se mantiene sin cambios; ya no hace
+// falta evitar la lengüeta, pero sigue siendo una posición válida.
 rear_wall_screw_diameter = insert_diameter;
 rear_wall_screw_z_low    = 27.0;
 rear_wall_screw_z_high   = 130.0;
@@ -188,9 +205,14 @@ module wallPadRelief(z, panelY, panelThickness)
 // FIJACIÓN DEL PANEL TRASERO A LAS PAREDES LATERALES — RETIRADA (2026-08-03)
 //
 // Se intentó (docs/03_Virtual_Assembly_Report.md), pero colisionaba
-// con el relleno local de la pared. El panel trasero sigue fijado a
-// la bandeja (openscad/parts/01_bandeja/rear_panel.scad,
-// rearBridgeTabs()), ya verificado sin colisión.
+// con el relleno local de la pared.
+//
+// El panel trasero se sujetaba también a la bandeja mediante unas
+// lengüetas (rearBridgeTabs(), openscad/parts/03_panels/rear_panel.scad)
+// — ELIMINADAS (2026-08-17, petición del usuario: "sobran estos
+// soportes, no son necesarios"). El panel trasero se sujeta ahora
+// SOLO con los tornillos a las paredes laterales
+// (rear_wall_screw_z_low/high, arriba).
 //=============================================================================
 
 
@@ -418,6 +440,20 @@ front_panel_lower_top = front_panel_cluster_z_high + front_panel_edge_margin;
 lower_panel_screw_z_low    = 10.0;
 lower_panel_screw_z_high   = front_panel_lower_top - 10.0;
 lower_panel_screw_diameter = insert_diameter;   // antes 6.5 (estimado propio) — ahora el mismo valor M3 (4,10mm) que usan el panel trasero y la tapa
+
+// FALLO CORREGIDO (2026-08-18, aviso del usuario con foto del
+// montaje real): "Los agujeros de fijación en el panel interior
+// están altos. Hay que bajarlos 3mm" — la foto muestra el agujero
+// del panel claramente por encima del inserto real de la pared (ya
+// impresa, fija). lower_panel_screw_z_low/high (arriba) las
+// comparten TANTO la pared (el inserto, sideBossPad() en
+// walls.scad) COMO el panel (el taladro de paso, lower_panel.scad)
+// — no se pueden bajar directamente sin mover también la pared, que
+// no puede cambiar. Se añaden aquí unas Z específicas solo para el
+// panel, desplazadas -3mm respecto a las de la pared (que se dejan
+// intactas, coinciden con el inserto real).
+lower_panel_hole_z_low    = lower_panel_screw_z_low  - 3.0;
+lower_panel_hole_z_high   = lower_panel_screw_z_high - 3.0;
 lower_panel_screw_depth    = insert_depth;   // antes 5.0 (estimado propio, coincidía por casualidad) — ahora referenciado al mismo valor compartido (5,00mm), para que no se puedan desincronizar
 
 front_panel_led_z_low  = front_panel_lower_top;
