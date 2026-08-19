@@ -1,0 +1,20 @@
+{
+  "04A1C8B2": {
+    "name": "Steam",
+    "launcher": "steam",
+    "led": "#0055FF",
+    "icon": "steam.png"
+  },
+  "04B2D9C3": {
+    "name": "RetroDECK",
+    "launcher": "retrodeck",
+    "led": "#8800FF",
+    "icon": "retrodeck.png"
+  },
+  "04C3EAD4": {
+    "name": "TeknoParrot",
+    "launcher": "teknoparrot",
+    "led": "#FF3300",
+    "icon": "teknoparrot.png"
+  }
+}
