@@ -187,43 +187,15 @@ la que flasheas.
 2. Abre la carpeta `firmware/` del proyecto en VS Code (**Archivo →
    Abrir carpeta**).
 3. Conecta el ESP32 al ordenador por USB.
-4. En VS Code, con `firmware/` abierta y el ESP32 conectado por USB,
-   usa los **botones de PlatformIO** en vez de escribir comandos —
-   son más fiables porque no dependen de que tu terminal tenga nada
-   configurado. Al instalar la extensión aparece una franja azul en la
-   parte inferior de VS Code con varios iconos; los que necesitas son:
-   - ✔️ (**Build**) — compila.
-   - ➡️ (**Upload**) — flashea el ESP32.
-   - 🔌 (**Serial Monitor**) — abre el monitor serie.
-
-   Pulsa los tres en ese orden. Si no ves esa franja azul, abre el
-   icono de PlatformIO (una cabeza de hormiga) en la barra lateral
-   izquierda → **PROJECT TASKS → esp32doit-devkit-v1 → General**, y
-   ahí tienes Build/Upload/Monitor como una lista.
-
-   > **¿Por qué no usar una terminal normal?** En Windows es habitual
-   > que el comando `pio` dé el error *"no se reconoce como nombre de
-   > un cmdlet..."* aunque la extensión funcione perfectamente — el
-   > `pio` de PlatformIO no se añade solo al PATH de PowerShell. Si
-   > prefieres la terminal de todos modos, abre **PlatformIO Core
-   > CLI** desde el icono de PlatformIO (no "Terminal → Nueva
-   > terminal" de VS Code): esa sí tiene `pio` disponible, con los
-   > mismos comandos que abajo.
+4. Abre una terminal dentro de VS Code (**Terminal → Nueva terminal**)
+   y ejecuta:
    ```bash
    cd firmware
    pio run                                            # compila
    pio run --target upload -e esp32doit-devkit-v1     # flashea el ESP32
    pio device monitor -b 115200                        # abre el monitor serie
    ```
-   El monitor serie (por botón o por `pio device monitor`) es clave:
-   abre una ventana de texto en directo con todo lo que el ESP32 envía
-   por el cable USB — es la única forma de "ver" lo que está haciendo,
-   ya que no tiene pantalla propia. Todo lo que describen los pasos 5
-   y 6 aparece ahí.
-5. Al arrancar deberías ver una única línea (si el ESP32 llevaba un
-   rato encendido antes de abrir el monitor, te la habrás perdido —
-   pulsa el botón RESET/EN de la placa, o desconecta y vuelve a
-   conectar el USB, para que arranque de nuevo con el monitor ya abierto):
+5. Al arrancar deberías ver una única línea:
    ```
    {"event":"boot","firmware":"1.0.0"}
    ```
@@ -332,13 +304,6 @@ journalctl --user -u steammachine.service -f
 ---
 
 ## 10. Solución de problemas
-
-**`pio` no se reconoce como comando (Windows, PowerShell)**
-La extensión de PlatformIO no añade `pio` al PATH de una terminal
-normal. Usa los botones ✔️/➡️/🔌 de la franja azul inferior de VS
-Code, o abre **PlatformIO Core CLI** desde el icono de PlatformIO en
-la barra lateral (no "Terminal → Nueva terminal") — ver el
-[Paso 4](#6-paso-4--programar-el-esp32-firmware).
 
 **El ESP32 no aparece al conectarlo (ni en PlatformIO ni en `/dev/serial/by-id/`)**
 Prueba otro cable USB (muchos cables baratos son solo de carga, sin
