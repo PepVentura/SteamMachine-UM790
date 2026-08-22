@@ -188,14 +188,23 @@ la que flasheas.
    Abrir carpeta**).
 3. Conecta el ESP32 al ordenador por USB.
 4. Abre una terminal dentro de VS Code (**Terminal → Nueva terminal**)
-   y ejecuta:
+   y ejecuta, una línea cada vez:
    ```bash
    cd firmware
    pio run                                            # compila
    pio run --target upload -e esp32doit-devkit-v1     # flashea el ESP32
    pio device monitor -b 115200                        # abre el monitor serie
    ```
-5. Al arrancar deberías ver una única línea:
+   El último comando (`pio device monitor`) es clave: abre, **dentro
+   de esa misma terminal**, una ventana de texto en directo con todo lo
+   que el ESP32 envía por el cable USB — es la única forma de "ver"
+   lo que está haciendo, ya que no tiene pantalla propia. Todo lo que
+   describen los pasos 5 y 6 aparece ahí, en esa terminal, no en
+   ningún otro sitio.
+5. Al arrancar deberías ver una única línea (si el ESP32 llevaba un
+   rato encendido antes de abrir el monitor, te la habrás perdido —
+   pulsa el botón RESET/EN de la placa, o desconecta y vuelve a
+   conectar el USB, para que arranque de nuevo con el monitor ya abierto):
    ```
    {"event":"boot","firmware":"1.0.0"}
    ```
