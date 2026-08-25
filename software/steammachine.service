@@ -1,0 +1,30 @@
+# SteamMachine UM790 - SteamMachine Core
+#
+# Servicio de usuario systemd para arranque automatico con la sesion
+# grafica de Bazzite (docs/06_Development_Roadmap.md, Fase 10,
+# "Arranque automatico").
+#
+# Instalacion: ver "Arranque automatico" en software/README.md.
+#
+# Ajusta WorkingDirectory/ExecStart si tu ruta de instalacion no es
+# ~/SteamMachine-UM790/software.
+
+[Unit]
+Description=SteamMachine Core (paneles NFC + OLED + LEDs + lanzador)
+After=graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/SteamMachine-UM790/software
+ExecStart=%h/SteamMachine-UM790/software/.venv/bin/python %h/SteamMachine-UM790/software/main.py
+Restart=on-failure
+RestartSec=3
+
+# El ESP32 tarda un instante en enumerarse tras el arranque del sistema;
+# sin esto, el primer intento de conexion podria fallar antes de que el
+# dispositivo /dev/ttyUSB* exista todavia.
+ExecStartPre=/bin/sleep 2
+
+[Install]
+WantedBy=graphical-session.target
