@@ -161,12 +161,11 @@ Archivo principal: `openscad/00_parametros.scad`
 - [x] Hardware montado (ESP32, RC522, OLED, barra LED, HUB USB).
 - [x] Firmware del ESP32 escrito, compilado y flasheado en hardware real.
 - [x] Software Core (Python) escrito, con tests unitarios.
-- [x] Probado en hardware real: lectura NFC, barra LED, pulsador frontal, pantalla OLED.
+- [x] Probado en hardware real: lectura NFC, barra LED, pulsador frontal, pantalla OLED, recuperación tras reinicio del ESP32.
 - [x] Guía de inicio completa para montarlo desde cero (`GUIA_INICIO.md`).
 
 ### Pendiente
 
-- [ ] Validar la recuperación tras desconectar/reconectar el USB.
 - [ ] Primera ejecución completa del Core conectado al ESP32 real.
 - [ ] Publicación de STL definitivos actualizados.
 

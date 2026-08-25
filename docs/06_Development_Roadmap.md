@@ -432,7 +432,7 @@ Estado
 
 
 
-Completado (ver firmware/, ESP32-WROOM-32D DevKit sobre PlatformIO/Arduino). Validado en hardware real: compila, flashea y arranca correctamente, y el RC522, la barra LED (8 LEDs, directo sin nivelador), el pulsador (GPIO13) y la OLED ya funcionan probados en el hardware real. Pendiente: recuperación tras desconectar/reconectar el USB.
+Completado (ver firmware/, ESP32-WROOM-32D DevKit sobre PlatformIO/Arduino). Validado en hardware real: compila, flashea y arranca correctamente, y el RC522, la barra LED (8 LEDs, directo sin nivelador), el pulsador (GPIO13), la OLED y la recuperación tras reinicio ya funcionan probados en el hardware real. Todas las pruebas de firmware de docs/10_Test_Plan.md superadas.
 
 
 

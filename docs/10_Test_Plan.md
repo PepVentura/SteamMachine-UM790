@@ -684,7 +684,13 @@ Debe recuperar la comunicación.
 
 
 
-Resultado: Pendiente.
+Resultado: ✔ Superado (2026-08-25). Tras un reinicio (equivalente
+eléctricamente a desconectar/reconectar el USB), el ESP32 arranca
+limpio y vuelve a mandar `{"event":"boot","firmware":"1.0.0"}`. Nota:
+Windows puede reasignar el número de puerto COM al reconectar (visto
+pasar de COM10 a COM7) — el Core lo detecta automáticamente por
+VID:PID, así que no debería ser un problema; a tener en cuenta si se
+fija el puerto a mano en `config.json`.
 
 
 
