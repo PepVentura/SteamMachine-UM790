@@ -109,3 +109,237 @@
 2026-08-25 18:25:44.457 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
 2026-08-25 18:25:44.901 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
 2026-08-25 18:25:44.901 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:31:26.623 | INFO     | core.application:shutdown:86 - Cerrando SteamMachine Core...
+2026-08-25 18:31:36.016 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 18:31:36.017 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 18:31:36.017 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 18:31:36.017 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 18:31:36.017 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 18:31:36.017 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 18:31:36.195 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 18:31:36.199 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 18:31:40.394 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:31:40.395 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:31:40.396 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:31:40.841 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:31:40.841 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:31:43.244 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:31:43.245 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:31:43.246 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:31:43.691 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:31:43.691 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:31:45.795 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:31:45.796 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:31:45.797 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:31:46.241 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:31:46.241 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:33:10.420 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 18:33:10.423 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 18:33:10.424 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 18:33:10.424 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 18:33:10.424 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 18:33:10.424 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 18:33:10.455 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 18:33:10.457 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 18:33:14.143 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:33:14.143 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:33:14.145 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:33:14.588 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:33:14.589 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:33:17.443 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:33:17.443 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:33:17.445 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:33:17.888 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:33:17.889 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:33:20.743 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:33:20.744 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:33:20.744 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:33:21.191 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:33:21.191 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:33:24.794 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:33:24.794 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:33:24.796 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:33:25.240 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:33:25.240 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:33:52.401 | INFO     | core.application:shutdown:86 - Cerrando SteamMachine Core...
+2026-08-25 18:33:56.321 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 18:33:56.322 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 18:33:56.322 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 18:33:56.322 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 18:33:56.322 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 18:33:56.322 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 18:33:56.340 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 18:33:56.341 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 18:34:51.386 | INFO     | core.application:shutdown:86 - Cerrando SteamMachine Core...
+2026-08-25 18:34:55.826 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 18:34:55.827 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 18:34:55.827 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 18:34:55.827 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 18:34:55.827 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 18:34:55.827 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 18:34:55.844 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 18:34:55.845 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 18:36:46.780 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 18:36:46.782 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 18:36:46.782 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 18:36:46.782 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 18:36:46.782 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 18:36:46.782 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 18:36:46.814 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 18:36:46.815 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 18:37:02.321 | ERROR    | devices.serial_manager:_read_loop:128 - Error en el hilo de lectura serie: GetOverlappedResult failed (PermissionError(13, 'Acceso denegado.', None, 5))
+2026-08-25 18:37:47.102 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 18:37:47.103 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 18:37:47.103 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 18:37:47.103 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 18:37:47.103 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 18:37:47.103 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 18:37:47.119 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 18:37:47.121 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 18:37:50.070 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': 'F2BAC203'}
+2026-08-25 18:37:50.070 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: F2BAC203
+2026-08-25 18:37:50.071 | WARNING  | core.application:_on_tag_detected:120 - UID desconocido: F2BAC203
+2026-08-25 18:37:50.515 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:37:50.516 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:37:57.121 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:37:57.121 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:37:57.131 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:37:57.566 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:37:57.567 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:38:29.669 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:38:29.670 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:38:29.672 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:38:30.115 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:38:30.116 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:38:32.519 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:38:32.519 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:38:32.520 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:38:32.965 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:38:32.965 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:57:39.986 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 18:57:39.988 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 18:57:39.988 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 18:57:39.988 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 18:57:39.988 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 18:57:39.988 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 18:57:40.072 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 18:57:40.111 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 18:57:40.112 | WARNING  | devices.serial_manager:_handle_line:142 - Linea serie no es JSON valido: 'ets Jul 29 2019 12:21:46'
+2026-08-25 18:57:40.114 | WARNING  | devices.serial_manager:_handle_line:142 - Linea serie no es JSON valido: 'rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)'
+2026-08-25 18:57:40.115 | WARNING  | devices.serial_manager:_handle_line:142 - Linea serie no es JSON valido: 'configsip: 0, SPIWP:0xee'
+2026-08-25 18:57:40.117 | WARNING  | devices.serial_manager:_handle_line:142 - Linea serie no es JSON valido: 'clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00'
+2026-08-25 18:57:40.144 | WARNING  | devices.serial_manager:_handle_line:142 - Linea serie no es JSON valido: 'mode:DIO, clock div:2'
+2026-08-25 18:57:40.145 | WARNING  | devices.serial_manager:_handle_line:142 - Linea serie no es JSON valido: 'load:0x3fff0030,len:1184'
+2026-08-25 18:57:40.146 | WARNING  | devices.serial_manager:_handle_line:142 - Linea serie no es JSON valido: 'load:0x40078000,len:13232'
+2026-08-25 18:57:40.147 | WARNING  | devices.serial_manager:_handle_line:142 - Linea serie no es JSON valido: 'load:0x40080400,len:3028'
+2026-08-25 18:57:40.147 | WARNING  | devices.serial_manager:_handle_line:142 - Linea serie no es JSON valido: 'entry 0x400805e4'
+2026-08-25 18:57:40.352 | DEBUG    | core.events:publish:47 - Evento publicado: BOOT {'firmware': '1.0.0'}
+2026-08-25 18:57:40.353 | INFO     | core.application:_on_boot:111 - ESP32 arrancado (firmware=1.0.0)
+2026-08-25 18:58:51.738 | INFO     | core.application:shutdown:86 - Cerrando SteamMachine Core...
+2026-08-25 18:59:00.378 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 18:59:00.379 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 18:59:00.379 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 18:59:00.379 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 18:59:00.379 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 18:59:00.379 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 18:59:00.420 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 18:59:00.422 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 18:59:04.104 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:59:04.104 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:59:04.106 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:59:10.875 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:59:10.875 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:59:12.203 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:59:12.203 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:59:12.204 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:59:24.075 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:59:24.076 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:59:26.753 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:59:26.753 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:59:26.755 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:59:28.725 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:59:28.725 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 19:01:31.527 | ERROR    | devices.serial_manager:_read_loop:128 - Error en el hilo de lectura serie: GetOverlappedResult failed (PermissionError(13, 'Acceso denegado.', None, 5))
+2026-08-25 19:53:41.561 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 19:53:41.565 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 19:53:41.566 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 19:53:41.566 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 19:53:41.566 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 19:53:41.566 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 19:53:41.623 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 19:53:41.624 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 19:53:45.185 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 19:53:45.185 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 19:53:45.186 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 19:53:48.656 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 19:53:48.656 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 19:53:51.635 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 19:53:51.635 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 19:53:51.639 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 19:53:59.582 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 19:53:59.582 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 19:54:22.671 | INFO     | core.application:shutdown:86 - Cerrando SteamMachine Core...
+2026-08-25 19:54:25.964 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 19:54:25.965 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 19:54:25.966 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 19:54:25.966 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 19:54:25.966 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 19:54:25.966 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 19:54:25.983 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 19:54:25.986 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 19:55:02.682 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 19:55:02.684 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 19:55:02.684 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 19:55:02.684 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 19:55:02.684 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 19:55:02.685 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 19:55:02.704 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 19:55:02.706 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 19:55:51.404 | ERROR    | devices.serial_manager:_read_loop:128 - Error en el hilo de lectura serie: GetOverlappedResult failed (PermissionError(13, 'Acceso denegado.', None, 5))
+2026-08-25 19:56:07.225 | INFO     | core.application:shutdown:86 - Cerrando SteamMachine Core...
+2026-08-25 19:56:10.714 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 19:56:10.716 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 19:56:10.716 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 19:56:10.716 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 19:56:10.716 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 19:56:10.716 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 19:56:10.747 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 19:56:10.748 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 19:56:15.405 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 19:56:15.405 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 19:56:21.683 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 19:56:21.683 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 19:56:21.685 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 19:56:40.629 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-08-25 19:56:40.630 | INFO     | core.application:_on_button:143 - Lanzando plataforma: steam
+2026-08-25 19:56:40.646 | ERROR    | launcher.base_plugin:_spawn:62 - steam: comando no encontrado: steam
+2026-08-25 19:56:41.013 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-08-25 19:56:41.014 | INFO     | core.application:_on_button:143 - Lanzando plataforma: steam
+2026-08-25 19:56:41.021 | ERROR    | launcher.base_plugin:_spawn:62 - steam: comando no encontrado: steam
+2026-08-25 19:56:42.386 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-08-25 19:56:42.386 | INFO     | core.application:_on_button:143 - Lanzando plataforma: steam
+2026-08-25 19:56:42.393 | ERROR    | launcher.base_plugin:_spawn:62 - steam: comando no encontrado: steam
+2026-08-25 19:58:17.352 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 19:58:17.353 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 20:00:01.576 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 20:00:01.577 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 20:00:01.580 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 20:00:08.347 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-08-25 20:00:08.348 | INFO     | core.application:_on_button:143 - Lanzando plataforma: steam
+2026-08-25 20:00:08.360 | ERROR    | launcher.base_plugin:_spawn:62 - steam: comando no encontrado: steam
+2026-08-25 20:00:08.818 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-08-25 20:00:08.818 | INFO     | core.application:_on_button:143 - Lanzando plataforma: steam
+2026-08-25 20:00:08.824 | ERROR    | launcher.base_plugin:_spawn:62 - steam: comando no encontrado: steam
+2026-08-25 20:00:12.086 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-08-25 20:00:12.087 | INFO     | core.application:_on_button:143 - Lanzando plataforma: steam
+2026-08-25 20:00:12.102 | ERROR    | launcher.base_plugin:_spawn:62 - steam: comando no encontrado: steam
+2026-08-25 20:00:12.547 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-08-25 20:00:12.548 | INFO     | core.application:_on_button:143 - Lanzando plataforma: steam
+2026-08-25 20:00:12.554 | ERROR    | launcher.base_plugin:_spawn:62 - steam: comando no encontrado: steam
+2026-08-25 20:01:13.446 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 20:01:13.446 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 20:01:16.424 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 20:01:16.425 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 20:01:16.431 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 20:01:18.396 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 20:01:18.396 | INFO     | core.application:_on_tag_removed:132 - Panel retirado

@@ -476,7 +476,7 @@ Estado
 
 
 
-Completado (ver software/), con tests unitarios para todos los modulos (LEDManager, OLEDManager, Application, PanelDatabase, Launcher).
+Completado (ver software/), con tests unitarios para todos los modulos (LEDManager, OLEDManager, Application, PanelDatabase, Launcher). Validado de extremo a extremo en hardware real (2026-08-25, PC Windows de pruebas, ESP32 real por USB): detecta panel NFC, actualiza OLED y LEDs, y responde al pulsador lanzando la plataforma correspondiente (el lanzamiento en sí falla en Windows por no tener steam/retrodeck/teknoparrot instalados, esperado — la lógica del Core es lo que se valida aquí, no las plataformas). Pendiente: ejecutarlo en el mini PC real con Bazzite.
 
 
 

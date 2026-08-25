@@ -38,9 +38,8 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
   presente; la detección de retirada real (tag físicamente quitado)
   no se ve afectada, ya que en ese caso `PICC_IsNewCardPresent()`
   falla igualmente por ausencia de tarjeta, no por su estado.
-- Sin verificar en hardware real por mi parte (no tengo acceso a un
-  ESP32/RC522 físico en este entorno) — pendiente de que el usuario
-  reflashee y confirme.
+- Confirmado en hardware real (2026-08-25): tras reflashear, el tag
+  permanece detectado sin `tag_removed` falso mientras sigue puesto.
 
 ---
 

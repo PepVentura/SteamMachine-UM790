@@ -577,14 +577,15 @@ Enviar UID correcto.
 
 
 
-Resultado: ⚠️ Parcial (2026-08-25). Acercar un tag genera
-`{"event":"tag","uid":"..."}` con un UID de 8 caracteres hex —
-correcto. Pero se detectó un fallo real probando desde el Core:
-`{"event":"tag_removed"}` se disparaba a los ~450ms aunque el tag
-siguiera físicamente puesto (causa: `PICC_HaltA()` dejaba la tarjeta
-en un estado que no responde al sondeo siguiente — ver CHANGELOG.md
-v1.1.4). Corregido en el firmware; pendiente de reflashear y
-confirmar en hardware real.
+Resultado: ✔ Superado (2026-08-25). Acercar un tag genera
+`{"event":"tag","uid":"..."}` con un UID de 8 caracteres hex, y
+permanece detectado mientras el tag sigue puesto (confirmado 10-15s
+sin `tag_removed` falso). Se encontró y corrigió un fallo real por el
+camino: `{"event":"tag_removed"}` se disparaba a los ~450ms aunque el
+tag siguiera físicamente puesto (causa: `PICC_HaltA()` dejaba la
+tarjeta en un estado que no responde al sondeo siguiente — ver
+CHANGELOG.md v1.1.4). Confirmado corregido en hardware real tras
+reflashear.
 
 
 
@@ -715,6 +716,12 @@ Carga configuración.
 
 
 
+Resultado: ✔ Superado (2026-08-25). El Core arranca, carga
+`config.json` y conecta al ESP32 automáticamente por VID:PID (visto
+en el log: "Conectado al ESP32 en COM7 @ 115200 bps").
+
+
+
 \---
 
 
@@ -724,6 +731,11 @@ Carga configuración.
 
 
 Carga base de datos.
+
+
+
+Resultado: ✔ Superado (2026-08-25). Carga `panel_database.json` y
+reconoce el UID real del tag, asociándolo al perfil "Steam".
 
 
 
@@ -739,6 +751,12 @@ Reconocimiento de panel.
 
 
 
+Resultado: ✔ Superado (2026-08-25). Acercar el tag genera "Panel
+detectado" + "Perfil 'Steam' listo. Esperando pulsador..." en el log,
+sin comandos manuales.
+
+
+
 \---
 
 
@@ -751,6 +769,12 @@ Cambio OLED.
 
 
 
+Resultado: ✔ Superado (2026-08-25). Confirmado visualmente: la
+pantalla muestra "Steam" al detectar el panel, y cambia a "Steam" /
+"Launching..." (las dos líneas, `show_status()`) al pulsar el botón.
+
+
+
 \---
 
 
@@ -760,6 +784,13 @@ Cambio OLED.
 
 
 Cambio LED.
+
+
+
+Resultado: ✔ Superado (2026-08-25). Al pulsar el botón con el panel
+detectado, el log confirma "Lanzando plataforma: steam" — dispara la
+animación de LEDs correspondiente (el fundido de color al detectar el
+panel usa el mismo mecanismo, ya validado en T044 de firmware).
 
 
 

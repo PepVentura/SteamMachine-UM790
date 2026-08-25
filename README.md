@@ -162,11 +162,11 @@ Archivo principal: `openscad/00_parametros.scad`
 - [x] Firmware del ESP32 escrito, compilado y flasheado en hardware real.
 - [x] Software Core (Python) escrito, con tests unitarios.
 - [x] Probado en hardware real: lectura NFC, barra LED, pulsador frontal, pantalla OLED, recuperación tras reinicio del ESP32.
+- [x] Core (Python) probado de extremo a extremo contra el ESP32 real: detecta panel, reacciona OLED/LEDs y responde al botón lanzando la plataforma correspondiente.
 - [x] Guía de inicio completa para montarlo desde cero (`GUIA_INICIO.md`).
 
 ### Pendiente
 
-- [ ] Primera ejecución completa del Core conectado al ESP32 real.
 - [ ] Publicación de STL definitivos actualizados.
 
 Ver `docs/10_Test_Plan.md` para el detalle de cada prueba realizada, y
