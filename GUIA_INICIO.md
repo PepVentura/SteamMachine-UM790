@@ -62,8 +62,7 @@ probarse.
 | Placa ESP32-WROOM-32D DevKit (modelo HW-394) | El "controlador" del frontal |
 | Lector NFC MFRC522 | Lee los paneles |
 | Pantalla OLED I²C 0.96" (128×64) | Muestra el estado |
-| Barra LED WS2812B (RGB direccionable) | Feedback visual |
-| Nivelador lógico 74AHCT125 | Adapta la señal de 3.3V del ESP32 a los 5V que espera la WS2812B |
+| Barra LED WS2812B (RGB direccionable) | Feedback visual — se conecta directa al ESP32, sin nivelador |
 | Pulsador metálico antivandálico Ø16mm, iluminado | Confirma el lanzamiento |
 | HUB USB CJMCU-204 (4 puertos) | Reparte el USB del mini PC entre frontal y ESP32 |
 | Fuente de alimentación externa | Menos calor y más espacio dentro de la carcasa |
@@ -127,7 +126,7 @@ funcione" más adelante.
 | RC522 RST | GPIO27 |
 | OLED SDA | GPIO21 |
 | OLED SCL | GPIO22 |
-| Barra LED WS2812B (a través del 74AHCT125) | GPIO25 |
+| Barra LED WS2812B (directa, sin nivelador) | GPIO25 |
 | Pulsador | GPIO13 |
 
 ### Alimentación
@@ -135,13 +134,33 @@ funcione" más adelante.
 | Riel | Alimenta |
 |---|---|
 | 3V3 (del ESP32) | RC522 + OLED |
-| VIN, ~4.68V | 74AHCT125 + WS2812B |
+| VIN, ~4.68V | WS2812B |
 | GND | Masa común a todo |
 
-El dato de la barra LED sale del ESP32 a 3.3V por el GPIO25, pasa por
-el 74AHCT125 (que lo eleva a los ~5V que espera la WS2812B) y de ahí a
-la tira — es decir, ese chip va *entre* el ESP32 y los LEDs, no en
-paralelo.
+El dato de la barra LED sale del ESP32 a 3.3V por el GPIO25 y va
+**directo** a la tira, sin ningún chip intermedio. El diseño original
+llevaba un nivelador lógico (74AHCT125) para elevar la señal a los
+~5V que en teoría espera la WS2812B, pero se retiró: probado con 8
+LEDs, funciona bien recibiendo la señal directamente a 3.3V, y con el
+nivelador en el circuito no encendía nada — lo más probable es que
+tuviera un pin de habilitación (/OE) sin conectar a GND, un fallo muy
+típico con ese chip. Si en el futuro con la tira completa (más larga)
+notas parpadeos o colores erráticos, puede ser señal de que sí hace
+falta un nivelador bien cableado — pero de entrada, directo funciona.
+
+### Cable y colores
+
+Cable 22 AWG / 0,32 mm², cobre estañado, aislamiento de silicona. Usa
+siempre el mismo color para lo mismo en todo el montaje — te ahorra
+sustos al revisar el cableado más adelante:
+
+| Color | Para |
+|---|---|
+| 🔴 Rojo | +5V |
+| ⚫ Negro | GND |
+| 🟡 Amarillo | Datos / señales |
+| 🔵 Azul | SPI (RC522) |
+| 🟢 Verde | I²C (OLED) |
 
 No conectes todavía el ESP32 al mini PC por USB — eso lo harás en el
 [Paso 4](#6-paso-4--programar-el-esp32-firmware), después de
@@ -187,19 +206,57 @@ la que flasheas.
 2. Abre la carpeta `firmware/` del proyecto en VS Code (**Archivo →
    Abrir carpeta**).
 3. Conecta el ESP32 al ordenador por USB.
-4. Abre una terminal dentro de VS Code (**Terminal → Nueva terminal**)
-   y ejecuta:
+4. En VS Code, con `firmware/` abierta y el ESP32 conectado por USB,
+   usa los **botones de PlatformIO** en vez de escribir comandos —
+   son más fiables porque no dependen de que tu terminal tenga nada
+   configurado. Al instalar la extensión aparece una franja azul en la
+   parte inferior de VS Code con varios iconos; los que necesitas son:
+   - ✔️ (**Build**) — compila.
+   - ➡️ (**Upload**) — flashea el ESP32.
+   - 🔌 (**Serial Monitor**) — abre el monitor serie.
+
+   Pulsa los tres en ese orden. Si no ves esa franja azul, abre el
+   icono de PlatformIO (una cabeza de hormiga) en la barra lateral
+   izquierda → **PROJECT TASKS → esp32doit-devkit-v1 → General**, y
+   ahí tienes Build/Upload/Monitor como una lista.
+
+   > **¿Por qué no usar una terminal normal?** En Windows es habitual
+   > que el comando `pio` dé el error *"no se reconoce como nombre de
+   > un cmdlet..."* aunque la extensión funcione perfectamente — el
+   > `pio` de PlatformIO no se añade solo al PATH de PowerShell. Si
+   > prefieres la terminal de todos modos, abre **PlatformIO Core
+   > CLI** desde el icono de PlatformIO (no "Terminal → Nueva
+   > terminal" de VS Code): esa sí tiene `pio` disponible, con los
+   > mismos comandos que abajo.
    ```bash
    cd firmware
    pio run                                            # compila
    pio run --target upload -e esp32doit-devkit-v1     # flashea el ESP32
    pio device monitor -b 115200                        # abre el monitor serie
    ```
-5. Al arrancar deberías ver una única línea:
+   El monitor serie (por botón o por `pio device monitor`) es clave:
+   abre una ventana de texto en directo con todo lo que el ESP32 envía
+   por el cable USB — es la única forma de "ver" lo que está haciendo,
+   ya que no tiene pantalla propia. Todo lo que describen los pasos 5
+   y 6 aparece ahí.
+5. Al arrancar verás primero unas líneas de texto sueltas del propio
+   arranque del ESP32 (algo como `ets Jul 29 2019...`, `rst:0x1...`,
+   `load:0x3fff0030...`) — son normales, ignóralas. Justo después debe
+   aparecer la línea que de verdad importa:
    ```
    {"event":"boot","firmware":"1.0.0"}
    ```
-   Si no aparece nada, ve a [Solución de problemas](#10-solución-de-problemas).
+   Si el ESP32 llevaba un rato encendido antes de abrir el monitor, te
+   la habrás perdido — pulsa el botón RESET/EN de la placa, o
+   desconecta y vuelve a conectar el USB, para que arranque de nuevo
+   con el monitor ya abierto.
+
+   Si justo después ves también `{"event":"error","code":1}`, es que
+   el RC522 (lector NFC) no responde — normal si todavía no lo has
+   cableado. Ver [Solución de problemas](#10-solución-de-problemas).
+
+   Si no aparece ninguna línea en absoluto, ve a
+   [Solución de problemas](#10-solución-de-problemas).
 6. Con el monitor todavía abierto, haz estas comprobaciones antes de
    seguir:
    - Acerca un tag NFC al lector → debe aparecer
@@ -305,6 +362,13 @@ journalctl --user -u steammachine.service -f
 
 ## 10. Solución de problemas
 
+**`pio` no se reconoce como comando (Windows, PowerShell)**
+La extensión de PlatformIO no añade `pio` al PATH de una terminal
+normal. Usa los botones ✔️/➡️/🔌 de la franja azul inferior de VS
+Code, o abre **PlatformIO Core CLI** desde el icono de PlatformIO en
+la barra lateral (no "Terminal → Nueva terminal") — ver el
+[Paso 4](#6-paso-4--programar-el-esp32-firmware).
+
 **El ESP32 no aparece al conectarlo (ni en PlatformIO ni en `/dev/serial/by-id/`)**
 Prueba otro cable USB (muchos cables baratos son solo de carga, sin
 datos) y otro puerto USB. En Linux, puede que necesites permisos:
@@ -314,12 +378,26 @@ datos) y otro puerto USB. En Linux, puede que necesites permisos:
 Revisa el mensaje de error concreto — suele ser una librería que no se
 descargó bien. Prueba `pio pkg update` dentro de `firmware/` y vuelve a
 intentarlo. Si el error es de red, comprueba tu conexión a internet
-(PlatformIO descarga el compilador y las librerías la primera vez).
+(PlatformIO descarga el compilador y las librerías la primera vez). Si
+el error menciona `FastLED` y `rbtree.h` (`mTree`, `const_iterator`,
+`RedBlackTree`...), es un fallo conocido de las versiones más recientes
+de FastLED con este compilador — este proyecto ya fija la versión
+`3.7.8` en `firmware/platformio.ini`, que lo evita. Si aun así te
+aparece, borra la carpeta `.pio` dentro de `firmware/` por completo
+(PlatformIO puede haber dejado en caché una versión rota descargada
+antes de que se fijara) y vuelve a compilar.
 
 **El monitor serie no muestra nada al arrancar**
 Confirma que elegiste la velocidad correcta (115200) y que ningún otro
 programa tiene el puerto abierto (cierra PlatformIO's monitor antes de
 abrir el Core, y viceversa — solo uno puede usar el puerto a la vez).
+
+**Aparece `{"event":"error","code":1}` justo después de arrancar**
+El firmware no encuentra el lector RC522. Normal si todavía no lo has
+cableado. Si ya lo tienes conectado, revisa los 5 cables (SDA/SS, SCK,
+MISO, MOSI, RST) contra la tabla del
+[Paso 2](#4-paso-2--cablear-la-electrónica), que esté alimentado a
+3.3V (no 5V — puede dañarlo) y reinicia el ESP32 tras corregir algo.
 
 **El panel NFC no se detecta**
 Acércalo más (unos 2-3cm) y prueba distintas orientaciones — el
@@ -345,9 +423,11 @@ Revisa la dirección I2C — por defecto se asume `0x3C`. Si tu módulo usa
 vuelve a flashear.
 
 **Los LEDs no encienden, o encienden en colores raros**
-Comprueba que el 74AHCT125 está bien alimentado por VIN (no por 3V3) y
-que el orden de color de tu tira coincide con `GRB` (el que usa el
-firmware por defecto) — si tu tira es `RGB`, avisa para ajustar
+La tira va directa al GPIO25 (sin nivelador, ver Paso 2) — comprueba
+que está bien alimentada por VIN (no por 3V3) y que el GND de la tira
+está unido al GND del ESP32. Si el color sale invertido, revisa que el
+orden de color de tu tira coincide con `GRB` (el que usa el firmware
+por defecto) — si tu tira es `RGB`, avisa para ajustar
 `firmware/src/hardware/leds.cpp`.
 
 Si nada de esto lo resuelve, el firmware tiene un canal de depuración

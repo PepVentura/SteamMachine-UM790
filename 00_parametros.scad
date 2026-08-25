@@ -40,7 +40,7 @@ top_thickness    = 3.0;
 //
 // Antes de esta confirmación, todo el ensamblaje usaba case_height
 // (152) directamente como altura de trabajo interna — ver
-// docs/03_Virtual_Assembly_Report.md, sección "Patas externas (148/152 mm)".
+// docs/Virtual_Assembly_Report.md, sección "Patas externas (148/152 mm)".
 leg_height   = 4.0;   // Dato real confirmado por el usuario (2026-08-03)
 shell_height = case_height - leg_height;  // 148.0
 
@@ -122,7 +122,7 @@ um790_mount_spacing_y = 99.0;
 //=============================================================================
 
 // Altura de postes — RECONCILIADA con el valor confirmado por el
-// usuario en el ensamblaje virtual v1 (docs/03_Virtual_Assembly_Report.md).
+// usuario en el ensamblaje virtual v1 (docs/Virtual_Assembly_Report.md).
 // Antes: 6.0 mm (no dejaba hueco suficiente para el pulsador/USB
 // frontal tras el panel; ver informe, hallazgo de colisión con la PCB
 // y los postes).
@@ -275,7 +275,7 @@ nfc_window_height = 40.0;
 // Antes: 70.0 (valor original, sin relación con el resto de zonas).
 //
 // Derivación (ver openscad/reference/components/assembly_positions.scad
-// para el cálculo completo, y docs/03_Virtual_Assembly_Report.md):
+// para el cálculo completo, y docs/Virtual_Assembly_Report.md):
 //   1. Envolvente del clúster inferior (pulsador + OLED + USB doble),
 //      con front_cluster_z = 19 mm: Z 1,5 - 36,5 mm.
 //   2. Panel inferior fijo mínimo = envolvente + 3 mm de margen = 0-39,5 mm.
@@ -424,7 +424,7 @@ base_thickness = tray_thickness;
 // USB frontal (también confirmado, ver assembly_positions.scad), la
 // PCB, el disipador y los 4 postes de anclaje quedan libres del
 // pulsador y del USB frontal: 28/28 pares sin colisión.
-// Ver docs/03_Virtual_Assembly_Report.md.
+// Ver docs/Virtual_Assembly_Report.md.
 um790_standoff_height = 20.0;
 
 um790_cooler_width  = 88.0;   // Estimado (openscad/reference/um790_reference.scad)

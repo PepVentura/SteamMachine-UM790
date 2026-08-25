@@ -6,6 +6,52 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
+## [1.1.3] - 2026-08-25 — Eliminado el 74AHCT125: la WS2812B va directa al ESP32
+
+### Encontrado
+
+- Probando el firmware ya validado en hardware real (compila, flashea,
+  arranca), la barra LED no encendía con ningún comando
+  (`{"cmd":"led",...}`) a pesar de que la comunicación serie
+  funcionaba bien (confirmado con `--echo` en el monitor de
+  PlatformIO). El usuario desmontó el 74AHCT125 y conectó el ESP32
+  directo a un tramo de prueba de 8 LEDs: encendió correctamente. Con
+  el 74AHCT125 en el circuito, nada. Causa más probable: el pin de
+  habilitación /1OE del chip (activo a nivel bajo) quedó flotante en
+  vez de a GND — fallo típico con este componente, y que ya estaba
+  anotado como punto a verificar en la lista de comprobación de
+  `Hardware/Hardware_Connections.md` antes de este cambio.
+
+### Decisión
+
+- Se retira el 74AHCT125 del diseño por completo. La señal de datos
+  del GPIO25 va directa a la WS2812B en lógica de 3.3V — la tira lo
+  admite bien en el tramo probado. Si con la tira completa (más larga
+  que el tramo de prueba) aparecen problemas de señal, se revisará si
+  hace falta reintroducir un nivelador, esta vez verificando bien el
+  cableado de /OE.
+
+### Cambiado
+
+- `Hardware/Hardware_Connections.md`: reescrita la sección de
+  ESP32→WS2812B (ya no hay paso intermedio por el chip), eliminada la
+  sección de desacoplamiento del 74AHCT125 (100nF, específica del
+  chip — el condensador de 470-1000µF de la propia tira se mantiene,
+  es independiente), actualizada la lista de componentes y el
+  checklist de verificación.
+- `firmware/src/config.h`, `firmware/README.md`, `GUIA_INICIO.md`,
+  `docs/07_Hardware_Specification.md`: quitadas las referencias al
+  74AHCT125 en el pinout, la tabla de alimentación y la solución de
+  problemas.
+
+### Sin tocar
+
+- No existía ningún componente ni keepout del 74AHCT125 en el CAD
+  (`openscad/`) — era solo un componente de cableado, sin geometría
+  propia en el ensamblaje, así que no hizo falta ningún cambio ahí.
+
+---
+
 ## [1.1.2] - 2026-08-18 — Segunda pared del canal LED, en L, para que la tira quede enfrentada al panel
 
 ### Encontrado
@@ -2187,7 +2233,7 @@ final antes del cierre:
 - Recorrido de inserción de la bandeja: verificado en 4 alturas
   intermedias, sin obstrucción.
 
-Ver `docs/03_Virtual_Assembly_Report.md`, sección 12, para el resumen
+Ver `docs/Virtual_Assembly_Report.md`, sección 12, para el resumen
 completo de cierre, incluidas las limitaciones conocidas no
 bloqueantes (medidas sin confirmar, un comentario del DIM sin
 reconciliar, y que no se ha comprobado el recorrido de inserción de
@@ -2750,7 +2796,7 @@ resulta relevante al laminar/imprimir.
 - Nuevos parámetros reales/estimados en `00_parametros.scad` para
   ESP32 Terminal Adapter, pulsador M16×55, USB empotrable doble Ø29,
   OLED 27×27, disipador e IO trasera del UM790.
-- `docs/03_Virtual_Assembly_Report.md` con el resultado final y el
+- `docs/Virtual_Assembly_Report.md` con el resultado final y el
   historial completo de la verificación.
 
 ### Modificado (valores ya existentes, confirmados por el usuario)

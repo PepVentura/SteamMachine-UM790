@@ -2,7 +2,9 @@
 Proyecto de Steam Machine casera funcional
 Diseño de carcasa 3D personalizada para convertir un mini PC **Minisforum UM790** en una Steam Machine compacta orientada a gaming, emulación y uso multimedia.
 
-Proyecto desarrollado en **OpenSCAD**, con piezas preparadas para impresión 3D.
+Proyecto desarrollado en **OpenSCAD**, con piezas preparadas para impresión 3D. Incluye también el firmware del ESP32 y el software que corre en el mini PC.
+
+> 👉 **¿Quieres montarlo tú mismo?** Empieza por [`GUIA_INICIO.md`](GUIA_INICIO.md) — guía completa paso a paso, sin conocimientos previos necesarios.
 
 ---
 
@@ -44,7 +46,7 @@ Cada panel frontal incorpora:
 Ejemplos de uso:
 
 - 🎮 Panel Steam Machine → inicia Steam Big Picture.
-- 🕹️ Panel Arcade → inicia RetroBat / frontend arcade.
+- 🕹️ Panel Arcade → inicia RetroDECK / TeknoParrot.
 - ⚙️ Panel Configuración → acceso a herramientas del sistema.
 - 🎵 Panel Multimedia → reproducción multimedia.
 
@@ -103,24 +105,23 @@ Compatible con:
 
 ## 📂 Estructura del proyecto
 
-SteamMachine-UM790
+```
+SteamMachine-UM790/
 │
-├── OpenSCAD
-│ ├── 00_parametros.scad
-│ ├── chasis.scad
-│ ├── tapa.scad
-│ └── piezas_auxiliares.scad
+├── GUIA_INICIO.md          Guía paso a paso para montarlo todo, de cero
+├── CHANGELOG.md            Historial completo de decisiones de diseño
 │
-├── STL
-│ ├── chasis_base.stl
-│ ├── tapa_superior.stl
-│ └── accesorios.stl
+├── openscad/               Diseño 3D paramétrico
+│   ├── parts/               Piezas por imprimir (chasis, paneles...)
+│   └── reference/            Componentes y posiciones del ensamblaje
+├── STL/                    STL listos para imprimir
 │
-├── Images
-│ └── renders
+├── firmware/                Firmware del ESP32 (C++, PlatformIO)
+├── software/                 Core en Python — corre en el mini PC
 │
-└── README.md
-
+├── Hardware/                 Conexiones eléctricas y cableado
+└── docs/                     Documentación técnica detallada (01 a 11)
+```
 
 ---
 
@@ -130,6 +131,8 @@ SteamMachine-UM790
   https://openscad.org/
 
 - Cura / OrcaSlicer / PrusaSlicer para laminado.
+- PlatformIO (VS Code) para el firmware del ESP32.
+- Python 3 para el Core que corre en el mini PC.
 
 ---
 
@@ -144,28 +147,32 @@ El diseño utiliza parámetros editables para modificar:
 - Anclajes.
 - Compatibilidad con diferentes accesorios.
 
-Archivo principal:
-
-
+Archivo principal: `openscad/00_parametros.scad`
 
 ---
 
 ## 🚀 Estado del proyecto
 
-🟡 En desarrollo
+🟢 Hardware montado y en pruebas
 
 ### Completado
 
-- [x] Definición inicial del diseño.
-- [x] Sistema paramétrico.
-- [x] Preparación del repositorio.
+- [x] Diseño mecánico completo (carcasa, paneles, canal LED, fijación OLED).
+- [x] Hardware montado (ESP32, RC522, OLED, barra LED, HUB USB).
+- [x] Firmware del ESP32 escrito, compilado y flasheado en hardware real.
+- [x] Software Core (Python) escrito, con tests unitarios.
+- [x] Probado en hardware real: lectura NFC, barra LED, pulsador frontal.
+- [x] Guía de inicio completa para montarlo desde cero (`GUIA_INICIO.md`).
 
 ### Pendiente
 
-- [ ] Validación de medidas reales.
-- [ ] Primera impresión de prueba.
-- [ ] Ajustes finales.
-- [ ] Publicación de STL definitivos.
+- [ ] Validar la pantalla OLED en hardware real.
+- [ ] Validar la recuperación tras desconectar/reconectar el USB.
+- [ ] Primera ejecución completa del Core conectado al ESP32 real.
+- [ ] Publicación de STL definitivos actualizados.
+
+Ver `docs/10_Test_Plan.md` para el detalle de cada prueba realizada, y
+`docs/06_Development_Roadmap.md` para el estado por fases.
 
 ---
 
