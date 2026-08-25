@@ -577,9 +577,14 @@ Enviar UID correcto.
 
 
 
-Resultado: ✔ Superado (2026-08-25). Acercar un tag genera
-`{"event":"tag","uid":"..."}` con un UID de 8 caracteres hex;
-retirarlo genera `{"event":"tag_removed"}`.
+Resultado: ⚠️ Parcial (2026-08-25). Acercar un tag genera
+`{"event":"tag","uid":"..."}` con un UID de 8 caracteres hex —
+correcto. Pero se detectó un fallo real probando desde el Core:
+`{"event":"tag_removed"}` se disparaba a los ~450ms aunque el tag
+siguiera físicamente puesto (causa: `PICC_HaltA()` dejaba la tarjeta
+en un estado que no responde al sondeo siguiente — ver CHANGELOG.md
+v1.1.4). Corregido en el firmware; pendiente de reflashear y
+confirmar en hardware real.
 
 
 

@@ -50,8 +50,15 @@ void Rc522Reader::update(EventQueue &queue) {
             queue.pushTag(_currentUid);
         }
 
-        _mfrc522.PICC_HaltA();
-        _mfrc522.PCD_StopCrypto1();
+        // NO se llama a PICC_HaltA()/PCD_StopCrypto1() aqui: solo leemos
+        // el UID (sin autenticacion ni lectura de bloques MIFARE), y
+        // haltear la tarjeta le impide responder al siguiente sondeo —
+        // una tarjeta en HALT no responde a REQA (PICC_IsNewCardPresent()),
+        // solo a WUPA, segun ISO14443A. Eso provocaba que el firmware
+        // reportara "tag_removed" a los ~450ms aunque el tag siguiera
+        // fisicamente puesto (2026-08-25, fallo real reportado por el
+        // usuario en hardware real: "me dice que el panel se ha
+        // retirado, pero el tag sigue presentado").
         return;
     }
 

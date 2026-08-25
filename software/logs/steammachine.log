@@ -1,0 +1,111 @@
+2026-08-25 17:59:10.637 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 17:59:10.648 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 17:59:10.648 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 17:59:10.648 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 17:59:10.648 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 17:59:10.648 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 17:59:10.719 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 17:59:10.720 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 18:01:39.541 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': 'E76DC103'}
+2026-08-25 18:01:39.541 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: E76DC103
+2026-08-25 18:01:39.542 | WARNING  | core.application:_on_tag_detected:120 - UID desconocido: E76DC103
+2026-08-25 18:01:39.986 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:01:39.987 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:02:02.490 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': 'E76DC103'}
+2026-08-25 18:02:02.490 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: E76DC103
+2026-08-25 18:02:02.491 | WARNING  | core.application:_on_tag_detected:120 - UID desconocido: E76DC103
+2026-08-25 18:02:02.936 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:02:02.936 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:02:04.591 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': 'E76DC103'}
+2026-08-25 18:02:04.591 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: E76DC103
+2026-08-25 18:02:04.592 | WARNING  | core.application:_on_tag_detected:120 - UID desconocido: E76DC103
+2026-08-25 18:02:05.037 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:02:05.037 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:02:05.792 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': 'E76DC103'}
+2026-08-25 18:02:05.793 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: E76DC103
+2026-08-25 18:02:05.794 | WARNING  | core.application:_on_tag_detected:120 - UID desconocido: E76DC103
+2026-08-25 18:02:06.237 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:02:06.237 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:02:06.842 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': 'E76DC103'}
+2026-08-25 18:02:06.842 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: E76DC103
+2026-08-25 18:02:06.843 | WARNING  | core.application:_on_tag_detected:120 - UID desconocido: E76DC103
+2026-08-25 18:02:07.287 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:02:07.288 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:04:01.139 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:04:01.140 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:04:01.141 | WARNING  | core.application:_on_tag_detected:120 - UID desconocido: 6739C003
+2026-08-25 18:04:01.585 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:04:01.585 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:04:44.127 | INFO     | core.application:shutdown:86 - Cerrando SteamMachine Core...
+2026-08-25 18:06:11.099 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 18:06:11.111 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 18:06:11.111 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 18:06:11.111 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 18:06:11.111 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 18:06:11.111 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 18:06:11.140 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 18:06:11.142 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 18:06:15.835 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:06:15.835 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:06:15.836 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:06:16.281 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:06:16.281 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:06:18.535 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:06:18.535 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:06:18.537 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:06:18.981 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:06:18.981 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:06:21.986 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:06:21.986 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:06:21.988 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:06:22.432 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:06:22.432 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:06:24.536 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:06:24.537 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:06:24.538 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:06:24.983 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:06:24.983 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:06:32.636 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:06:32.637 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:06:32.639 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:06:33.081 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:06:33.082 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:06:34.886 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:06:34.886 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:06:34.887 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:06:35.333 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:06:35.333 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:06:36.986 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:06:36.986 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:06:36.988 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:06:37.433 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:06:37.434 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:08:38.529 | INFO     | core.application:shutdown:86 - Cerrando SteamMachine Core...
+2026-08-25 18:25:30.816 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-08-25 18:25:30.817 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-08-25 18:25:30.817 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-08-25 18:25:30.818 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-08-25 18:25:30.818 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-08-25 18:25:30.818 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-08-25 18:25:30.861 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-08-25 18:25:30.863 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-08-25 18:25:35.454 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:25:35.455 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:25:35.457 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:25:35.901 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:25:35.901 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:25:38.305 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:25:38.305 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:25:38.307 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:25:38.752 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:25:38.752 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:25:41.755 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:25:41.755 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:25:41.756 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:25:42.201 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:25:42.201 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-08-25 18:25:44.455 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-08-25 18:25:44.456 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-08-25 18:25:44.457 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-08-25 18:25:44.901 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-08-25 18:25:44.901 | INFO     | core.application:_on_tag_removed:132 - Panel retirado

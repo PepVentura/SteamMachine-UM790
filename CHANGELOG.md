@@ -6,7 +6,43 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
-## [1.1.3] - 2026-08-25 — Eliminado el 74AHCT125: la WS2812B va directa al ESP32
+## [1.1.4] - 2026-08-25 — Corregido: falso "tag_removed" con el panel puesto
+
+### Encontrado
+
+- Probando el Core por primera vez contra el ESP32 real (conectado y
+  funcionando por USB), el usuario reportó: "cuando pongo el tag al
+  poco me dice que el panel se ha retirado, pero el tag sigue
+  presentado". Reproducible de forma consistente.
+
+### Causa
+
+- `hardware/rc522.cpp`, `Rc522Reader::update()`: tras cada lectura
+  correcta del UID, se llamaba a `PICC_HaltA()` +
+  `PCD_StopCrypto1()` — buena práctica habitual para liberar la
+  tarjeta tras operaciones MIFARE autenticadas, pero innecesaria aquí
+  (solo leemos el UID, sin autenticación ni lectura de bloques). El
+  problema: una tarjeta en estado HALT no responde al comando REQA
+  que usa `PICC_IsNewCardPresent()` en el siguiente sondeo — según
+  ISO14443A, un HALT solo se despierta con WUPA. El resultado: el
+  firmware dejaba de "ver" el tag nada más leerlo la primera vez, y a
+  los 3 sondeos fallidos (`RC522_REMOVAL_THRESHOLD` × 
+  `RC522_POLL_INTERVAL_MS` ≈ 450ms) disparaba `tag_removed` aunque el
+  tag siguiera físicamente puesto.
+
+### Corregido
+
+- Eliminadas las llamadas a `PICC_HaltA()`/`PCD_StopCrypto1()` del
+  ciclo de sondeo. Sin ellas, la tarjeta permanece en estado ACTIVE y
+  responde con normalidad a los sondeos siguientes mientras siga
+  presente; la detección de retirada real (tag físicamente quitado)
+  no se ve afectada, ya que en ese caso `PICC_IsNewCardPresent()`
+  falla igualmente por ausencia de tarjeta, no por su estado.
+- Sin verificar en hardware real por mi parte (no tengo acceso a un
+  ESP32/RC522 físico en este entorno) — pendiente de que el usuario
+  reflashee y confirme.
+
+---
 
 ### Encontrado
 
