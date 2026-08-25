@@ -492,7 +492,7 @@ configuration()
 
 
 
-\# Plugins previstos
+\# Plugins implementados
 
 
 
@@ -500,39 +500,15 @@ Steam
 
 
 
-RetroBat
+RetroDECK (pack todo-en-uno de emulacion: PS2, GameCube, Wii, PS3...)
 
 
 
-TeknoParrot
+TeknoParrot (via Lutris)
 
 
 
-RPCS3
-
-
-
-PCSX2
-
-
-
-Dolphin
-
-
-
-Citra
-
-
-
-Yuzu (si procede)
-
-
-
-BigBox
-
-
-
-Hyperspin
+Nuevas plataformas se añaden implementando BasePlugin (ver launcher/base\_plugin.py en software/), sin tocar el resto del Launcher.
 
 
 

@@ -478,6 +478,34 @@ Animaciones previstas
 
 
 
+\## Estado / diagnóstico
+
+
+
+```json
+
+{
+
+&#x20;   "cmd":"status"
+
+}
+
+```
+
+
+
+Descripción
+
+
+
+Solicita al ESP32 que responda con el evento `status` descrito en la sección "Diagnóstico".
+
+
+
+\---
+
+
+
 \# Tabla de eventos
 
 
@@ -509,6 +537,10 @@ Animaciones previstas
 | animation | PC | Ejecutar animación |
 
 | restart | PC | Reiniciar ESP32 |
+
+| status | PC | Solicitar diagnóstico (uptime, memoria libre) |
+
+| status | ESP32 | Respuesta al diagnóstico solicitado |
 
 
 

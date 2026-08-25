@@ -852,7 +852,34 @@ Suficiente para imprimir todas las piezas sin dividirlas.
 
 
 
-\# 20. Estado
+\# 20. Cableado
+
+
+
+Cable 22 AWG / 0,32 mm², cobre estañado, aislamiento de silicona.
+
+
+
+Código de colores (5 colores, para mantener el cableado organizado en
+todo el montaje — especialmente entre RC522, OLED, WS2812B y ESP32):
+
+
+
+| Color | Se reserva para |
+|---|---|
+| Rojo | +5V |
+| Negro | GND |
+| Amarillo | Datos / señales |
+| Azul | SPI |
+| Verde | I²C |
+
+
+
+\---
+
+
+
+\# 21. Estado
 
 
 

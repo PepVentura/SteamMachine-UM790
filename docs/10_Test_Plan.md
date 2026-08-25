@@ -340,7 +340,7 @@ Equipo
 
 
 
-Windows
+Bazzite
 
 
 
@@ -536,6 +536,13 @@ Transferencia de archivos.
 
 
 
+Pruebas realizadas a mano por el monitor serie de PlatformIO
+(`pio device monitor`), sobre el ESP32-WROOM-32D DevKit real ya
+cableado — ver `firmware/README.md`, sección "Prueba de integración",
+para el procedimiento paso a paso.
+
+
+
 \## T040
 
 
@@ -545,6 +552,12 @@ Arranque
 
 
 Enviar BOOT.
+
+
+
+Resultado: ✔ Superado (2026-08-25). Al arrancar (o tras pulsar RESET
+con el monitor abierto) aparece `{"event":"boot","firmware":"1.0.0"}`,
+precedido del ruido normal del bootloader del ESP32.
 
 
 
@@ -564,6 +577,12 @@ Enviar UID correcto.
 
 
 
+Resultado: ✔ Superado (2026-08-25). Acercar un tag genera
+`{"event":"tag","uid":"..."}` con un UID de 8 caracteres hex;
+retirarlo genera `{"event":"tag_removed"}`.
+
+
+
 \---
 
 
@@ -577,6 +596,12 @@ Pulsador
 
 
 Enviar evento.
+
+
+
+Resultado: ✔ Superado (2026-08-25). Cada pulsación genera
+`{"event":"button"}`. Confirmado en GPIO13 (ver
+`firmware/src/config.h`) — deja de estar marcado como pin provisional.
 
 
 
@@ -596,6 +621,12 @@ Actualizar información.
 
 
 
+Resultado: Pendiente. Falta probar `{"cmd":"oled",...}`,
+`{"cmd":"oled2",...}` y `{"cmd":"oled_clear"}` — ver checklist en
+`firmware/README.md`.
+
+
+
 \---
 
 
@@ -609,6 +640,23 @@ LED
 
 
 Actualizar color.
+
+
+
+Resultado: ✔ Superado (2026-08-25), tras una incidencia real que se
+documenta aquí porque fue instructiva: la primera vez que se probó
+(`{"cmd":"led","color":"#FF0000"}`), la tira no encendía, aunque el
+comando se enviaba correctamente (confirmado con `--echo` en el
+monitor). Se aisló el problema desconectando el nivelador lógico
+74AHCT125 y conectando el ESP32 directo a un tramo de prueba de 8
+LEDs: encendió bien. Con el 74AHCT125 en el circuito, nada — causa más
+probable, el pin /1OE del chip flotante en vez de a GND (fallo típico
+de este componente). Se decidió retirar el 74AHCT125 del diseño por
+completo en vez de depurar el cableado del chip; la tira (8 LEDs,
+confirmado como dato real y definitivo) funciona bien recibiendo la
+señal directa del GPIO25 a 3.3V. Ver CHANGELOG.md v1.1.3 para el
+historial completo de esta decisión, y
+`Hardware/Hardware_Connections.md` para el cableado actualizado.
 
 
 
@@ -633,6 +681,10 @@ Reconectar.
 
 
 Debe recuperar la comunicación.
+
+
+
+Resultado: Pendiente.
 
 
 
@@ -720,7 +772,7 @@ Lanzamiento de Steam.
 
 
 
-Lanzamiento RetroBat.
+Lanzamiento RetroDECK.
 
 
 
@@ -732,7 +784,7 @@ Lanzamiento RetroBat.
 
 
 
-Lanzamiento RPCS3.
+Lanzamiento de un emulador dentro de RetroDECK (p.ej. PS3 via RPCS3 integrado).
 
 
 

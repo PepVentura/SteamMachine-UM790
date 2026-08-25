@@ -507,6 +507,30 @@ No forzar.
 
 
 
+**Pulsador de encendido del UM790** (añadido 2026-08-22, ver
+CHANGELOG — independiente del ESP32):
+
+
+
+↓
+
+
+
+Insertar el pulsador en el hueco redondo del panel trasero (a ~2,5cm
+del lateral derecho, altura media entre el disipador del UM790 y el
+ventilador)
+
+
+
+↓
+
+
+
+Cablear sus dos contactos directamente al header de encendido de la
+placa del UM790 — NO al ESP32, es un circuito totalmente aparte
+
+
+
 \---
 
 
@@ -531,6 +555,16 @@ OLED
 
 
 
+Brida de sujeción de la OLED (2 tornillos M2 en los insertos térmicos
+a los lados de la pantalla — ver CHANGELOG 2026-08-22 y
+`openscad/parts/03_panels/oled_bracket.scad`; sustituye al pegamento)
+
+
+
+↓
+
+
+
 Pulsador
 
 
@@ -547,7 +581,8 @@ USB
 
 
 
-Barra LED
+Barra LED (canal rediseñado 2026-08-22: costillas repartidas en vez
+de repisa — ver CHANGELOG)
 
 
 
@@ -677,7 +712,7 @@ La dirección I²C del módulo OLED debe comprobarse durante la puesta en marcha
 
 
 
-Se instalarán aproximadamente **15 cm de tira**, equivalentes a unos **9 LED** en la versión de 60 LED/m.
+Se instalarán **8 LED** (dato real confirmado, 2026-08-25).
 
 
 
@@ -698,7 +733,7 @@ Para la entrada DIN se recomienda una resistencia serie de **330–470 Ω**. Se 
 
 
 
-El firmware deberá limitar el brillo máximo para mantener bajo el consumo. Con unos 9 LED, el consumo teórico máximo a blanco y brillo total es aproximadamente 540 mA, por lo que el brillo limitado será la configuración normal de funcionamiento.
+El firmware deberá limitar el brillo máximo para mantener bajo el consumo. Con 8 LED, el consumo teórico máximo a blanco y brillo total es aproximadamente 480 mA, por lo que el brillo limitado será la configuración normal de funcionamiento.
 
 
 
@@ -731,7 +766,7 @@ ESP32
 │   ├── VCC    → 3V3
 │   └── GND    → GND
 │
-└── WS2812B (~15 cm / ~9 LED)
+└── WS2812B (8 LED)
     ├── DIN    → GPIO25
     ├── +5V    → 5V/VIN
     └── GND    → GND
@@ -891,7 +926,7 @@ Ready
 
 □ Brillo limitado según configuración de firmware.
 
-□ Los aproximadamente 9 LED encienden correctamente sin reiniciar el ESP32.
+□ Los 8 LED encienden correctamente sin reiniciar el ESP32.
 
 
 
@@ -927,7 +962,7 @@ Ready
 
 
 
-□ Reconocido por Windows.
+□ Reconocido por el sistema (`lsusb`).
 
 
 

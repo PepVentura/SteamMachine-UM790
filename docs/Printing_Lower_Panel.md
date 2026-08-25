@@ -80,10 +80,17 @@ Pasos en Anycubic Slicer Next:
 
 ## 5. Soportes
 
-La pared del canal de la tira LED tiene un voladizo (10 mm de
-grosor, ver `led_channel_wall_thickness` en `lower_panel.scad`) que
-necesita soporte. Activar soportes en el laminador antes de
-laminar.
+**Rediseño 2026-08-22**: la pared del canal ya no tiene una repisa en
+voladizo (se eliminó por completo — chocaba con los conectores USB-C
+internos, ver CHANGELOG). Ahora son 6 costillas cortas (10mm de vano,
+8mm de ancho cada una — ver `led_channel_rib_count`/`led_channel_rib_width`
+en `lower_panel.scad`) que conectan la pared directamente con el
+panel. Un vano de 10mm en una pieza tan estrecha normalmente NO
+necesita soporte (la mayoría de impresoras hacen bridging limpio hasta
+15-20mm), pero compruébalo en la vista de previsualización de tu
+laminador antes de asumirlo — si ves puentes largos sin apoyo o
+cuelgan mal en la previsualización, activa soportes solo en esa franja
+concreta.
 
 ---
 
@@ -94,7 +101,9 @@ en **Filamento**, comprobar que:
 
 - La franja del difusor (40,5–46,5 mm) se distingue claramente del
   resto del cuerpo del panel.
-- Los soportes aparecen bajo la pared del canal LED.
+- Las costillas del canal LED (6, repartidas a lo largo) imprimen
+  limpias, sin necesidad de soporte — si alguna sale mal, activar
+  soporte solo ahí.
 - El resto de la pieza queda enteramente en el filamento 1.
 
 > ⚠️ **El modelo 3D en gris no significa que falte configuración.**
@@ -131,10 +140,19 @@ Confirmado con una laminación real en Anycubic Slicer Next:
   purgas): 1h 9m.
 - Coste estimado: 0,53 (moneda del laminador).
 
+![Esquema de colores tras laminar, confirmando el consumo del filamento 2](images/lower_panel_printing/verificacion_esquema_colores.png)
+
 ---
 
 ## 7. Historial
 
+- **2026-08-22**: rediseño del canal LED (repisa en voladizo
+  eliminada, sustituida por 6 costillas cortas) y nuevos bosses para
+  la brida de sujeción de la OLED — cambia la geometría del canal y
+  puede que ya no necesite soporte (ver sección 5). **Los tiempos,
+  pesos y coste de la sección 6 son de la versión anterior del
+  modelo — hay que volver a laminar y actualizar estos números antes
+  de confiar en ellos.**
 - **2026-08-06**: primera versión de este flujo de trabajo,
   confirmada con una impresión real (franja de 6 mm, dentro del
   hueco libre de marco).

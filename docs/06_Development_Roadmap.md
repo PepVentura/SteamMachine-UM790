@@ -52,6 +52,8 @@ Cada fase deberá quedar completamente terminada antes de comenzar la siguiente.
 
 \- ✔ Frontal definitivo aprobado
 
+\- ✔ Montaje físico completado
+
 
 
 \## Software
@@ -63,6 +65,12 @@ Cada fase deberá quedar completamente terminada antes de comenzar la siguiente.
 \- ✔ Protocolo de comunicación definido
 
 \- ✔ Arquitectura firmware definida
+
+\- ✔ Firmware ESP32 implementado y validado en hardware real (compila, flashea y arranca; protocolo boot/error confirmado por monitor serie)
+
+\- ✔ SteamMachine Core implementado, con tests unitarios
+
+\- ✔ Arranque automático documentado (systemd)
 
 
 
@@ -424,7 +432,7 @@ Estado
 
 
 
-Pendiente
+Completado (ver firmware/, ESP32-WROOM-32D DevKit sobre PlatformIO/Arduino). Validado en hardware real: compila, flashea y arranca correctamente, y el RC522, la barra LED (8 LEDs, directo sin nivelador) y el pulsador (GPIO13) ya funcionan probados en el hardware real. Pendiente de validar la OLED.
 
 
 
@@ -442,7 +450,7 @@ Objetivo
 
 
 
-Aplicación principal para Windows.
+Aplicación principal para Bazzite (Linux).
 
 
 
@@ -468,7 +476,7 @@ Estado
 
 
 
-Pendiente
+Completado (ver software/), con tests unitarios para todos los modulos (LEDManager, OLEDManager, Application, PanelDatabase, Launcher).
 
 
 
@@ -508,7 +516,7 @@ Estado
 
 
 
-Pendiente
+Cableado, firmware y software completados. Pendiente la primera prueba con hardware real (ver checklist en firmware/README.md, sección "Prueba de integracion").
 
 
 
@@ -550,7 +558,7 @@ Estado
 
 
 
-Pendiente
+Animaciones y diagnóstico completados. Arranque automático (systemd) documentado en software/README.md. Actualizaciones y plugins adicionales, pendientes.
 
 
 
@@ -660,7 +668,7 @@ Software
 
 \- Gestión de errores
 
-\- Compatibilidad Windows
+\- Compatibilidad Bazzite / actualizaciones de RetroDECK y Lutris
 
 \- Actualizaciones
 

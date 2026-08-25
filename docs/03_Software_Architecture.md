@@ -88,7 +88,7 @@ Todo el resto será completamente automático.
 
 &#x20;               |               |               |
 
-&#x20;            Steam         RetroBat       TeknoParrot
+&#x20;            Steam         RetroDECK       TeknoParrot
 
 ```
 
@@ -180,15 +180,9 @@ Ejemplos
 
 \- Steam
 
-\- RetroBat
-
-\- RPCS3
+\- RetroDECK
 
 \- TeknoParrot
-
-\- Dolphin
-
-\- PCSX2
 
 
 
@@ -250,11 +244,15 @@ Steam → Azul
 
 
 
-RetroBat → Morado
+RetroDECK → Morado
 
 
 
-RPCS3 → Rojo
+TeknoParrot → Rojo
+
+
+
+Bazzite (reposo) → Azul
 
 
 
