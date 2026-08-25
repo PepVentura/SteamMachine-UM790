@@ -17,7 +17,11 @@ from core.events import Event, EventManager
 from core.logger import get_logger, setup_logger
 from database.panel_database import PanelDatabase
 from devices.esp32_controller import ESP32Controller
+from devices.led_manager import LEDManager
+from devices.oled_manager import OLEDManager
 from launcher.launcher import Launcher
+
+IDLE_COLOR = "#0055FF"
 
 logger = get_logger()
 
@@ -36,6 +40,8 @@ class Application:
         self._events = EventManager()
         self._database = PanelDatabase()
         self._esp32: ESP32Controller | None = None
+        self._oled: OLEDManager | None = None
+        self._leds: LEDManager | None = None
         self._launcher: Launcher | None = None
 
         self._running = False
@@ -51,6 +57,8 @@ class Application:
         self._database.load()
         self._launcher = Launcher(self._config.get("platforms", {}))
         self._esp32 = ESP32Controller(self._config, self._events)
+        self._oled = OLEDManager(self._esp32)
+        self._leds = LEDManager(self._esp32)
 
         self._subscribe_events()
 
@@ -101,8 +109,8 @@ class Application:
 
     def _on_boot(self, firmware: str = None) -> None:
         logger.info("ESP32 arrancado (firmware={})", firmware)
-        self._esp32.oled("SteamMachine")
-        self._esp32.set_led("#0055FF")
+        self._oled.show_text("SteamMachine")
+        self._leds.set_color(IDLE_COLOR)
 
     def _on_tag_detected(self, uid: str) -> None:
         logger.info("Panel detectado: {}", uid)
@@ -110,21 +118,21 @@ class Application:
 
         if not panel:
             logger.warning("UID desconocido: {}", uid)
-            self._esp32.oled_lines("Panel", "no reconocido")
-            self._esp32.set_led("#FF0000")
+            self._oled.show_status("Panel", "no reconocido")
+            self._leds.flash("#FF0000", times=3, restore_to=IDLE_COLOR)
             self._pending_panel = None
             return
 
         self._pending_panel = panel
-        self._esp32.oled(panel["name"])
-        self._esp32.set_led(panel["led"])
+        self._oled.show_text(panel["name"])
+        self._leds.fade(panel["led"])
         logger.info("Perfil '{}' listo. Esperando pulsador...", panel["name"])
 
     def _on_tag_removed(self) -> None:
         logger.info("Panel retirado")
         self._pending_panel = None
-        self._esp32.clear_oled()
-        self._esp32.set_led("#0055FF")
+        self._oled.sleep()
+        self._leds.fade(IDLE_COLOR)
 
     def _on_button(self) -> None:
         if not self._pending_panel:
@@ -133,11 +141,11 @@ class Application:
 
         platform = self._pending_panel["launcher"]
         logger.info("Lanzando plataforma: {}", platform)
-        self._esp32.animation("launch")
-        self._esp32.oled_lines(self._pending_panel["name"], "Launching...")
+        self._leds.animation("launch")
+        self._oled.show_status(self._pending_panel["name"], "Launching...")
 
         ok = self._launcher.launch(platform)
-        self._esp32.animation("success" if ok else "error")
+        self._leds.animation("success" if ok else "error")
 
     def _on_error(self, code: int = None) -> None:
         logger.error("Error reportado por el ESP32 (codigo {})", code)

@@ -25,8 +25,9 @@ DEFAULT_CONFIG = {
         "baudrate": 115200,
         "esp32_vid_pid": ["10C4:EA60", "1A86:7523", "303A:1001"],
         # Modo simulado: no requiere ESP32 ni firmware. Los eventos (tag/button)
-        # se generan desde teclado. Util mientras el firmware no existe todavia.
-        "simulate": True,
+        # se generan desde teclado. Util para desarrollo; con hardware real
+        # (ya montado) se deja en False para conectar al ESP32 de verdad.
+        "simulate": False,
         "reconnect_interval_seconds": 3,
     },
     "log_level": "INFO",

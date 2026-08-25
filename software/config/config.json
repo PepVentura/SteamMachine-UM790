@@ -3,7 +3,7 @@
     "port": "auto",
     "baudrate": 115200,
     "esp32_vid_pid": ["10C4:EA60", "1A86:7523", "303A:1001"],
-    "simulate": true,
+    "simulate": false,
     "reconnect_interval_seconds": 3
   },
   "log_level": "INFO",
