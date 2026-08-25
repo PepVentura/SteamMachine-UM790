@@ -621,9 +621,9 @@ Actualizar información.
 
 
 
-Resultado: Pendiente. Falta probar `{"cmd":"oled",...}`,
-`{"cmd":"oled2",...}` y `{"cmd":"oled_clear"}` — ver checklist en
-`firmware/README.md`.
+Resultado: ✔ Superado (2026-08-25). `{"cmd":"oled",...}`,
+`{"cmd":"oled2",...}` y `{"cmd":"oled_clear"}` funcionan correctamente
+en hardware real.
 
 
 
