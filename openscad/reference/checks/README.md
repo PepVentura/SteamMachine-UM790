@@ -42,7 +42,7 @@ Requiere el binario `openscad` en el `PATH`. Los archivos `.scad` y
 
 ## Último resultado conocido
 
-Ver `docs/03_Virtual_Assembly_Report.md` para el resultado de la
+Ver `docs/Virtual_Assembly_Report.md` para el resultado de la
 última ejecución y su interpretación.
 
 ## Añadir un componente nuevo

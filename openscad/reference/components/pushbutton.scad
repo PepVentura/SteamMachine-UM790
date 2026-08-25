@@ -26,7 +26,7 @@
 // colisiones de virtual_assembly_v1.scad puede por tanto detectar
 // una interferencia real con la PCB del UM790 si la posición de
 // montaje no deja 55 mm libres detrás del panel; ver
-// docs/03_Virtual_Assembly_Report.md.
+// docs/Virtual_Assembly_Report.md.
 //
 // ============================================================================
 

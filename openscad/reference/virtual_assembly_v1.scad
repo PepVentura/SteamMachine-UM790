@@ -28,7 +28,7 @@
 // openscad/reference/checks/ y usa estos mismos archivos, de modo que
 // el resultado del render y el de la comprobación son siempre coherentes.
 //
-// Ver docs/03_Virtual_Assembly_Report.md para el informe de resultados
+// Ver docs/Virtual_Assembly_Report.md para el informe de resultados
 // de esta primera verificación.
 //
 // ============================================================================
@@ -230,6 +230,6 @@ echo(str("hub_pos   = ", hub_pos));
 echo(str("oled_pos  = ", oled_pos));
 echo(str("pushbutton_pos = ", pushbutton_pos));
 echo(str("usb_front_pos  = ", usb_front_pos));
-echo("Ver docs/03_Virtual_Assembly_Report.md para el resultado");
+echo("Ver docs/Virtual_Assembly_Report.md para el resultado");
 echo("de la comprobación automática de colisiones.");
 echo("=====================================================");

@@ -181,6 +181,24 @@ module pushbuttonInstanceFull()
 
 
 //=============================================================================
+// PULSADOR TRASERO (encendido/apagado UM790) — girado en sentido
+// opuesto al frontal: protrusión local +Z → -Y global, porque el
+// panel trasero mira hacia +Y y el cuerpo del pulsador debe entrar
+// HACIA el interior del chasis (-Y).
+//=============================================================================
+
+module rearPushbuttonInstanceBody()
+{
+    translate(rear_pushbutton_pos) rotate([90,0,0]) pushbuttonFull();
+}
+
+module rearPushbuttonInstanceFull()
+{
+    rearPushbuttonInstanceBody();
+}
+
+
+//=============================================================================
 // USB FRONTALES (girado: protrusión local +Z → +Y global)
 //=============================================================================
 
@@ -213,6 +231,7 @@ module allBodies()
     hubInstanceBody();
     oledInstanceBody();
     pushbuttonInstanceBody();
+    rearPushbuttonInstanceBody();
     usbFrontInstanceBody();
 }
 
@@ -230,5 +249,6 @@ module allComponents()
     hubInstanceFull();
     oledInstanceFull();
     pushbuttonInstanceFull();
+    rearPushbuttonInstanceFull();
     usbFrontInstanceFull();
 }

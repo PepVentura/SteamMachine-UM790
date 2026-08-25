@@ -107,7 +107,7 @@ nfc_panel_z_mid  = (nfc_panel_z_low + nfc_panel_z_high) / 2;
 //
 // Los imanes/tornillos (Ø hasta 8,15 mm) son más anchos que la propia
 // pared (wall_thickness = 3 mm) — hallazgo del usuario, ver
-// docs/03_Virtual_Assembly_Report.md. openscad/parts/02_chassis/walls.scad
+// docs/Virtual_Assembly_Report.md. openscad/parts/02_chassis/walls.scad
 // añade un relleno local (side_boss_depth) por el lado NO visto y
 // recentra el alojamiento dentro de ese grosor extra.
 //
@@ -204,7 +204,7 @@ module wallPadRelief(z, panelY, panelThickness)
 //=============================================================================
 // FIJACIÓN DEL PANEL TRASERO A LAS PAREDES LATERALES — RETIRADA (2026-08-03)
 //
-// Se intentó (docs/03_Virtual_Assembly_Report.md), pero colisionaba
+// Se intentó (docs/Virtual_Assembly_Report.md), pero colisionaba
 // con el relleno local de la pared.
 //
 // El panel trasero se sujetaba también a la bandeja mediante unas
@@ -319,7 +319,7 @@ hub_pos = [
 // de la cara inferior de la PCB elevada (z_pcb_bottom, ver más
 // arriba) — así ninguno de los tres necesita atravesar la PCB.
 //
-// Ver docs/03_Virtual_Assembly_Report.md, sección "Fila única con
+// Ver docs/Virtual_Assembly_Report.md, sección "Fila única con
 // USB de doble puerto".
 //=============================================================================
 
@@ -341,6 +341,56 @@ pushbutton_pos = [
     pushbutton_x,
     front_inner_face_y,
     front_cluster_z
+];
+
+
+//=============================================================================
+// PULSADOR TRASERO — encendido/apagado del UM790 (segundo pulsador,
+// independiente del frontal: ese queda dedicado solo a confirmar el
+// panel NFC — decisión del usuario, ver docs/06_Development_Roadmap.md).
+//
+// Situado en el panel trasero, en el hueco vertical que queda libre
+// entre el disipador del UM790 (z_cooler_top = 65.6) y el volumen de
+// seguridad del flujo de aire del ventilador (noctuaAirflowKeepout,
+// que baja hasta z_fan_bottom - 20 = 110) — así "no molesta" a
+// ninguno de los dos, con margen de sobra a cada lado (ver
+// verificación real con OpenSCAD en el propio commit).
+//
+// X: PEDIDO POR EL USUARIO — "a unos dos centímetros del lateral".
+// rear_panel_width/2 (74.5) - 20mm = 54.5mm desde el centro. Lado
+// derecho elegido arbitrariamente (vista desde detrás, mirando el
+// panel trasero de frente); cambiar el signo si se prefiere el
+// izquierdo, no afecta a ninguna otra cota.
+//=============================================================================
+
+rear_pushbutton_margin = 2.0;  // margen de seguridad a cada lado del hueco vertical disponible
+rear_pushbutton_z_low  = z_cooler_top + rear_pushbutton_margin;                        // 67.6
+rear_pushbutton_z_high = z_fan_bottom - 20 - rear_pushbutton_margin;                   // 108.0 (20 = profundidad de noctuaAirflowKeepout)
+rear_pushbutton_z      = (rear_pushbutton_z_low + rear_pushbutton_z_high) / 2;          // 87.8, centrado en el hueco
+
+rear_pushbutton_lateral_offset = 20.0;  // "a unos dos centímetros del lateral", pedido por el usuario
+
+// COMPROBADO CON OPENSCAD REAL (exportando cada cuerpo a STL y
+// midiendo su caja envolvente, ver openscad/reference/checks): a
+// exactamente 2cm del lateral (X=54.5, cualquiera de los dos lados)
+// el pulsador invade al ESP32 (izquierda, huella medida X: -73 a
+// -53.4) o al HUB USB (derecha, huella medida X: 61 a 73) — ambos
+// viven en esta misma franja vertical (side_mount_z, el mismo hueco
+// entre disipador y ventilador elegido para el pulsador). El lateral
+// derecho necesita menos margen extra para librar el HUB que el
+// izquierdo para librar el ESP32, así que se elige ese lado.
+//
+// rear_pushbutton_x = HUB_x_min(61.00, medido) - radio_del_embellecedor(9.75)
+//                      - margen_seguridad(2.0) = 49.25, redondeado a 49.
+// Unos 25.5mm del lateral (≈2,5cm) en vez de los 2cm pedidos — lo más
+// cerca posible sin colisionar, verificado sin colisión contra los 6
+// componentes del ensamblaje (ver checks generados).
+rear_pushbutton_x = 49.0;
+
+rear_pushbutton_pos = [
+    rear_pushbutton_x,
+    case_depth/2 - wall_thickness,  // cara interior del panel trasero (mismo criterio que front_inner_face_y)
+    rear_pushbutton_z
 ];
 
 // USB empotrable — lado DERECHO, unidad única. Desplazado hacia el
@@ -371,10 +421,65 @@ usb_front_pos = [
 oled_left_neighbour_edge  = pushbutton_x + pushbutton_cap_diameter/2;
 oled_right_neighbour_edge = usb_front_x  - usb_front_flange_diameter/2;
 
+// Medidas de la ventana de la OLED (antes solo en lower_panel.scad;
+// movidas aquí 2026-08-22 porque oled_bracket.scad, la brida de
+// sujeción, también las necesita — "use<>" no comparte variables
+// entre ficheros, solo módulos, así que deben vivir en el include
+// común). Ver histórico completo del ajuste 27x27→27x20 en
+// lower_panel.scad antes de este cambio.
+oled_screen_width  = 27.0;
+oled_screen_height = 20.0;
+oled_pin_clearance_height = 3.0;  // ESTIMADO — margen de los pines que sobresalen
+oled_pin_clearance_pocket_depth = 1.5;  // ESTIMADO — profundidad del rebaje ciego, dentro del grosor del panel
+
 oled_pos = [
     (oled_left_neighbour_edge + oled_right_neighbour_edge) / 2,
     front_inner_face_y,
     front_cluster_z
+];
+
+
+//=============================================================================
+// BOSSES DE INSERTO PARA LA SUJECIÓN DE LA OLED (2026-08-22)
+//
+// PEDIDO POR EL USUARIO: fijación robusta y visible para la OLED, en
+// vez de fiarla a pegamento — inspirado en
+// https://www.thingiverse.com/thing:7296586 (carcasa + 2 insertos
+// M2x2,5x3,2 + 2 tornillos M2x3, que sujeta el módulo por detrás).
+//
+// Dos bosses en las esquinas inferiores del hueco del módulo OLED
+// (27x27mm, oled_module_width/height), lejos de los pines (que
+// sobresalen por el borde superior según lower_panel.scad). Compartido
+// entre lower_panel.scad (que imprime los bosses) y oled_bracket.scad
+// (la brida nueva, pieza separada, que se atornilla en ellos) — misma
+// fuente para que ninguna de las dos se quede desincronizada.
+//
+// Profundidad comprobada dentro del hueco ya reservado para la OLED
+// en el ensamblaje (oled_module_thickness + oled_module_pin_height =
+// 7.5mm desde la cara interior del panel) — no hace falta una
+// comprobación de colisiones nueva contra el resto de componentes.
+//=============================================================================
+
+// COMPROBADO NUMÉRICAMENTE (2026-08-22, exportando a STL y midiendo
+// cajas envolventes): la primera versión de este diseño ponía los dos
+// bosses en las esquinas INFERIORES del módulo (27x27mm) — pero la
+// pantalla (27x20mm) ya ocupa casi todo ese ancho, dejando un margen
+// de solo ~1,5mm entre el hueco de la ventana y el borde de la brida.
+// Insuficiente para un boss de 6mm de diámetro (se solapaban).
+//
+// Rediseño: los bosses van a los LADOS de la pantalla, a su misma
+// altura — ahí hay 47mm libres entre el pulsador y el USB
+// (oled_right_neighbour_edge - oled_left_neighbour_edge), de sobra
+// para separarlos del hueco de la ventana sin tocarlo.
+oled_bracket_insert_diameter = 3.2;   // Igual que el Thingiverse de referencia (M2x2,5x3,2)
+oled_bracket_insert_depth    = 3.5;   // ESTIMADO — algo mayor que el inserto (2,5mm) para holgura
+oled_bracket_boss_diameter   = 6.0;   // ESTIMADO — pared de ~1,4mm alrededor del inserto
+oled_bracket_boss_length     = 4.0;   // ESTIMADO — protrusión desde la cara interior del panel; libra el grosor del módulo (1,5mm) con margen, dentro de los 7,5mm ya reservados
+oled_bracket_boss_x_offset   = 19.0;  // distancia del centro del boss al centro de la pantalla — comprobado numericamente: deja ~1,5mm de hueco libre respecto al borde de la ventana (antes 18mm, tocaba justo con el margen de la ventana)
+
+oled_bracket_screw_positions = [
+    [oled_pos[0] - oled_bracket_boss_x_offset, oled_pos[2]],
+    [oled_pos[0] + oled_bracket_boss_x_offset, oled_pos[2]],
 ];
 
 
@@ -398,7 +503,7 @@ oled_pos = [
 // nfc_panel_height) no coincide con front_panel_nfc_z_low_check
 // (calculado aquí, de abajo hacia arriba), es que 00_parametros.scad
 // se ha quedado desactualizado respecto a alguna de las piezas del
-// clúster y hay que revisar docs/03_Virtual_Assembly_Report.md.
+// clúster y hay que revisar docs/Virtual_Assembly_Report.md.
 //=============================================================================
 
 front_panel_edge_margin = 3.0;  // margen entre el clúster y el borde del panel inferior

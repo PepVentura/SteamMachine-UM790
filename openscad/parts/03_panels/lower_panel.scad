@@ -11,7 +11,7 @@
 // Panel inferior FIJO — sustituye a front_panel.scad/front_layout.scad
 // (obsoletos, ver notas al final de ambos archivos). Diseño definitivo
 // tras la verificación completa del ensamblaje virtual v1
-// (docs/03_Virtual_Assembly_Report.md): pulsador, OLED y USB doble en
+// (docs/Virtual_Assembly_Report.md): pulsador, OLED y USB doble en
 // fila única, más la barra LED justo encima, impresos en la MISMA
 // pieza con la Anycubic Kobra X en dos filamentos independientes.
 //
@@ -151,10 +151,11 @@ module pushbuttonCut()
 // sobresalen — necesitan hueco por dentro, pero SIN llegar a
 // atravesar hacia el exterior (rebaje ciego, no un segundo agujero
 // visible).
-oled_screen_width  = 27.0;
-oled_screen_height = 20.0;  // antes 27.0 (la placa entera, no la pantalla)
-oled_pin_clearance_height = 3.0;  // ESTIMADO — margen de los pines que sobresalen, según lo descrito
-oled_pin_clearance_pocket_depth = 1.5;  // ESTIMADO — profundidad del rebaje ciego, dentro del grosor del panel (deja 1,5mm de piel sólida delante)
+//
+// MOVIDO a assembly_positions.scad (2026-08-22): oled_bracket.scad
+// (la nueva brida de sujeción) también necesita estas medidas, y con
+// "use<>" no se comparten variables entre ficheros — solo módulos —
+// así que deben vivir en el include común a ambos.
 
 module oledCut()
 {
@@ -175,6 +176,50 @@ module oledCut()
         oled_pos[2] + oled_screen_height/2
     ])
         cube([oled_screen_width, oled_pin_clearance_pocket_depth+0.1, oled_pin_clearance_height]);
+
+}
+
+
+//=============================================================================
+// BOSSES DE INSERTO PARA LA SUJECIÓN DE LA OLED
+//
+// Ver nota completa junto a oled_bracket_screw_positions en
+// assembly_positions.scad. Dos bosses cilíndricos en las esquinas
+// inferiores del hueco de la OLED, con un rebaje ciego para el
+// inserto térmico M2 — la brida (oled_bracket.scad) se atornilla
+// aquí, sujetando el módulo por detrás contra la cara interior del
+// panel.
+//=============================================================================
+
+module oledInsertBosses()
+{
+
+    for (p = oled_bracket_screw_positions)
+    {
+
+        translate([p[0], -case_depth/2 + front_panel_thickness, p[1]])
+            rotate([-90,0,0])
+                cylinder(d = oled_bracket_boss_diameter, h = oled_bracket_boss_length);
+
+    }
+
+}
+
+module oledInsertHoles()
+{
+
+    for (p = oled_bracket_screw_positions)
+    {
+
+        translate([
+            p[0],
+            -case_depth/2 + front_panel_thickness + oled_bracket_boss_length - oled_bracket_insert_depth,
+            p[1]
+        ])
+            rotate([-90,0,0])
+                cylinder(d = oled_bracket_insert_diameter, h = oled_bracket_insert_depth+0.1);
+
+    }
 
 }
 
@@ -350,25 +395,47 @@ module ledDiffuserThinCut()
 
 
 //=============================================================================
-// SEGUNDA PARED DEL CANAL DE LA TIRA LED
+// PARED DEL CANAL DE LA TIRA LED (REDISEÑADO 2026-08-22)
 //
-// PEDIDO POR EL USUARIO (2026-08-03, con foto de referencia): la
-// "pared existente" es el propio grosor del panel (front_panel_thickness,
-// su cara frontal, que ya forma una pared al verla de canto). Esta es
-// la SEGUNDA pared, paralela a esa, separada hacia el interior (+Y)
-// una distancia igual al ancho de la tira LED real
-// (led_bar_strip_width) — el hueco entre ambas paredes es donde se
-// pega la tira, con su longitud a lo largo de X y su anchura
-// encajada entre las dos paredes.
+// PEDIDO POR EL USUARIO: "su soportación con el panel es muy débil...
+// toca con los conectores USB-C que van al UM790... desplazar hasta
+// tocar con el propio panel... retirar la pieza horizontal para pegar
+// la tira que incorporamos recientemente, para evitar contacto con
+// los USB mencionados."
 //
-// MEDIDAS ESTIMADAS, pendientes de confirmar con la tira LED real:
-// led_channel_wall_height (cuánto sobresale cada pared en Z) y
-// led_channel_wall_thickness (grosor de la pared nueva).
+// Diseño anterior (2026-08-03/18): una repisa horizontal de 10mm de
+// grosor (led_channel_wall_thickness) se proyectaba hacia fuera desde
+// el ancho real de la tira, y de su borde más alejado colgaba la
+// pared donde se pegaba la tira — protrusión total desde el panel:
+// led_bar_strip_width + led_channel_wall_thickness ≈ 20mm. Esa repisa
+// (justo la parte que más sobresalía) es la que chocaba con los
+// conectores USB-C, y aportaba poco a la robustez (sujeta solo por
+// dos patas de 4mm en los extremos, con ~140mm de vano sin apoyo
+// entre medias).
+//
+// Rediseño: se elimina la repisa por completo. La pared donde se pega
+// la tira (antes ledChannelBackWall()) pasa a estar exactamente a
+// led_bar_strip_width del panel — el hueco justo para el ancho real
+// de la tira, sin ningún sobrante — reduciendo la protrusión total a
+// la mitad (~10mm en vez de ~20mm). La conexión al panel deja de ser
+// dos patas sueltas: ahora es una serie de costillas cortas y anchas,
+// repartidas a lo largo de TODO el ancho del canal (no solo en los
+// extremos), fusionadas con solape real tanto en el panel como en la
+// pared — igual de robusto que una unión continua, pero sin tapar la
+// mayor parte del hueco por donde debe pasar la luz hacia el difusor.
 //=============================================================================
 
-led_channel_wall_height    = 3.0;  // ESTIMADO — altura de cada pared del canal, en Z
-led_channel_wall_thickness = 10.0;  // PEDIDO POR EL USUARIO (2026-08-03): "el soporte para la tira led es demasiado estrecho, debería de tener un ancho de 10mm" — antes 1,5mm
+led_channel_wall_height    = 3.0;  // ESTIMADO — altura de la pared del canal, en Z
+led_channel_backwall_thickness = 2.0;  // ESTIMADO — grosor de la pared donde se pega la tira
+led_channel_backwall_margin    = 2.0;  // ESTIMADO — margen por debajo de la franja del difusor (40,5mm), para cubrirla entera con holgura
 led_channel_x_margin       = 8.0;  // igual que ledDiffuserZone(), mismo ancho de zona
+
+// Costillas de conexión: anchas (más superficie de pegado que las
+// antiguas patas de 4mm) y repartidas a lo largo de todo el canal, no
+// solo en los extremos — resuelve la queja de soportación débil.
+led_channel_rib_count     = 6;    // nº de costillas repartidas a lo largo del canal
+led_channel_rib_width     = 8.0;  // ancho de cada costilla, en X
+led_channel_rib_overlap   = 0.4;  // pequeño solape con el panel y con la pared, para fusion real (no solo contacto) y evitar geometria no-manifold
 
 module ledChannelWalls()
 {
@@ -376,100 +443,44 @@ module ledChannelWalls()
     channelWidth = case_width - 2*led_channel_x_margin;
     channelZ     = (front_panel_led_z_low + front_panel_led_z_high)/2 - led_channel_wall_height/2;
 
-    // Pared nueva, paralela a la cara frontal del panel (la "pared
-    // existente"), separada hacia el interior el ancho real de la
-    // tira LED.
-    translate([
-        -channelWidth/2,
-        -case_depth/2 + front_panel_thickness + led_bar_strip_width,
-        channelZ
-    ])
-
-        cube([
-            channelWidth,
-            led_channel_wall_thickness,
-            led_channel_wall_height
-        ]);
-
-    // PEDIDO POR EL USUARIO (2026-08-18): "se trata de añadir otra
-    // pared larga ancha de lado a lado conectada al final de la
-    // existente y bajando a 90 grados, para que al pegar la tira en
-    // su interior esta esté enfrentada al panel" — la pared de
-    // arriba es horizontal (su cara ancha mira hacia Z, no hacia el
-    // panel); no ofrece una superficie donde pegar la tira LED
-    // mirando al panel. Esta segunda pared se conecta al extremo más
-    // alejado del panel (el borde exterior de la pared existente) y
-    // baja en Z, con su cara ancha mirando hacia Y (hacia el panel)
-    // — ahí es donde se pega la tira, con los LEDs enfrentados
-    // directamente a la franja del difusor.
-    ledChannelBackWall();
-
-}
-
-led_channel_backwall_thickness = 2.0;  // ESTIMADO — grosor de la nueva pared, más fina que la existente (10mm) por no necesitar tanto cuerpo
-led_channel_backwall_margin    = 2.0;  // ESTIMADO — margen por debajo de la franja del difusor (40,5mm), para cubrirla entera con holgura
-
-module ledChannelBackWall()
-{
-
-    channelWidth = case_width - 2*led_channel_x_margin;
-    channelZ     = (front_panel_led_z_low + front_panel_led_z_high)/2 - led_channel_wall_height/2;
-
-    // Y del borde exterior de la pared existente (el "final" al que
-    // se conecta esta, según pidió el usuario) — el borde más
-    // alejado del panel.
-    outerWallY = -case_depth/2 + front_panel_thickness + led_bar_strip_width + led_channel_wall_thickness;
-
+    panelBackY  = -case_depth/2 + front_panel_thickness;
+    wallY       = panelBackY + led_bar_strip_width;   // a tocar con el ancho real de la tira, sin sobrante
     wallBottomZ = front_panel_led_z_low - led_channel_backwall_margin;
+    wallTopZ    = channelZ + led_channel_wall_height;
 
+    // Pared donde se pega la tira, con su cara ancha mirando hacia el
+    // panel (-Y) — los LEDs enfrentados directamente a la franja del
+    // difusor, igual que antes.
     translate([
         -channelWidth/2,
-        outerWallY - led_channel_backwall_thickness,
+        wallY,
         wallBottomZ
     ])
 
         cube([
             channelWidth,
             led_channel_backwall_thickness,
-            (channelZ + led_channel_wall_height) - wallBottomZ
+            wallTopZ - wallBottomZ
         ]);
 
-}
-
-
-//=============================================================================
-// PUENTES DE CONEXIÓN DEL CANAL LED
-//
-// FALLO CORREGIDO (2026-08-03, aviso del usuario: "has suprimido la
-// soportación para la tira de leds"): confirmado que NUNCA estuvo
-// conectada — la pared del canal (ledChannelWalls()) queda flotando,
-// separada 10mm del cuerpo del panel (el ancho real de la tira LED),
-// sin ningún puente entre ambos. No es algo que se rompiera con el
-// marco elevado; ya estaba así desde que se diseñó el canal. Dos
-// patas cortas, una a cada extremo, conectan el cuerpo del panel con
-// la pared del canal.
-//=============================================================================
-
-module ledChannelSupports()
-{
-
-    channelWidth = case_width - 2*led_channel_x_margin;
-    channelZ     = (front_panel_led_z_low + front_panel_led_z_high)/2 - led_channel_wall_height/2;
-
-    panelBackY = -case_depth/2 + front_panel_thickness;
-    wallFarY   = -case_depth/2 + front_panel_thickness + led_bar_strip_width + led_channel_wall_thickness;
-
-    legWidth = 4.0;
-
-    for(ix = [-1,1])
+    // Costillas de conexión al panel, repartidas a lo largo de X.
+    for (i = [0:led_channel_rib_count-1])
+    {
+        ribX = -channelWidth/2 + led_channel_rib_width/2
+             + i*(channelWidth - led_channel_rib_width) / (led_channel_rib_count-1);
 
         translate([
-            ix*(channelWidth/2 - legWidth/2 - 2) - legWidth/2,
-            panelBackY,
+            ribX - led_channel_rib_width/2,
+            panelBackY - led_channel_rib_overlap,
             channelZ
         ])
 
-            cube([legWidth, wallFarY - panelBackY, led_channel_wall_height]);
+            cube([
+                led_channel_rib_width,
+                (wallY + led_channel_backwall_thickness + led_channel_rib_overlap) - (panelBackY - led_channel_rib_overlap),
+                led_channel_wall_height
+            ]);
+    }
 
 }
 
@@ -499,6 +510,7 @@ module lowerPanel()
             {
                 lowerPanelSolid();
                 lowerPanelBezel();
+                oledInsertBosses();
             }
 
             pushbuttonCut();
@@ -511,11 +523,11 @@ module lowerPanel()
 
             ledDiffuserThinCut();
 
+            oledInsertHoles();
+
         }
 
         ledChannelWalls();
-
-        ledChannelSupports();
 
     }
 

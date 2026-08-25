@@ -211,7 +211,7 @@ module rearIOCut()
 // Resuelve el hueco entre el borde trasero de la bandeja
 // (tray_depth/2 = 75 mm) y la cara frontal de este panel
 // (case_depth/2 - wall_thickness = 78,2 mm): 3,2 mm — ver
-// docs/03_Virtual_Assembly_Report.md.
+// docs/Virtual_Assembly_Report.md.
 //
 // El inserto M3 va en la bandeja (openscad/parts/01_bandeja/base.scad,
 // trayRearBridgeInserts()); aquí solo el taladro de paso.

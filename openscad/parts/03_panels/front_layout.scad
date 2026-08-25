@@ -16,7 +16,7 @@
 //
 // Las posiciones de este archivo (USB de Ø12 mm a modo de boceto,
 // panel NFC de 70 mm de ancho) quedaron desactualizadas tras el
-// ensamblaje virtual v1 — ver docs/03_Virtual_Assembly_Report.md. Se
+// ensamblaje virtual v1 — ver docs/Virtual_Assembly_Report.md. Se
 // conserva sin borrar como referencia histórica.
 //
 // ============================================================================

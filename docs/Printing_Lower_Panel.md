@@ -140,6 +140,8 @@ Confirmado con una laminación real en Anycubic Slicer Next:
   purgas): 1h 9m.
 - Coste estimado: 0,53 (moneda del laminador).
 
+![Esquema de colores tras laminar, confirmando el consumo del filamento 2](images/lower_panel_printing/verificacion_esquema_colores.png)
+
 ---
 
 ## 7. Historial

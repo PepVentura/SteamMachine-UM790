@@ -22,7 +22,7 @@
 //
 // Este archivo incluía una PARED FRONTAL fija que ya no corresponde
 // al diseño confirmado (el panel frontal es magnético y desmontable,
-// sin pared fija detrás — ver docs/03_Virtual_Assembly_Report.md).
+// sin pared fija detrás — ver docs/Virtual_Assembly_Report.md).
 // Se conserva sin borrar como referencia histórica, pero no debe
 // usarse para imprimir.
 //

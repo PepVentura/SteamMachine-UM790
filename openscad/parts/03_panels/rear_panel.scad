@@ -238,6 +238,32 @@ module rearIOCut()
 
 
 //=============================================================================
+// HUECO DEL PULSADOR TRASERO (encendido/apagado del UM790)
+//
+// Mismo criterio que pushbuttonCut() en lower_panel.scad (panel
+// frontal): un pasante del diámetro de la rosca del pulsador
+// (pushbutton_thread_diameter), a través de todo el grosor del panel.
+// Aquí no hay marco/bisel que atravesar (rearPanelSolid() es una
+// placa plana de wall_thickness), así que basta ese grosor + margen.
+//
+// Posición y verificación de colisiones: ver rear_pushbutton_pos en
+// assembly_positions.scad — comprobado sin colisión contra los 6
+// componentes del ensamblaje (UM790, ESP32, HUB, ventilador —cuerpo
+// y volumen de seguridad de flujo de aire—, RC522 y el pulsador
+// frontal) exportando a STL con OpenSCAD real, no solo a ojo.
+//=============================================================================
+
+module rearPushbuttonCut()
+{
+
+    translate([rear_pushbutton_pos[0], case_depth/2 - wall_thickness - 1, rear_pushbutton_pos[2]])
+        rotate([-90,0,0])
+            cylinder(d = pushbutton_thread_diameter, h = wall_thickness + 2);
+
+}
+
+
+//=============================================================================
 // PANEL TRASERO COMPLETO
 //=============================================================================
 
@@ -250,6 +276,8 @@ module rearPanel()
         rearPanelSolid();
 
         rearIOCut();
+
+        rearPushbuttonCut();
 
         rearWallScrewHoles();
 

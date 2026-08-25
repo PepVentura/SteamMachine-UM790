@@ -12,7 +12,7 @@
 //   - openscad/parts/03_panels/nfc_panel.scad (panel NFC extraíble)
 //
 // Este archivo combinaba en una sola pieza lo que el ensamblaje
-// virtual v1 (docs/03_Virtual_Assembly_Report.md) determinó que
+// virtual v1 (docs/Virtual_Assembly_Report.md) determinó que
 // deben ser DOS piezas separadas (una fija atornillada, otra
 // extraíble magnética), y no incluía el USB frontal ni reflejaba las
 // posiciones y tamaños ya validados (panel inferior mínimo, NFC

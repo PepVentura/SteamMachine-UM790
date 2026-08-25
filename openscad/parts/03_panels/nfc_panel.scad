@@ -21,7 +21,7 @@
 // Lleva la ventana/alojamiento del tag NFC, centrada, a media altura
 // del panel — el RC522 queda detrás, sujeto al bastidor (no a este
 // panel), separado 3 mm (ya verificado, ver
-// docs/03_Virtual_Assembly_Report.md).
+// docs/Virtual_Assembly_Report.md).
 //
 // Sistema de coordenadas: igual que assembly_positions.scad — origen
 // centrado en X/Y, Z=0 en la cara inferior exterior del cascarón.

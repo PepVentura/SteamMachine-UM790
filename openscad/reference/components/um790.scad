@@ -125,7 +125,7 @@ module um790RearIO()
 // Misma posición que openscad/parts/01_bandeja/posts.scad
 // (um790_mount_spacing_x/y, um790_post_diameter), pero con la altura
 // vigente en este ensamblaje virtual (um790_standoff_height, ver
-// 00_parametros.scad y docs/03_Virtual_Assembly_Report.md respecto a
+// 00_parametros.scad y docs/Virtual_Assembly_Report.md respecto a
 // la reconciliación pendiente con posts.scad: 6 mm allí).
 //
 // Se dibujan hacia abajo desde la cara inferior de la PCB (Z=0 local)
