@@ -182,13 +182,10 @@ flashearlo.
    ```bash
    flatpak install flathub net.retrodeck.retrodeck
    ```
-4. Instala Lutris (para TeknoParrot, recreativas) igual, desde la
-   Discover Store o:
-   ```bash
-   flatpak install flathub net.lutris.Lutris
-   ```
-   Dentro de Lutris, añade TeknoParrot como si fuera cualquier otro
-   juego/programa (Lutris tiene guías propias para esto).
+4. **Lutris** (para TeknoParrot, recreativas) ya viene preinstalado
+   en Bazzite — no hace falta instalarlo. Dentro de Lutris, añade
+   TeknoParrot como si fuera cualquier otro juego/programa (Lutris
+   tiene guías propias para esto).
 5. Comprueba que Steam ya está instalado (Bazzite lo trae de fábrica).
 
 ---
