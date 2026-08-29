@@ -11,7 +11,7 @@
 // Panel inferior FIJO — sustituye a front_panel.scad/front_layout.scad
 // (obsoletos, ver notas al final de ambos archivos). Diseño definitivo
 // tras la verificación completa del ensamblaje virtual v1
-// (docs/Virtual_Assembly_Report.md): pulsador, OLED y USB doble en
+// (docs/03_Virtual_Assembly_Report.md): pulsador, OLED y USB doble en
 // fila única, más la barra LED justo encima, impresos en la MISMA
 // pieza con la Anycubic Kobra X en dos filamentos independientes.
 //
@@ -146,82 +146,144 @@ module pushbuttonCut()
 // ACTUALIZADO (2026-08-03, aviso del usuario tras probar la
 // impresión real): "la medida que te di fue de toda la placa no de
 // la pantalla" — el hueco usaba 27x27mm (la placa completa), cuando
-// la pantalla real (la parte visible) mide 27,0 x 20,0mm. Además, por
-// encima de la pantalla, en un margen de 3mm, hay unos pines que
-// sobresalen — necesitan hueco por dentro, pero SIN llegar a
-// atravesar hacia el exterior (rebaje ciego, no un segundo agujero
-// visible).
+// la pantalla real (la parte visible) mide 27,0 x 20,0mm.
 //
-// MOVIDO a assembly_positions.scad (2026-08-22): oled_bracket.scad
-// (la nueva brida de sujeción) también necesita estas medidas, y con
-// "use<>" no se comparten variables entre ficheros — solo módulos —
-// así que deben vivir en el include común a ambos.
+// CORREGIDO (2026-08-19, el usuario consultó a Gemini sobre el mal
+// ajuste del OLED): la medida de 27x20mm seguía siendo demasiado
+// grande — es aproximadamente toda la cara frontal de la placa, no
+// el cristal activo. La ventana real del cristal es mucho más
+// pequeña (23,0 x 12,0mm, dato de Gemini como estimación de
+// partida, sin verificar con calibre — el usuario no tenía la
+// placa a mano).
+//
+// SEGUNDA RONDA (2026-08-19, mismo día): "la pantalla OLED queda muy
+// separada del borde del panel y no será fácil visualizarla... ¿Y si
+// preparamos la ventana... pero con bisel y añadimos cuatro agujeros
+// para fijarla con tornillos pasantes y tuercas...?" — el hueco era
+// pasante recto, de borde a borde (3mm de panel + 2mm de bisel = 5mm
+// de "túnel" antes de llegar al cristal, que además va aún más atrás
+// dentro del grosor de la propia placa) — corregido con un bisel
+// cónico (más ancho por fuera, estrechándose hasta el tamaño real
+// del cristal) para mejorar la visibilidad en ángulo.
+// MEDIDA REAL CONFIRMADA (2026-08-19, el usuario midió con calibre):
+// el cristal mide 26,0 x 14,5mm — sustituye la estimación anterior
+// de Gemini (23,0 x 12,0mm, sin verificar).
+oled_screen_width  = 26.0;  // Real, medido por el usuario con calibre — antes 23.0 (estimado, Gemini)
+oled_screen_height = 14.5;  // Real, medido por el usuario con calibre — antes 12.0 (estimado, Gemini)
+oled_pcb_width     = 27.4;  // ESTIMADO (Gemini)
+oled_pcb_height    = 27.4;  // ESTIMADO (Gemini)
+oled_mount_spacing = 23.0;  // ESTIMADO (Gemini) — separación entre los 4 taladros
+oled_pcb_clearance_depth = oled_module_thickness + oled_module_pin_height + 2.0;  // ESTIMADO — profundidad del hueco de paso para el cuerpo de la placa, hasta detrás de los pines, con margen
+
+// CORREGIDO (2026-08-19, el usuario aclaró que me había explicado
+// mal): "el recorte para la ventana del oled no está biselado, me
+// interesaría un bisel de 45 grados" — el bisel anterior (hull()
+// entre dos rectángulos) tenía una pendiente de ~50° (margen 3mm en
+// una profundidad de 2,5mm), no 45° exactos, y probablemente no se
+// apreciaba bien. Corregido para que sea un 45° real: margen =
+// profundidad del bisel (oled_bevel_depth), condición exacta para
+// que la pendiente sea de 45°.
+oled_bevel_depth  = front_bezel_depth;  // el bisel ocupa toda la profundidad añadida por el bisel del panel (2mm)
+oled_bevel_margin = oled_bevel_depth;   // igual a la profundidad -> pendiente exacta de 45°
+
+oled_pin_clearance_height       = 3.0;  // ESTIMADO — cuánto sobresalen hacia arriba los pines de soldadura, sobre el borde superior de la pantalla
+oled_pin_clearance_pocket_depth = 1.5;  // ESTIMADO — profundidad del rebaje ciego, dentro del grosor del panel (deja 1,5mm de piel sólida delante)
 
 module oledCut()
 {
 
-    // Hueco pasante — solo la pantalla real, no toda la placa.
+    // Bisel real de 45°: boca ancha en la cara exterior del bisel
+    // del panel, estrechándose hasta el tamaño real del cristal
+    // justo al llegar a la cara frontal del propio panel — mejora la
+    // visibilidad en ángulo, en vez de mirar por un túnel recto.
+    hull()
+    {
+
+        translate([oled_pos[0], -case_depth/2-oled_bevel_depth, oled_pos[2]])
+            cube([
+                oled_screen_width + 2*oled_bevel_margin,
+                0.1,
+                oled_screen_height + 2*oled_bevel_margin
+            ], center=true);
+
+        translate([oled_pos[0], -case_depth/2, oled_pos[2]])
+            cube([oled_screen_width, 0.1, oled_screen_height], center=true);
+
+    }
+
+    // Resto del hueco, a partir de donde termina el bisel (cara
+    // frontal del panel, detrás del bisel) — recto, tamaño real del
+    // cristal, hasta la cara trasera del panel.
     translate([
         oled_pos[0] - oled_screen_width/2,
-        -case_depth/2-front_bezel_depth-1,
+        -case_depth/2,
         oled_pos[2] - oled_screen_height/2
     ])
-        cube([oled_screen_width, front_panel_thickness+front_bezel_depth+2, oled_screen_height]);
+        cube([oled_screen_width, front_panel_thickness+0.1, oled_screen_height]);
 
-    // Rebaje ciego para los pines, por encima de la pantalla — solo
-    // por dentro (desde la cara trasera), sin llegar a la exterior.
+    // RESTAURADO (2026-08-19, aviso del usuario: "se te ha olvidado
+    // el rebaje que teníamos para los pines de soldadura que tiene
+    // la pantalla en su parte superior") — se había perdido al
+    // rediseñar el hueco a partir de los datos de Gemini. Rebaje
+    // CIEGO (no llega a la cara trasera del panel, a diferencia del
+    // hueco de la pantalla) por encima de la ventana, para los pines
+    // de soldadura que sobresalen ahí — sin este rebaje, el material
+    // sólido del panel (fuera del propio hueco de la pantalla)
+    // chocaría con ellos.
     translate([
         oled_pos[0] - oled_screen_width/2,
-        -case_depth/2 + front_panel_thickness - oled_pin_clearance_pocket_depth,
+        -case_depth/2,
         oled_pos[2] + oled_screen_height/2
     ])
         cube([oled_screen_width, oled_pin_clearance_pocket_depth+0.1, oled_pin_clearance_height]);
 
+    // Hueco de paso para el cuerpo de la placa (27,4x27,4mm) por
+    // detrás del panel — la placa no se recesa dentro del propio
+    // panel, se sujeta con los 4 tornillos del usuario a través de
+    // oledMountHoles(), con su cara frontal apoyada contra la cara
+    // trasera del panel alrededor de la ventana.
+    translate([
+        oled_pos[0] - oled_pcb_width/2,
+        -case_depth/2 + front_panel_thickness - 0.1,
+        oled_pos[2] - oled_pcb_height/2
+    ])
+        cube([oled_pcb_width, oled_pcb_clearance_depth+0.2, oled_pcb_height]);
+
 }
 
 
 //=============================================================================
-// BOSSES DE INSERTO PARA LA SUJECIÓN DE LA OLED
+// 4 AGUJEROS DE FIJACIÓN DEL OLED — sin soportes
 //
-// Ver nota completa junto a oled_bracket_screw_positions en
-// assembly_positions.scad. Dos bosses cilíndricos en las esquinas
-// inferiores del hueco de la OLED, con un rebaje ciego para el
-// inserto térmico M2 — la brida (oled_bracket.scad) se atornilla
-// aquí, sujetando el módulo por detrás contra la cara interior del
-// panel.
+// CORREGIDO (2026-08-19, el usuario aclaró que me había explicado
+// mal): "sigue quedando muy separada del panel, deja únicamente
+// cuatro orificios en el panel y yo pondré los tornillos y las
+// tuercas, no necesito soportes solo los agujeros" — eliminadas las
+// 4 torres con bolsillo hexagonal (ronda anterior); ahora son 4
+// simples agujeros pasantes, atravesando solo el grosor del propio
+// panel, sin ningún material añadido. El usuario pone sus propios
+// tornillos y tuercas.
 //=============================================================================
 
-module oledInsertBosses()
+oled_m2_clearance_diameter = 2.2;   // holgura de paso para M2
+
+module oledMountHoles()
 {
 
-    for (p = oled_bracket_screw_positions)
-    {
-
-        translate([p[0], -case_depth/2 + front_panel_thickness, p[1]])
-            rotate([-90,0,0])
-                cylinder(d = oled_bracket_boss_diameter, h = oled_bracket_boss_length);
-
-    }
-
-}
-
-module oledInsertHoles()
-{
-
-    for (p = oled_bracket_screw_positions)
-    {
+    for(ix=[-1,1])
+    for(iz=[-1,1])
 
         translate([
-            p[0],
-            -case_depth/2 + front_panel_thickness + oled_bracket_boss_length - oled_bracket_insert_depth,
-            p[1]
+            oled_pos[0] + ix*oled_mount_spacing/2,
+            -case_depth/2-1,
+            oled_pos[2] + iz*oled_mount_spacing/2
         ])
-            rotate([-90,0,0])
-                cylinder(d = oled_bracket_insert_diameter, h = oled_bracket_insert_depth+0.1);
 
-    }
+            rotate([-90,0,0])
+                cylinder(d = oled_m2_clearance_diameter, h = front_panel_thickness+2);
 
 }
+
 
 
 //=============================================================================
@@ -395,47 +457,29 @@ module ledDiffuserThinCut()
 
 
 //=============================================================================
-// PARED DEL CANAL DE LA TIRA LED (REDISEÑADO 2026-08-22)
+// PARED DEL CANAL DE LA TIRA LED
 //
-// PEDIDO POR EL USUARIO: "su soportación con el panel es muy débil...
-// toca con los conectores USB-C que van al UM790... desplazar hasta
-// tocar con el propio panel... retirar la pieza horizontal para pegar
-// la tira que incorporamos recientemente, para evitar contacto con
-// los USB mencionados."
+// PEDIDO POR EL USUARIO (2026-08-03, con foto de referencia): la
+// "pared existente" es el propio grosor del panel (front_panel_thickness,
+// su cara frontal, que ya forma una pared al verla de canto).
 //
-// Diseño anterior (2026-08-03/18): una repisa horizontal de 10mm de
-// grosor (led_channel_wall_thickness) se proyectaba hacia fuera desde
-// el ancho real de la tira, y de su borde más alejado colgaba la
-// pared donde se pegaba la tira — protrusión total desde el panel:
-// led_bar_strip_width + led_channel_wall_thickness ≈ 20mm. Esa repisa
-// (justo la parte que más sobresalía) es la que chocaba con los
-// conectores USB-C, y aportaba poco a la robustez (sujeta solo por
-// dos patas de 4mm en los extremos, con ~140mm de vano sin apoyo
-// entre medias).
-//
-// Rediseño: se elimina la repisa por completo. La pared donde se pega
-// la tira (antes ledChannelBackWall()) pasa a estar exactamente a
-// led_bar_strip_width del panel — el hueco justo para el ancho real
-// de la tira, sin ningún sobrante — reduciendo la protrusión total a
-// la mitad (~10mm en vez de ~20mm). La conexión al panel deja de ser
-// dos patas sueltas: ahora es una serie de costillas cortas y anchas,
-// repartidas a lo largo de TODO el ancho del canal (no solo en los
-// extremos), fusionadas con solape real tanto en el panel como en la
-// pared — igual de robusto que una unión continua, pero sin tapar la
-// mayor parte del hueco por donde debe pasar la luz hacia el difusor.
+// CORREGIDO (2026-08-19, el usuario aclaró que me había explicado
+// mal): "no quiero el soporte de la tira de leds en L, lo quiero
+// perpendicular al panel, como en el diseño original, pero pegado
+// directamente al panel sin soportes y de paso que tenga un ancho de
+// 15mm en lugar de los 10 actuales" — se elimina la segunda pared en
+// L (ledChannelBackWall(), ronda anterior) y las patas de conexión
+// (ledChannelSupports(), ya no hacen falta al tocar la pared
+// directamente el panel, sin hueco de por medio). La pared vuelve a
+// ser una única pieza, perpendicular al panel (igual que el diseño
+// original), pero ahora arranca directamente en la cara trasera del
+// panel (sin el hueco de led_bar_strip_width) y con
+// led_channel_wall_thickness ampliado a 15mm (antes 10mm).
 //=============================================================================
 
-led_channel_wall_height    = 3.0;  // ESTIMADO — altura de la pared del canal, en Z
-led_channel_backwall_thickness = 2.0;  // ESTIMADO — grosor de la pared donde se pega la tira
-led_channel_backwall_margin    = 2.0;  // ESTIMADO — margen por debajo de la franja del difusor (40,5mm), para cubrirla entera con holgura
+led_channel_wall_height    = 3.0;  // ESTIMADO — altura de cada pared del canal, en Z
+led_channel_wall_thickness = 15.0;  // antes 10.0 — petición del usuario (2026-08-19)
 led_channel_x_margin       = 8.0;  // igual que ledDiffuserZone(), mismo ancho de zona
-
-// Costillas de conexión: anchas (más superficie de pegado que las
-// antiguas patas de 4mm) y repartidas a lo largo de todo el canal, no
-// solo en los extremos — resuelve la queja de soportación débil.
-led_channel_rib_count     = 6;    // nº de costillas repartidas a lo largo del canal
-led_channel_rib_width     = 8.0;  // ancho de cada costilla, en X
-led_channel_rib_overlap   = 0.4;  // pequeño solape con el panel y con la pared, para fusion real (no solo contacto) y evitar geometria no-manifold
 
 module ledChannelWalls()
 {
@@ -443,44 +487,26 @@ module ledChannelWalls()
     channelWidth = case_width - 2*led_channel_x_margin;
     channelZ     = (front_panel_led_z_low + front_panel_led_z_high)/2 - led_channel_wall_height/2;
 
-    panelBackY  = -case_depth/2 + front_panel_thickness;
-    wallY       = panelBackY + led_bar_strip_width;   // a tocar con el ancho real de la tira, sin sobrante
-    wallBottomZ = front_panel_led_z_low - led_channel_backwall_margin;
-    wallTopZ    = channelZ + led_channel_wall_height;
+    // FALLO CORREGIDO: pegada exactamente a la cara trasera del
+    // panel (sin margen) dejaba la pieza no watertight —
+    // coincidencia geométrica exacta entre la cara de la pared y la
+    // cara del panel, mismo tipo de problema ya visto varias veces
+    // en este proyecto (islas de la bandeja, marco delantero).
+    // Solapada 0,2mm hacia dentro del propio panel para que las
+    // caras no coincidan exactamente.
+    wall_overlap = 0.2;
 
-    // Pared donde se pega la tira, con su cara ancha mirando hacia el
-    // panel (-Y) — los LEDs enfrentados directamente a la franja del
-    // difusor, igual que antes.
     translate([
         -channelWidth/2,
-        wallY,
-        wallBottomZ
+        -case_depth/2 + front_panel_thickness - wall_overlap,
+        channelZ
     ])
 
         cube([
             channelWidth,
-            led_channel_backwall_thickness,
-            wallTopZ - wallBottomZ
+            led_channel_wall_thickness + wall_overlap,
+            led_channel_wall_height
         ]);
-
-    // Costillas de conexión al panel, repartidas a lo largo de X.
-    for (i = [0:led_channel_rib_count-1])
-    {
-        ribX = -channelWidth/2 + led_channel_rib_width/2
-             + i*(channelWidth - led_channel_rib_width) / (led_channel_rib_count-1);
-
-        translate([
-            ribX - led_channel_rib_width/2,
-            panelBackY - led_channel_rib_overlap,
-            channelZ
-        ])
-
-            cube([
-                led_channel_rib_width,
-                (wallY + led_channel_backwall_thickness + led_channel_rib_overlap) - (panelBackY - led_channel_rib_overlap),
-                led_channel_wall_height
-            ]);
-    }
 
 }
 
@@ -510,20 +536,19 @@ module lowerPanel()
             {
                 lowerPanelSolid();
                 lowerPanelBezel();
-                oledInsertBosses();
             }
 
             pushbuttonCut();
 
             oledCut();
 
+            oledMountHoles();
+
             usbFrontCut();
 
             lowerPanelScrewHoles();
 
             ledDiffuserThinCut();
-
-            oledInsertHoles();
 
         }
 
