@@ -25,7 +25,7 @@ def platforms_config():
     return {
         "steam": {"command": sleep_command(2)},
         "retrodeck": {"command": ["este-binario-no-existe-xyz"]},
-        # "teknoparrot" se omite a proposito: sin comando configurado.
+        # "hotd_remake" se omite a proposito: sin comando configurado.
     }
 
 
@@ -38,10 +38,10 @@ def launcher(platforms_config):
 
 
 def test_platform_without_command_is_not_registered(launcher):
-    # "teknoparrot" no tenia "command" en la config -> sin plugin, sin crash.
-    assert launcher.launch("teknoparrot") is False
-    assert launcher.running("teknoparrot") is False
-    assert launcher.status("teknoparrot") is None
+    # "hotd_remake" no tenia "command" en la config -> sin plugin, sin crash.
+    assert launcher.launch("hotd_remake") is False
+    assert launcher.running("hotd_remake") is False
+    assert launcher.status("hotd_remake") is None
 
 
 def test_unknown_platform_returns_false(launcher):
@@ -89,7 +89,7 @@ def test_status_reports_name_running_and_pid(launcher):
 
 def test_status_without_platform_returns_all(launcher):
     status = launcher.status()
-    assert set(status.keys()) == {"steam", "retrodeck"}  # teknoparrot no registrado
+    assert set(status.keys()) == {"steam", "retrodeck"}  # hotd_remake no registrado
 
 
 def test_running_without_platform_returns_all(launcher):

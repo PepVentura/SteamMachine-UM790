@@ -6,6 +6,56 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
+## [1.2.0] - 2026-08-28 — Panel TeknoParrot sustituido por panel Zombies (Steam nativo) + soporte RetroArch
+
+### Contexto
+
+- TeknoParrot tiene mala compatibilidad con Linux/Bazzite (depende de
+  Wine + Demulshooter, poco fiable). Se decidió sustituir el panel de
+  recreativas por un panel de disparos/zombies usando juegos nativos
+  de Steam en vez de emulación, pensado para jugarse con Wiimote como
+  pistola (Bluetooth + barra de sensor IR, integración pospuesta a más
+  adelante).
+
+### Añadido
+
+- `software/launcher/hotd_remake_plugin.py` y
+  `hotd2_remake_plugin.py`: lanzan THE HOUSE OF THE DEAD: Remake
+  (AppID Steam `1694600`) y THE HOUSE OF THE DEAD 2: Remake (AppID
+  `3376690`) via `steam://rungameid/`. Juegos nativos, sin BIOS ni
+  cores.
+- `software/launcher/retroarch_plugin.py`: lanza RetroArch (Flatpak
+  `org.libretro.RetroArch`) directamente, sin pasar por RetroDECK.
+  Instalado y validado en este ciclo con los núcleos Flycast, Beetle
+  Saturn, PCSX-ReARMed y MAME2003-Plus.
+- `config/panel_database.json`: panel `04C3EAD4` renombrado a
+  "Zombies - HOTD Remake" (launcher `hotd_remake`); nuevo panel
+  `0AAABBCC` "Zombies - HOTD 2 Remake" (launcher `hotd2_remake`) —
+  UID placeholder pendiente de un segundo tag físico real.
+- `config/config.json`: nuevas plataformas `retroarch`, `hotd_remake`,
+  `hotd2_remake`.
+- Documentación de instalación de RetroArch (Flatpak, actualización de
+  información de núcleos, descarga de núcleos, ubicación de BIOS/ROMs)
+  añadida en `GUIA_INICIO.md`, incluyendo el fallo conocido "No hay
+  elementos disponibles" en el Descargador de núcleos y su solución.
+
+### Eliminado
+
+- `software/launcher/teknoparrot_plugin.py` y la plataforma
+  `teknoparrot` de `config/config.json` / `panel_database.json`.
+
+### Pendiente
+
+- Emparejar el Wiimote por Bluetooth y montar la barra de sensor IR
+  (ya adquirida) para usarlo como pistola en el panel Zombies.
+- Asignar un UID de tag NFC real al panel de HOTD 2 Remake.
+- Diseño físico (OpenSCAD) del panel Zombies: pendiente, igual que en
+  su día quedó pendiente el icono de TeknoParrot hasta tener una
+  imagen de referencia — `openscad/parts/03_panels/nfc_panel_teknoparrot.scad`
+  no se ha tocado en este ciclo.
+
+---
+
 ## [1.1.4] - 2026-08-25 — Corregido: falso "tag_removed" con el panel puesto
 
 ### Encontrado

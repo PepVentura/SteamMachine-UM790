@@ -88,7 +88,7 @@ Todo el resto será completamente automático.
 
 &#x20;               |               |               |
 
-&#x20;            Steam         RetroDECK       TeknoParrot
+&#x20;            Steam         RetroDECK       Zombies (HOTD)
 
 ```
 
@@ -182,7 +182,7 @@ Ejemplos
 
 \- RetroDECK
 
-\- TeknoParrot
+\- Zombies (HOTD Remake, via Steam)
 
 
 
@@ -248,7 +248,7 @@ RetroDECK → Morado
 
 
 
-TeknoParrot → Rojo
+Zombies (HOTD Remake) → Rojo
 
 
 

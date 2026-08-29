@@ -838,7 +838,7 @@ Lanzamiento de un emulador dentro de RetroDECK (p.ej. PS3 via RPCS3 integrado).
 
 
 
-Lanzamiento TeknoParrot.
+Lanzamiento panel Zombies (HOTD Remake / HOTD 2 Remake, via Steam).
 
 
 

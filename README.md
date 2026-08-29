@@ -46,7 +46,10 @@ Cada panel frontal incorpora:
 Ejemplos de uso:
 
 - 🎮 Panel Steam Machine → inicia Steam Big Picture.
-- 🕹️ Panel Arcade → inicia RetroDECK / TeknoParrot.
+- 🕹️ Panel Arcade → inicia RetroDECK / RetroArch.
+- 🧟 Panel Zombies → THE HOUSE OF THE DEAD: Remake / THE HOUSE OF THE
+  DEAD 2: Remake (nativos de Steam vía Proton — pensado para jugarse
+  con Wiimote como pistola, integración pendiente).
 - ⚙️ Panel Configuración → acceso a herramientas del sistema.
 - 🎵 Panel Multimedia → reproducción multimedia.
 

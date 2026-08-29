@@ -10,6 +10,8 @@
   "platforms": {
     "steam": { "command": ["steam", "steam://open/bigpicture"] },
     "retrodeck": { "command": ["flatpak", "run", "net.retrodeck.retrodeck"] },
-    "teknoparrot": { "command": ["lutris", "lutris:rungame/teknoparrot"] }
+    "retroarch": { "command": ["flatpak", "run", "org.libretro.RetroArch"] },
+    "hotd_remake": { "command": ["steam", "steam://rungameid/1694600"] },
+    "hotd2_remake": { "command": ["steam", "steam://rungameid/3376690"] }
   }
 }

@@ -13,16 +13,20 @@ from typing import Optional
 
 from core.logger import get_logger
 from launcher.base_plugin import BasePlugin
+from launcher.hotd2_remake_plugin import Hotd2RemakePlugin
+from launcher.hotd_remake_plugin import HotdRemakePlugin
 from launcher.retrodeck_plugin import RetroDeckPlugin
+from launcher.retroarch_plugin import RetroArchPlugin
 from launcher.steam_plugin import SteamPlugin
-from launcher.teknoparrot_plugin import TeknoParrotPlugin
 
 logger = get_logger()
 
 PLUGIN_CLASSES = {
     "steam": SteamPlugin,
     "retrodeck": RetroDeckPlugin,
-    "teknoparrot": TeknoParrotPlugin,
+    "retroarch": RetroArchPlugin,
+    "hotd_remake": HotdRemakePlugin,
+    "hotd2_remake": Hotd2RemakePlugin,
 }
 
 

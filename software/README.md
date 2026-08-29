@@ -2,7 +2,9 @@
 
 Aplicacion Python que corre en el mini PC (Bazzite) y coordina el ESP32
 (paneles NFC + boton + OLED + LEDs) con el lanzador de plataformas
-(Steam, RetroDECK, TeknoParrot). Arquitectura y protocolo: ver `docs/03`,
+(Steam, RetroDECK, RetroArch, y el panel de zombies/disparos con THE
+HOUSE OF THE DEAD: Remake y THE HOUSE OF THE DEAD 2: Remake, ambos
+nativos de Steam via Proton). Arquitectura y protocolo: ver `docs/03`,
 `docs/04`, `docs/05`, `docs/08` en la raiz del repo.
 
 ## Instalar
@@ -56,11 +58,14 @@ sim> r             # simula "retirar panel"
 sim> q             # salir
 ```
 
-Los UID de ejemplo (Steam / RetroDECK / TeknoParrot) estan en
-`config/panel_database.json` y corresponden a los 3 paneles NFC ya
-diseñados en el CAD — si tus tags reales tienen otros UID, actualiza
-ese fichero con los que reporte el firmware al leerlos (ver el
-checklist de `firmware/README.md`).
+Los UID de ejemplo (Steam / RetroDECK / Zombies-HOTD Remake /
+Zombies-HOTD 2 Remake) estan en `config/panel_database.json` — si tus
+tags reales tienen otros UID, actualiza ese fichero con los que
+reporte el firmware al leerlos (ver el checklist de
+`firmware/README.md`). El UID del panel de HOTD 2 Remake
+(`0AAABBCC`) es un placeholder: sustituyelo por el UID real en cuanto
+tengas un segundo tag/panel fisico asignado a ese juego; hasta
+entonces, el panel de zombies (`04C3EAD4`) lanza HOTD Remake.
 
 ## Arranque automático (systemd)
 
@@ -111,7 +116,8 @@ hardware, ESP32 ni las plataformas reales para correrlos.
 core/        Application, ConfigurationManager, EventManager, logger
 devices/     SerialManager (real) / SimulatedSerialManager, ESP32Controller
 database/    PanelDatabase (config/panel_database.json)
-launcher/    BasePlugin + SteamPlugin, RetroDeckPlugin, TeknoParrotPlugin
+launcher/    BasePlugin + SteamPlugin, RetroDeckPlugin, RetroArchPlugin,
+             HotdRemakePlugin, Hotd2RemakePlugin
 config/      config.json, panel_database.json
 ```
 
@@ -127,4 +133,7 @@ config/      config.json, panel_database.json
   pero si se añade reconexion en caliente conviene revisar ese estado.
 - Zumbador y actualizaciones OTA: sin implementar todavía (ver roadmap,
   Fase 10).
+- Wiimote como lightgun (Bluetooth + barra de sensor IR) para el panel
+  de zombies: pospuesto, sin implementar todavía. Los juegos (HOTD
+  Remake / HOTD 2 Remake) ya funcionan con raton normal mientras tanto.
 

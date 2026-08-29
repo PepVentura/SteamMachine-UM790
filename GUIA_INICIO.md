@@ -32,8 +32,10 @@ Un mini PC (Minisforum UM790 Pro) metido dentro de una carcasa impresa
 en 3D con forma de consola. Tiene paneles frontales intercambiables:
 cada panel lleva una etiqueta NFC escondida, y al acercarlo a un lector
 y pulsar un botón, el PC lanza automáticamente Steam, tu colección
-retro (RetroDECK) o tus recreativas (TeknoParrot). Una pantalla OLED y
-una barra de LEDs te muestran qué panel has puesto.
+retro (RetroDECK / RetroArch) o el panel de disparos/zombies (THE
+HOUSE OF THE DEAD: Remake y THE HOUSE OF THE DEAD 2: Remake, ambos
+nativos de Steam vía Proton). Una pantalla OLED y una barra de LEDs te
+muestran qué panel has puesto.
 
 Tres piezas hacen que esto funcione:
 
@@ -182,11 +184,36 @@ flashearlo.
    ```bash
    flatpak install flathub net.retrodeck.retrodeck
    ```
-4. **Lutris** (para TeknoParrot, recreativas) ya viene preinstalado
-   en Bazzite — no hace falta instalarlo. Dentro de Lutris, añade
-   TeknoParrot como si fuera cualquier otro juego/programa (Lutris
-   tiene guías propias para esto).
+4. Instala también **RetroArch** (Flatpak, directo, sin pasar por
+   RetroDECK — útil para paneles dedicados a un sistema/core concreto):
+   ```bash
+   flatpak install flathub org.libretro.RetroArch
+   ```
+   Ábrelo una vez para que genere su configuración en
+   `~/.var/app/org.libretro.RetroArch/config/retroarch/`. Luego, desde
+   dentro de RetroArch: **Menú principal → Actualizador en línea →
+   Actualizar información de núcleos** (imprescindible, o el
+   Descargador de núcleos mostrará "No hay elementos disponibles") y a
+   continuación **Descargador de núcleos**, donde instalas los que
+   necesites — por ejemplo:
+   - **Flycast** (Dreamcast/Naomi)
+   - **Beetle Saturn** / Mednafen Saturn
+   - **PCSX-ReARMed** (PS1)
+   - **MAME2003-Plus** (arcade)
+
+   Los BIOS (obligatorios para PS1 y Saturn; recomendables para
+   Dreamcast) van en
+   `~/.var/app/org.libretro.RetroArch/config/retroarch/system/` —
+   tienes que dumpearlos tú mismo de hardware que poseas, RetroArch no
+   los distribuye. Las ROMs las importas luego desde **Importar
+   contenido → Escanear directorio**.
 5. Comprueba que Steam ya está instalado (Bazzite lo trae de fábrica).
+   Para el panel de zombies, instala desde Steam **THE HOUSE OF THE
+   DEAD: Remake** (AppID `1694600`) y **THE HOUSE OF THE DEAD 2:
+   Remake** (AppID `3376690`) — son juegos nativos de Steam vía
+   Proton, no necesitan emulador. Si al primero le fallan los vídeos
+   de introducción, fuerza **Proton GE** en vez del Proton estándar
+   (Propiedades del juego → Compatibilidad).
 
 ---
 
@@ -288,17 +315,21 @@ USB).
 3. Conecta el ESP32 (ya flasheado) al mini PC por USB, a través del
    HUB del frontal.
 4. Añade los UID reales de tus tags NFC (los que apuntaste en el paso
-   anterior) en `config/panel_database.json`. Ya trae tres de ejemplo:
+   anterior) en `config/panel_database.json`. Ya trae varios de ejemplo:
    ```json
    {
      "04A1C8B2": { "name": "Steam", "launcher": "steam", "led": "#0055FF", "icon": "steam.png" },
      "04B2D9C3": { "name": "RetroDECK", "launcher": "retrodeck", "led": "#8800FF", "icon": "retrodeck.png" },
-     "04C3EAD4": { "name": "TeknoParrot", "launcher": "teknoparrot", "led": "#FF3300", "icon": "teknoparrot.png" }
+     "04C3EAD4": { "name": "Zombies - HOTD Remake", "launcher": "hotd_remake", "led": "#FF3300", "icon": "hotd_remake.png" },
+     "0AAABBCC": { "name": "Zombies - HOTD 2 Remake", "launcher": "hotd2_remake", "led": "#CC0000", "icon": "hotd2_remake.png" }
    }
    ```
    Sustituye esas claves (`04A1C8B2`, etc.) por los UID de tus tags
    reales — la clave es el UID, el resto de campos puedes dejarlos o
-   personalizarlos.
+   personalizarlos. El de HOTD 2 Remake (`0AAABBCC`) es un placeholder
+   hasta que tengas un segundo tag/panel físico dedicado a ese juego;
+   mientras tanto, un solo panel puede apuntar a `hotd_remake` y
+   cambiar de juego se hace a mano desde Steam.
 5. Arranca el Core:
    ```bash
    python main.py
@@ -321,7 +352,8 @@ Con el Core corriendo (`python main.py`), acerca un panel al lector:
 1. La pantalla OLED debería mostrar el nombre del panel.
 2. La barra LED debería cambiar suavemente al color de ese panel.
 3. Pulsa el botón → la barra hace una animación de "lanzamiento" y, si
-   todo va bien, se abre Steam/RetroDECK/TeknoParrot según el panel.
+   todo va bien, se abre Steam/RetroDECK/RetroArch o el juego de
+   zombies correspondiente según el panel.
 4. Retira el panel → la pantalla se apaga y el LED vuelve al azul de
    reposo.
 
@@ -407,12 +439,19 @@ aparece nada ahí, el problema es de cableado/USB, no del software —
 vuelve al Paso 4. Si aparece pero el Core no conecta, ponlo a mano en
 `config/config.json` como se explica en el Paso 5.
 
-**Steam/RetroDECK/TeknoParrot no arrancan al pulsar el botón**
+**Steam/RetroDECK/RetroArch/Zombies no arrancan al pulsar el botón**
 Prueba a lanzarlos a mano desde el escritorio de Bazzite primero — si
 tampoco arrancan así, el problema es de esa instalación, no del
 proyecto. Si arrancan a mano pero no desde el botón, revisa que el
 `launcher` de ese panel en `panel_database.json` coincide con las
-claves `steam` / `retrodeck` / `teknoparrot` de `config/config.json`.
+claves `steam` / `retrodeck` / `retroarch` / `hotd_remake` /
+`hotd2_remake` de `config/config.json`.
+
+**El Descargador de núcleos de RetroArch muestra "No hay elementos disponibles"**
+Falta actualizar el índice antes de poder listar núcleos: entra en
+**Actualizador en línea → Actualizar información de núcleos**, espera
+a que termine, y vuelve a **Descargador de núcleos** — ya debería
+aparecer la lista completa.
 
 **La pantalla OLED no enciende**
 Revisa la dirección I2C — por defecto se asume `0x3C`. Si tu módulo usa
@@ -429,6 +468,38 @@ por defecto) — si tu tira es `RGB`, avisa para ajustar
 
 Si nada de esto lo resuelve, el firmware tiene un canal de depuración
 más detallado por Serial2 — ver "Depuración" en `firmware/README.md`.
+
+**El mini PC se queda en un prompt `grub>` en vez de arrancar Bazzite**
+Es la consola de rescate de GRUB — aparece cuando el firmware UEFI
+pierde la referencia al fichero de arranque, normalmente por un corte
+de corriente justo durante un arranque anterior (no es un fallo del
+proyecto, ni algo que se pueda producir cableando el pulsador de
+encendido trasero — solo coincidencia si pasa justo después). El
+sistema en sí no suele estar dañado, solo esa referencia. Para
+recuperarlo sin perder nada:
+
+1. En el prompt `grub>`, comprueba que el disco se ve bien:
+   ```
+   ls
+   ```
+   Deberías ver algo como `(hd0) (hd0,gpt1) (hd0,gpt2) (hd0,gpt3)`.
+2. Localiza la partición EFI (comprueba una a una si hace falta):
+   ```
+   ls (hd0,gpt1)/
+   ```
+   Busca una carpeta `efi/` — si no está en `gpt1`, prueba con `gpt2`, etc.
+3. Dentro debería haber `efi/fedora/grub.cfg`. Cárgalo directamente:
+   ```
+   configfile (hd0,gpt1)/efi/fedora/grub.cfg
+   ```
+   (ajusta el número de partición al que hayas encontrado en el paso 2).
+4. Debería aparecer el menú normal de arranque de Bazzite — arranca
+   con Enter.
+5. Una vez dentro, **reinicia una vez de forma normal** (menú de
+   Steam/Bazzite, no cortando corriente) para confirmar que el
+   arranque automático ya funciona solo, sin repetir estos pasos. Si
+   vuelve a fallar, hay un comando (`sudo bootupctl`) para reescribir
+   la entrada de arranque de forma permanente.
 
 ---
 

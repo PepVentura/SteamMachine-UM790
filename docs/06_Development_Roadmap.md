@@ -668,7 +668,7 @@ Software
 
 \- Gestión de errores
 
-\- Compatibilidad Bazzite / actualizaciones de RetroDECK y Lutris
+\- Compatibilidad Bazzite / actualizaciones de RetroDECK y RetroArch
 
 \- Actualizaciones
 

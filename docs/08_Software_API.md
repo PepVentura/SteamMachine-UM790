@@ -504,7 +504,15 @@ RetroDECK (pack todo-en-uno de emulacion: PS2, GameCube, Wii, PS3...)
 
 
 
-TeknoParrot (via Lutris)
+RetroArch (Flatpak, directo, sin pasar por RetroDECK)
+
+
+
+Zombies - HOTD Remake (THE HOUSE OF THE DEAD: Remake, nativo de Steam via Proton)
+
+
+
+Zombies - HOTD 2 Remake (THE HOUSE OF THE DEAD 2: Remake, nativo de Steam via Proton)
 
 
 
