@@ -118,6 +118,10 @@ SteamMachine-UM790/
 │   ├── parts/               Piezas por imprimir (chasis, paneles...)
 │   └── reference/            Componentes y posiciones del ensamblaje
 ├── STL/                    STL listos para imprimir
+│   └── Anagramas/            Panel NFC en blanco + anagramas sueltos,
+│                              para imprimir por separado y pegar con
+│                              Loctite (reduce el tiempo de impresión
+│                              de ~6h a ~1h frente a la pieza única)
 │
 ├── firmware/                Firmware del ESP32 (C++, PlatformIO)
 ├── software/                 Core en Python — corre en el mini PC
@@ -167,10 +171,12 @@ Archivo principal: `openscad/00_parametros.scad`
 - [x] Probado en hardware real: lectura NFC, barra LED, pulsador frontal, pantalla OLED, recuperación tras reinicio del ESP32.
 - [x] Core (Python) probado de extremo a extremo contra el ESP32 real: detecta panel, reacciona OLED/LEDs y responde al botón lanzando la plataforma correspondiente.
 - [x] Guía de inicio completa para montarlo desde cero (`GUIA_INICIO.md`).
+- [x] Publicación de STL definitivos actualizados (incluye `STL/Anagramas/` — panel en blanco + anagramas sueltos para pegar con Loctite).
 
 ### Pendiente
 
-- [ ] Publicación de STL definitivos actualizados.
+- [ ] Wiimote como pistola para el panel Zombies (Bluetooth + barra de sensor IR).
+- [ ] UID de tag NFC real para el panel Zombies - HOTD 2 Remake.
 
 Ver `docs/10_Test_Plan.md` para el detalle de cada prueba realizada, y
 `docs/06_Development_Roadmap.md` para el estado por fases.

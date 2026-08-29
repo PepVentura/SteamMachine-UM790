@@ -6,6 +6,30 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
+## [1.2.1] - 2026-08-29 — Paneles NFC: impresión en dos piezas (base + anagrama pegado con Loctite)
+
+### Cambiado
+
+- Los STL de los paneles NFC con anagrama pasan de imprimirse como
+  pieza única (base + emblema en relieve integrado) a imprimirse en
+  dos piezas independientes: `STL/Anagramas/nfc_panel_blank.stl` (la
+  base, común a todos los temas) y un STL suelto por anagrama
+  (`Steam.stl`, `Retrobat.stl`, `Parrot.stl`, `engranaje.stl`,
+  `Gung.stl`), que se pegan después con Loctite (cianoacrilato tipo
+  401/454, compatible con PLA/PETG).
+- Motivo: baja el tiempo de impresión de ~6h (pieza única con el
+  relieve del emblema) a ~1h por panel.
+- Documentado en `GUIA_INICIO.md` (paso 1, lista de materiales) y
+  `docs/11_Assembly_Manual.md` (Paso 11, Panel NFC).
+- Los STL de bloque único (con el emblema ya integrado) se mantienen
+  en `STL/` y `openscad/parts/03_panels/` para quien prefiera esa vía.
+
+### Confirmado
+
+- `Gung.stl` es el anagrama del panel Zombies (04C3EAD4 / hotd_remake).
+
+---
+
 ## [1.2.0] - 2026-08-28 — Panel TeknoParrot sustituido por panel Zombies (Steam nativo) + soporte RetroArch
 
 ### Contexto

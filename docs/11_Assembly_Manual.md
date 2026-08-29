@@ -806,7 +806,40 @@ No presiona ningún cable.
 
 
 
-\## Panel NFC
+\## Panel NFC (impresión en dos piezas + pegado)
+
+
+
+Desde este ciclo, el panel NFC con anagrama se imprime en dos piezas
+separadas en vez de como bloque único con el emblema en relieve:
+
+
+
+Base del panel (STL/Anagramas/nfc\_panel\_blank.stl)
+
+
+
+↓
+
+
+
+Anagrama suelto (STL/Anagramas/Steam.stl, Retrobat.stl, Parrot.stl,
+engranaje.stl, Gung.stl para el panel Zombies — según el panel)
+
+
+
+↓
+
+
+
+Pegar el anagrama sobre la base con Loctite (cianoacrilato tipo
+401/454, compatible con PLA/PETG)
+
+
+
+Ventaja frente a la pieza única: el tiempo de impresión baja de ~6h a
+~1h, al no necesitar imprimir el relieve del emblema integrado en el
+mismo trabajo que la base.
 
 
 

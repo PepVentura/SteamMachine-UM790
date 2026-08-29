@@ -72,6 +72,7 @@ probarse.
 | Tornillería M2, M2.5, M3, M4, M5, M6, M8 e insertos roscados | Según pieza — ver `docs/07_Hardware_Specification.md` |
 | Imanes de neodimio 3×2mm y 6×2mm | Fijan los paneles intercambiables |
 | Filamento PLA+ (pruebas) y PETG (pieza definitiva) | Impresión 3D |
+| Loctite (cianoacrilato tipo 401/454) | Pegar los anagramas sueltos de `STL/Anagramas/` sobre el panel NFC en blanco |
 
 ### Herramientas
 
@@ -97,6 +98,21 @@ Linux.
    GitHub, o `git clone` si ya sabes usarlo).
 2. Los ficheros listos para imprimir están en `STL/`. Si tu impresora
    los admite directamente, no necesitas tocar nada más.
+
+   Para los **paneles NFC con anagrama** (Steam, RetroBat, etc.),
+   `STL/Anagramas/` trae el panel en blanco (`nfc_panel_blank.stl`) y
+   cada anagrama por separado (`Steam.stl`, `Retrobat.stl`,
+   `Parrot.stl`, `engranaje.stl`, `Gung.stl` — este último es el
+   anagrama del panel Zombies) para imprimirlos como piezas independientes en vez de la pieza única con el emblema
+   integrado. Imprime el panel en blanco y el anagrama que quieras por
+   separado, y pégalos con **Loctite** (un cianoacrilato tipo Loctite
+   401/454 va bien en PLA/PETG). Este método baja el tiempo de
+   impresión de ~6 horas (pieza única con el emblema en relieve) a
+   ~1 hora, porque el anagrama es una pieza pequeña y plana que no
+   necesita soportes ni tantas capas del panel completo debajo.
+   Los STL de un único bloque (con el emblema ya integrado, sin pegar)
+   siguen disponibles directamente en `STL/` y en
+   `openscad/parts/03_panels/` si prefieres esa vía.
 3. Si quieres ajustar medidas (por ejemplo, si tu mini PC no es
    exactamente un UM790 Pro), el diseño paramétrico está en
    `openscad/` y `00_parametros.scad`, hecho con
