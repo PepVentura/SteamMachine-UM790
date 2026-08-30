@@ -15,6 +15,22 @@ actual del proyecto (OpenSCAD), no maquetas ni imágenes genéricas —
 se regeneran cada vez que cambia el CAD, así que siempre reflejan el
 estado real de las piezas.
 
+### Carcasa montada, con distintos anagramas de panel NFC
+
+| Steam | RetroBat | En blanco |
+|---|---|---|
+| ![Ensamblaje con panel Steam](docs/img/render_ensamblaje_steam.png) | ![Ensamblaje con panel RetroBat](docs/img/render_ensamblaje_retrobat.png) | ![Ensamblaje con panel en blanco](docs/img/render_ensamblaje_blank.png) |
+
+El panel NFC frontal es intercambiable — el ensamblaje es siempre el
+mismo, solo cambia la pieza pequeña con el anagrama (ver `openscad/parts/03_panels/nfc_panel_*.scad`
+y el sistema de impresión en dos piezas de `STL/Anagramas/`). El
+anagrama del panel Zombies (`STL/Anagramas/Gung.stl`) todavía no tiene
+un `.scad` paramétrico propio como los de arriba —está modelado
+directamente como STL suelto—, así que de momento no aparece en este
+render conjunto.
+
+### Piezas por separado
+
 | Chasis | Panel superior (rejilla) |
 |---|---|
 | ![Chasis](docs/img/render_chasis.png) | ![Panel superior](docs/img/render_panel_superior.png) |
