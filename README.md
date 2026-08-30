@@ -10,8 +10,22 @@ Proyecto desarrollado en **OpenSCAD**, con piezas preparadas para impresión 3D.
 
 ## 📷 Galería
 
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/8020d66b-9920-4f28-941f-c2b32f67ebfd" />
+Renders reales generados directamente desde el diseño paramétrico
+actual del proyecto (OpenSCAD), no maquetas ni imágenes genéricas —
+se regeneran cada vez que cambia el CAD, así que siempre reflejan el
+estado real de las piezas.
 
+| Chasis | Panel superior (rejilla) |
+|---|---|
+| ![Chasis](docs/img/render_chasis.png) | ![Panel superior](docs/img/render_panel_superior.png) |
+
+| Panel inferior (frontal, con OLED/botón/USB) | Panel trasero |
+|---|---|
+| ![Panel inferior](docs/img/render_panel_inferior.png) | ![Panel trasero](docs/img/render_panel_trasero.png) |
+
+| Bandeja interior |
+|---|
+| ![Bandeja](docs/img/render_bandeja.png) |
 
 ---
 
