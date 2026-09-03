@@ -5,19 +5,19 @@
     "led": "#0055FF",
     "icon": "steam.png"
   },
-  "04B2D9C3": {
+  "E76DC103": {
     "name": "RetroDECK",
     "launcher": "retrodeck",
     "led": "#8800FF",
     "icon": "retrodeck.png"
   },
-  "04C3EAD4": {
+  "112FC103": {
     "name": "Zombies - HOTD Remake",
     "launcher": "hotd_remake",
     "led": "#FF3300",
     "icon": "hotd_remake.png"
   },
-  "0AAABBCC": {
+  "56A1C003": {
     "name": "Zombies - HOTD 2 Remake",
     "launcher": "hotd2_remake",
     "led": "#CC0000",
