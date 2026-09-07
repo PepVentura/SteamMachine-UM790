@@ -6,6 +6,43 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
+## [1.4.7] - 2026-09-04 — Corregida la asignación real de UID a perfil; MAINTENANCE ya tiene panel físico
+
+### Corregido
+
+- El usuario confirmó la asignación real de sus tags NFC físicos, que
+  resultó ser distinta de lo que [1.4.3]/[1.4.4] habían asumido:
+  - `6739C003` → STEAM (sin cambios)
+  - `E76DC103` → RETRO (sin cambios)
+  - `112FC103` → **MAINTENANCE** (antes asignado por error a DISPAROS)
+  - `56A1C003` → **DISPAROS** (antes retirado por error en [1.4.4],
+    creyendo que era el panel de HOTD 2 Remake que ya no hacía falta)
+
+### Cambiado
+
+- `software/config/panel_database.json`: `112FC103` pasa de
+  `"name": "Zombies"` / `profile: "DISPAROS"` a `"name": "Maintenance"`
+  / `profile: "MAINTENANCE"` / `launcher: null`. Recuperado
+  `56A1C003` con `"name": "Zombies"` / `profile: "DISPAROS"` /
+  `launcher: "steam"` (la definición que antes tenía `112FC103`).
+- `software/tests/test_panel_database.py`: actualizado el test de
+  integridad que tenía la asignación anterior "grabada" — ahora
+  comprueba explícitamente los 4 pares UID→perfil correctos, para
+  detectar si esto se vuelve a desordenar en el futuro.
+- `docs/12_Profile_System.md`: corregidas las menciones a UID
+  concretos en el estado de DISPAROS y MAINTENANCE, y en "Decisiones
+  cerradas" — MAINTENANCE ya no aparece como "sin panel físico
+  asignado".
+- 97 tests en total, todos en verde.
+
+### Nota
+
+- No he tocado el `CHANGELOG.md` de [1.4.3]/[1.4.4] — quedan como
+  registro histórico de lo que se creía en su momento; esta entrada
+  documenta la corrección, no reescribe lo anterior.
+
+---
+
 ## [1.4.6] - 2026-09-04 — Perfil AUTO implementado: ProcessWatcher, cierra el alcance de la v0.2
 
 ### Añadido

@@ -154,15 +154,25 @@ def test_save_then_reload_round_trips(db_path):
 
 
 def test_default_database_disparos_panel_launches_steam_not_a_specific_game():
+    # CORREGIDO 2026-09-04: el usuario aclaro la asignacion real de
+    # UID -> panel (112FC103 es MAINTENANCE, 56A1C003 es DISPAROS/
+    # Zombies - al reves de lo que se habia asumido en [1.4.3]/[1.4.4]).
     db = PanelDatabase()
     db.load()
 
-    # 56A1C003 (Zombies - HOTD 2 Remake) se retiro el 2026-09-03: la
-    # idea de "un panel por juego" se sustituyo por un unico panel
-    # DISPAROS que abre Steam Big Picture (ver docs/12_Profile_System.md).
-    assert db.find("56A1C003") is None
-
-    zombies_panel = db.find("112FC103")
+    zombies_panel = db.find("56A1C003")
     assert zombies_panel is not None
     assert zombies_panel["profile"] == "DISPAROS"
     assert zombies_panel["launcher"] == "steam"
+
+
+def test_default_database_has_the_current_uid_to_profile_assignment():
+    # Confirmado por el usuario 2026-09-04: Steam=6739C003,
+    # RETRO=E76DC103, MAINTENANCE=112FC103, DISPAROS=56A1C003.
+    db = PanelDatabase()
+    db.load()
+
+    assert db.find("6739C003")["profile"] == "STEAM"
+    assert db.find("E76DC103")["profile"] == "RETRO"
+    assert db.find("112FC103")["profile"] == "MAINTENANCE"
+    assert db.find("56A1C003")["profile"] == "DISPAROS"

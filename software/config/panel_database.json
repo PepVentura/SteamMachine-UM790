@@ -14,6 +14,13 @@
     "icon": "retrodeck.png"
   },
   "112FC103": {
+    "name": "Maintenance",
+    "profile": "MAINTENANCE",
+    "launcher": null,
+    "led": "#FFFFFF",
+    "icon": "maintenance.png"
+  },
+  "56A1C003": {
     "name": "Zombies",
     "profile": "DISPAROS",
     "launcher": "steam",
