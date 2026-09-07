@@ -2,10 +2,10 @@
 
 # 12 - Profile System (panel = perfil, no panel = programa)
 
-Version: 0.2 (decisión de AUTO tomada; resto sigue siendo propuesta,
-sin implementar)
-Status: Draft — el punto de precedencia NFC/AUTO ya está decidido; el
-resto sigue pendiente de validación antes de tocar código
+Version: 0.3 (STEAM, RETRO, DISPAROS, MAINTENANCE y AUTO implementados;
+KODI/MUSIC/DESKTOP/NIGHT/DEMO siguen siendo huecos reservados)
+Status: Implementado — alcance completo de la v0.2 original en código
+y con tests; ver "Pendiente" para los refinamientos que quedan
 
 ---
 
@@ -198,17 +198,23 @@ programa corre, no solo al lanzarlo:
   que permite consultar el contenido cargado. Viable, pero es una
   integración propia (poll periódico + parseo de la respuesta), no
   algo que salga gratis de tener el perfil definido en JSON.
-- **MAINTENANCE** (CPU/GPU/FAN/RAM/estado ESP32-NFC-OLED): datos del
-  propio sistema (vía `psutil` o lectura directa de `/sys`) más el
-  estado ya conocido por el propio Core (conexión ESP32, último NFC
-  leído, etc. — esto sí es inmediato, ya lo tiene `Application`).
+  **Sin implementar todavía.**
+- **MAINTENANCE** (CPU/RAM — GPU/FAN quedaron fuera, ver más abajo):
+  **implementado en [1.4.5]** — `status/system_stats_provider.py`, vía
+  `psutil`. El estado ya conocido por el propio Core (conexión ESP32,
+  último NFC leído...) que se mencionaba aquí como "inmediato" NO se
+  ha incorporado todavía a la plantilla — de momento solo se usan las
+  métricas de `psutil`, fusionar el estado interno de `Application` es
+  trabajo pendiente.
 
-Ambos quedan como componentes `StatusProvider` aparte (interfaz común:
-"dame un dict de variables para rellenar la plantilla"), fuera del
-alcance de la primera versión del sistema de perfiles — el sistema de
-perfiles debe quedar preparado para que un `status_provider` exista,
-pero implementar `retroarch_network_commands` y `system_stats` es
-trabajo posterior.
+Ambos son componentes `StatusProvider` con la misma interfaz
+(`snapshot() -> dict`, registrados en `status/status_manager.py`).
+`system_stats` (MAINTENANCE) ya existe; `retroarch_network_commands`
+(RETRO) sigue pendiente — el mecanismo genérico de `Application`
+(`_on_tag_detected()`, plantilla `oled.idle_template` +
+`status_provider`) ya está preparado para él, añadirlo no debería
+requerir tocar `Application` otra vez, solo el provider nuevo y el
+campo en `retro.json`.
 
 ---
 
@@ -216,6 +222,58 @@ trabajo posterior.
 
 **Con contenido de OLED definido y una razón de ser clara:**
 `STEAM` · `RETRO` · `DISPAROS` · `MAINTENANCE` · `AUTO`
+
+Estado de implementación (`software/config/profiles/`):
+- ✅ `STEAM` — migrado ([1.4.0]), `oled.idle` estático.
+- ✅ `RETRO` — migrado ([1.4.2]), `oled.idle` estático; el
+  `running_template` y el `status_provider` ya están en el JSON pero
+  siguen inertes — `Application` todavía no lee ninguno de los dos
+  (pendiente de implementar `StatusProvider`, ver "Pendiente").
+- ✅ `DISPAROS` — migrado ([1.4.3], selector decidido en [1.4.4]).
+  Es un perfil que agrupa varios juegos (`games[]`, catálogo de
+  referencia que crecerá) bajo un único panel físico (`112FC103`,
+  llamado ahora simplemente "Zombies"). **Decidido (2026-09-03): el
+  botón siempre abre Steam Big Picture** (`launcher: "steam"`, tanto
+  en el perfil como en el panel) — la lista real de juegos de
+  disparos es una Colección de Steam que el usuario organiza a mano
+  dentro del propio Steam, no un menú de este proyecto. El panel
+  `56A1C003` (HOTD 2 Remake, un panel por juego) se retiró: ya no
+  hace falta un panel físico por juego.
+- ✅ `AUTO` — implementado ([1.4.6]). `core/process_watcher.py`
+  (`ProcessWatcher`, vía `psutil.process_iter()`, poll cada 5s por
+  defecto) + campo opcional `auto_match` en cada perfil (hoy: `STEAM`
+  → `["steam"]`, `RETRO` → `["retroarch", "retrodeck"]`). Arranca en
+  `_on_tag_removed()` y al iniciar la `Application`; se para en
+  `_on_tag_detected()` (el panel físico manda siempre). Limitaciones
+  conocidas:
+  - `DISPAROS` no tiene `auto_match` — el proceso `steam` ya lo
+    reclama `STEAM`, y la tabla de coincidencias es plana (un proceso
+    solo puede apuntar a un perfil); mientras se juega a HOTD Remake/2,
+    AUTO cae en `STEAM`, no en `DISPAROS`.
+  - Los nombres de proceso (`retroarch`, `retrodeck`...) son un
+    supuesto razonable, no verificado todavía contra el Bazzite real
+    del usuario — puede hacer falta ajustarlos tras la primera prueba.
+  - No hay debounce por lanzamiento lento: si un programa tarda varios
+    segundos en arrancar su proceso real, AUTO no lo detecta hasta que
+    aparece, no antes.
+- ✅ `MAINTENANCE` — migrado ([1.4.5]). Primer perfil con contenido en
+  vivo real: `oled.idle_template` se rellena con
+  `StatusProvider("system_stats")` (CPU/RAM vía `psutil`). Limitaciones
+  deliberadas de esta primera versión:
+  - **Foto fija, no en vivo** — los valores se calculan una sola vez,
+    al detectar el panel, no se refrescan mientras el panel sigue
+    puesto (el refresco periódico sigue en "Pendiente").
+  - **Sin GPU ni FAN** — `psutil` no tiene una forma genérica de leer
+    ninguna de las dos (el nombre de los sensores de fan depende de la
+    placa base, y la temperatura de GPU necesita el driver específico
+    del fabricante) — mejor no mostrar un dato inventado.
+  - **Sin panel físico asignado todavía** — no hay UID en
+    `panel_database.json` para `MAINTENANCE`; el perfil existe y está
+    probado, pero no es alcanzable por NFC hasta que se le asigne un
+    panel real.
+  - **El botón no lanza nada** (`launcher: null`) — comportamiento
+    explícito, no un descuido; `_on_button()` lo reconoce y no
+    muestra animación de error.
 
 `DISPAROS` es el mismo concepto que el panel **Zombies** ya existente
 en `panel_database.json` (`hotd_remake` / `hotd2_remake`) — incorpora
@@ -260,19 +318,45 @@ pantalla ahora):** `KODI` · `MUSIC` · `DESKTOP` · `NIGHT` · `DEMO`
   complejidad sin necesidad concreta detrás. Si en el futuro hace
   falta diferenciar, se puede añadir el campo entonces, sin que esto
   bloquee nada de lo ya implementado.
+- **Selector de DISPAROS: el botón siempre abre Steam Big Picture**
+  (2026-09-03) — en vez de un menú navegable dentro del dispositivo
+  (que habría requerido ampliar el protocolo de `BUTTON` con
+  pulsación corta/larga), la lista de juegos de disparos es una
+  Colección de Steam que el usuario organiza a mano dentro del propio
+  Steam. `games[]` en `disparos.json` queda como registro de
+  referencia del catálogo, sin que ningún código lo lea. Como
+  consecuencia, el panel `56A1C003` (HOTD 2 Remake, un panel físico
+  por juego) se retiró de `panel_database.json` — ya no hace falta un
+  panel por juego, con uno solo (`112FC103`, "Zombies") basta.
 
 ---
 
 # Pendiente
 
+- **Refresco en vivo de MAINTENANCE** — hoy es una foto fija tomada al
+  detectar el panel; falta un mecanismo de actualización periódica
+  mientras el panel siga puesto (afecta también a RETRO cuando se
+  implemente su `StatusProvider`).
+- **GPU y FAN en MAINTENANCE** — sin API genérica en `psutil`; para
+  añadirlos hace falta identificar los sensores concretos del hardware
+  real (nombres de `sensors_fans()`, driver de la GPU) y no es
+  portable sin más entre máquinas distintas.
+- **Fusionar el estado interno de `Application`** (conexión ESP32,
+  último NFC leído...) en la plantilla de MAINTENANCE — hoy
+  `system_stats` solo aporta métricas de `psutil`.
+- **Panel físico para MAINTENANCE** — el perfil existe y está probado,
+  pero no hay ningún UID en `panel_database.json` asignado todavía.
+- **Verificar contra el Bazzite real** los nombres de proceso de
+  `auto_match` (`steam`, `retroarch`, `retrodeck`) — supuestos
+  razonables, sin confirmar todavía en la máquina física.
+- **`DISPAROS` en AUTO** — hoy no participa (ver limitaciones de AUTO
+  arriba); decidir si merece la pena resolver la ambigüedad con
+  `STEAM` de otra forma (¿mirar también el nombre de la ventana
+  activa, no solo el proceso?) o dejarlo así.
 - Ampliar el protocolo/firmware de la OLED a más de 2 líneas si se
   quiere el formato de 5 líneas de los mockups originales — tarea de
   firmware, no de este documento.
-- Diseñar `ProcessWatcher` (qué procesos vigilar en Bazzite, cada
-  cuánto, y cómo se arranca/para desde `_on_tag_removed()` /
-  `_on_tag_detected()` — ver "Implicación en `core/application.py`"
-  más arriba).
-- Implementar los `StatusProvider` de RetroArch (Network Commands,
-  UDP 55355) y de sistema (`psutil`).
+- Implementar el `StatusProvider` de RetroArch (Network Commands,
+  UDP 55355) para RETRO — el de sistema (`psutil`) ya está hecho.
 - Contenido de OLED para los perfiles reservados (`KODI`, `MUSIC`,
   `DESKTOP`, `NIGHT`, `DEMO`) cuando se decida incorporarlos.

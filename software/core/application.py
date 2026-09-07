@@ -15,6 +15,7 @@ import time
 from core.config import ConfigurationManager
 from core.events import Event, EventManager
 from core.logger import get_logger, setup_logger
+from core.process_watcher import ProcessWatcher
 from core.profile_manager import ProfileManager
 from database.panel_database import PanelDatabase
 from devices.esp32_controller import ESP32Controller
@@ -47,6 +48,7 @@ class Application:
         self._oled: OLEDManager | None = None
         self._leds: LEDManager | None = None
         self._launcher: Launcher | None = None
+        self._process_watcher: ProcessWatcher | None = None
 
         self._running = False
         self._pending_panel: dict | None = None  # panel detectado, a la espera del boton
@@ -64,11 +66,16 @@ class Application:
         self._esp32 = ESP32Controller(self._config, self._events)
         self._oled = OLEDManager(self._esp32)
         self._leds = LEDManager(self._esp32)
+        self._process_watcher = ProcessWatcher(self._build_auto_match_table(), self._on_auto_profile_changed)
 
         self._subscribe_events()
 
         if not self._esp32.connect():
             logger.warning("No se pudo conectar con el ESP32; reintentando en segundo plano")
+
+        # AUTO (docs/12_Profile_System.md): sin panel puesto es el
+        # estado por defecto, incluido justo al arrancar.
+        self._process_watcher.start()
 
     def run(self) -> None:
         self.initialize()
@@ -90,6 +97,8 @@ class Application:
     def shutdown(self) -> None:
         logger.info("Cerrando SteamMachine Core...")
         self._running = False
+        if self._process_watcher:
+            self._process_watcher.stop()
         if self._esp32:
             self._esp32.disconnect()
 
@@ -119,6 +128,14 @@ class Application:
 
     def _on_tag_detected(self, uid: str) -> None:
         logger.info("Panel detectado: {}", uid)
+
+        # AUTO (docs/12_Profile_System.md): un panel fisico manda
+        # siempre por encima de lo que ProcessWatcher haya detectado -
+        # se para en cuanto se detecta CUALQUIER panel, antes incluso
+        # de comprobar si el UID es valido.
+        if self._process_watcher:
+            self._process_watcher.stop()
+
         panel = self._database.find(uid)
 
         if not panel:
@@ -176,6 +193,51 @@ class Application:
         self._pending_panel = None
         self._oled.sleep()
         self._leds.fade(IDLE_COLOR)
+
+        # AUTO (docs/12_Profile_System.md): sin panel puesto, se vigila
+        # que corre en Bazzite en vez de quedarse solo en reposo.
+        if self._process_watcher:
+            self._process_watcher.start()
+
+    def _build_auto_match_table(self) -> dict:
+        """
+        {substring_de_proceso_en_minusculas: profile_id}, a partir del
+        campo opcional "auto_match" de cada perfil (steam.json,
+        retro.json...). Un perfil sin "auto_match" no participa en AUTO.
+        """
+        table: dict[str, str] = {}
+        for profile_id, profile in self._profiles.all().items():
+            for substring in profile.get("auto_match", []):
+                table[substring.lower()] = profile_id
+        return table
+
+    def _on_auto_profile_changed(self, profile_id: str | None) -> None:
+        """
+        Callback de ProcessWatcher: se llama solo cuando el proceso
+        detectado cambia (no en cada poll). No toca self._pending_panel
+        - AUTO actualiza OLED/LEDs, pero no hay panel fisico del que
+        lanzar nada al pulsar el boton.
+        """
+        if not profile_id:
+            logger.info("AUTO: nada relevante en ejecucion")
+            self._oled.sleep()
+            self._leds.fade(IDLE_COLOR)
+            return
+
+        profile = self._profiles.get(profile_id)
+        if not profile:
+            return
+
+        logger.info("AUTO: perfil '{}' detectado en ejecucion", profile_id)
+        idle_lines = profile.get("oled", {}).get("idle")
+        if idle_lines:
+            if len(idle_lines) >= 2:
+                self._oled.show_status(idle_lines[0], idle_lines[1])
+            else:
+                self._oled.show_text(idle_lines[0])
+
+        led_color = profile.get("led", {}).get("idle", IDLE_COLOR)
+        self._leds.fade(led_color)
 
     def _on_button(self) -> None:
         if not self._pending_panel:

@@ -6,6 +6,77 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
+## [1.4.6] - 2026-09-04 — Perfil AUTO implementado: ProcessWatcher, cierra el alcance de la v0.2
+
+### Añadido
+
+- `software/core/process_watcher.py`: `ProcessWatcher` — vigila
+  periódicamente (`psutil.process_iter(["name"])`, cada 5s por
+  defecto) qué procesos corren, y avisa (callback) solo cuando el
+  perfil detectado CAMBIA respecto a la última lectura (no en cada
+  poll). Recibe una tabla ya construida (`{substring: profile_id}`),
+  no decide el mapeo por sí mismo. `psutil` inyectable por
+  constructor, mismo patrón que `SystemStatsProvider`, para poder
+  testear con hilos reales pero procesos falsos (poll de 20ms en los
+  tests, no 5s).
+- Campo opcional `auto_match` en los perfiles: `steam.json` →
+  `["steam"]`, `retro.json` → `["retroarch", "retrodeck"]`. `DISPAROS`
+  y `MAINTENANCE` no lo llevan — ver limitaciones más abajo.
+- `software/core/application.py`:
+  - `_build_auto_match_table()`: arma la tabla plana a partir del
+    `auto_match` de cada perfil cargado.
+  - `_on_auto_profile_changed(profile_id)`: aplica el `oled.idle` /
+    `led.idle` del perfil detectado (o pone la OLED en reposo si no
+    hay nada relevante corriendo) — mismo mecanismo visual que un
+    panel físico, sin tocar `self._pending_panel` (AUTO no lanza nada
+    al pulsar el botón, solo informa).
+  - `_on_tag_removed()`: arranca `ProcessWatcher` (entra en AUTO) —
+    decisión de [1.3.3] finalmente implementada.
+  - `_on_tag_detected()`: para `ProcessWatcher` en cuanto se detecta
+    CUALQUIER panel físico, antes incluso de comprobar si el UID es
+    válido — un panel físico manda siempre por encima de AUTO.
+  - `initialize()`: crea el `ProcessWatcher` y lo arranca al final —
+    AUTO es también el estado por defecto justo al arrancar, antes de
+    que se coloque ningún panel.
+  - `shutdown()`: para `ProcessWatcher` al cerrar, para no dejar el
+    hilo de fondo colgado.
+- 15 tests nuevos (96 en total, todos en verde):
+  `test_process_watcher.py` (9 — coincidencia por subcadena, sin
+  coincidencia, solo avisa en cambios, cambia de un perfil a otro,
+  sin psutil, tabla vacía, `process_iter()` lanzando excepción,
+  arranque/parada de hilo real con poll de 20ms, `start()`
+  idempotente) + 6 de integración en `test_application.py`
+  (`_on_tag_removed`/`_on_tag_detected` arrancan/paran el watcher;
+  `_on_auto_profile_changed` con perfil real, con `None`, y con un id
+  desconocido; `_build_auto_match_table` lee `auto_match` de los
+  perfiles reales).
+- `tests/fakes.py`: `FakeProcessWatcher`.
+
+### Limitaciones conocidas (documentadas, no descuidos)
+
+- **`DISPAROS` no participa en AUTO** — el proceso `steam` ya lo
+  reclama `STEAM`, y la tabla de coincidencias es plana (un proceso
+  solo puede apuntar a un perfil): mientras se juega a HOTD Remake/2,
+  AUTO mostrará `STEAM`, no `DISPAROS`.
+- **Nombres de proceso sin verificar contra el Bazzite real** —
+  `retroarch`/`retrodeck` son un supuesto razonable dado que RetroDECK
+  empaqueta RetroArch por debajo, pero no se ha comprobado todavía en
+  la máquina física del usuario.
+- **Sin debounce de arranque lento** — AUTO detecta un programa en
+  cuanto su proceso aparece en la lista, ni un poll (hasta 5s) antes.
+
+### Documentación
+
+- `docs/12_Profile_System.md`: subido a versión 0.3 ("Implementado" —
+  alcance completo de la v0.2 original en código: STEAM, RETRO,
+  DISPAROS, MAINTENANCE y AUTO). Estado de AUTO actualizado con sus
+  limitaciones; quitado de "Pendiente" el diseño de `ProcessWatcher`
+  (ya resuelto), añadidos los puntos concretos que quedan abiertos.
+- `software/README.md`: añadido `ProcessWatcher` a la estructura de
+  `core/`.
+
+---
+
 ## [1.4.5] - 2026-09-03 — Perfil MAINTENANCE migrado: primer StatusProvider real (CPU/RAM, foto fija)
 
 ### Añadido

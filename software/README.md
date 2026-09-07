@@ -114,7 +114,8 @@ hardware, ESP32 ni las plataformas reales para correrlos.
 
 ```
 core/        Application, ConfigurationManager, EventManager, logger,
-             ProfileManager (config/profiles/*.json)
+             ProfileManager (config/profiles/*.json), ProcessWatcher
+             (detección de perfil AUTO por proceso en ejecución)
 devices/     SerialManager (real) / SimulatedSerialManager, ESP32Controller
 database/    PanelDatabase (config/panel_database.json)
 launcher/    BasePlugin + SteamPlugin, RetroDeckPlugin, RetroArchPlugin,

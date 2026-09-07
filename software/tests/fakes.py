@@ -136,3 +136,17 @@ class FakeStatusManager:
 
     def snapshot(self, provider_name):
         return self._snapshots.get(provider_name, {})
+
+
+class FakeProcessWatcher:
+    """Doble de ProcessWatcher para tests de Application: no lanza hilos reales."""
+
+    def __init__(self):
+        self.start_calls = 0
+        self.stop_calls = 0
+
+    def start(self):
+        self.start_calls += 1
+
+    def stop(self):
+        self.stop_calls += 1

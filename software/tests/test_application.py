@@ -13,7 +13,14 @@
 import pytest
 
 from core.application import Application, IDLE_COLOR
-from tests.fakes import FakeDatabase, FakeLauncher, FakeLEDManager, FakeOLEDManager, FakeStatusManager
+from tests.fakes import (
+    FakeDatabase,
+    FakeLauncher,
+    FakeLEDManager,
+    FakeOLEDManager,
+    FakeProcessWatcher,
+    FakeStatusManager,
+)
 
 
 @pytest.fixture
@@ -251,6 +258,62 @@ def test_on_tag_removed_clears_pending_sleeps_oled_and_fades_to_idle(app):
     assert app._pending_panel is None
     assert app._oled.calls_of("sleep") == [()]
     assert app._leds.calls_of("fade") == [(IDLE_COLOR, 0.6, 20)]
+
+
+# -- AUTO (docs/12_Profile_System.md) ----------------------------------------
+
+
+def test_on_tag_removed_starts_the_process_watcher(app):
+    app._process_watcher = FakeProcessWatcher()
+
+    app._on_tag_removed()
+
+    assert app._process_watcher.start_calls == 1
+
+
+def test_on_tag_detected_stops_the_process_watcher_even_for_unknown_uid(app):
+    # Un panel fisico manda siempre por encima de AUTO - incluso si el
+    # UID resulta ser desconocido, ProcessWatcher se para igualmente.
+    app._process_watcher = FakeProcessWatcher()
+
+    app._on_tag_detected("FFFFFFFF")
+
+    assert app._process_watcher.stop_calls == 1
+
+
+def test_on_auto_profile_changed_none_sleeps_oled_and_fades_to_idle(app):
+    app._on_auto_profile_changed(None)
+
+    assert app._oled.calls_of("sleep") == [()]
+    assert app._leds.calls_of("fade") == [(IDLE_COLOR, 0.6, 20)]
+
+
+def test_on_auto_profile_changed_applies_the_detected_profiles_oled_and_led(app):
+    app._profiles.load()  # perfiles reales de config/profiles (incluye steam.json)
+
+    app._on_auto_profile_changed("STEAM")
+
+    assert app._oled.calls_of("show_status") == [("STEAM MACHINE", "Steam")]
+    assert app._leds.calls_of("fade") == [("#0055FF", 0.6, 20)]
+
+
+def test_on_auto_profile_changed_unknown_profile_id_does_nothing(app):
+    # Defensivo: si ProcessWatcher devolviera un id que ya no existe
+    # (perfil borrado entre medias, etc.), no debe reventar ni tocar
+    # la OLED/LEDs con datos a medias.
+    app._on_auto_profile_changed("NO_EXISTE")
+
+    assert app._oled.calls_of("show_status") == []
+    assert app._oled.calls_of("sleep") == []
+
+
+def test_build_auto_match_table_reads_auto_match_from_loaded_profiles(app):
+    app._profiles.load()  # perfiles reales (steam.json: auto_match ["steam"])
+
+    table = app._build_auto_match_table()
+
+    assert table.get("steam") == "STEAM"
+    assert table.get("retroarch") == "RETRO"
 
 
 # -- boton ------------------------------------------------------------------
