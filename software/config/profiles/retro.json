@@ -2,6 +2,7 @@
   "id": "RETRO",
   "name": "Retro (SNES / PS2)",
   "launcher": "retrodeck",
+  "auto_match": ["retroarch", "retrodeck"],
   "led": {
     "idle": "#8800FF",
     "running": "#8800FF"

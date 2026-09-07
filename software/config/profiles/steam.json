@@ -2,6 +2,7 @@
   "id": "STEAM",
   "name": "Steam",
   "launcher": "steam",
+  "auto_match": ["steam"],
   "led": {
     "idle": "#0055FF",
     "running": "#0055FF"
