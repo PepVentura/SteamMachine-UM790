@@ -6,6 +6,25 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
+## [1.4.8] - 2026-09-04 — Anotado: el campo `icon` de panel_database.json no se usa todavía
+
+### Documentado
+
+- El usuario preguntó dónde se ubican los iconos referenciados por
+  `"icon": "steam.png"` en `panel_database.json`. Respuesta: en
+  ningún sitio — es un campo huérfano desde el principio del
+  proyecto, sin ningún código que lo lea. `OLEDManager.show_logo()`
+  ya tenía un `TODO` sobre esto (la OLED es solo texto, sin soporte
+  de bitmaps en el protocolo del firmware) — no era un descuido nuevo,
+  solo no estaba anotado en `docs/12_Profile_System.md`.
+- Añadido a "Pendiente" en `docs/12_Profile_System.md`: para que
+  `icon` sirva de algo hace falta (1) ampliar el protocolo del
+  firmware para bitmaps 1-bit pequeños, y (2) crear una carpeta real
+  de recursos (`software/resources/icons/` o similar) — ninguna de
+  las dos existe hoy. Sin cambios de código en este turno.
+
+---
+
 ## [1.4.7] - 2026-09-04 — Corregida la asignación real de UID a perfil; MAINTENANCE ya tiene panel físico
 
 ### Corregido

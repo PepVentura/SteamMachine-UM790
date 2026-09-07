@@ -231,14 +231,13 @@ Estado de implementación (`software/config/profiles/`):
   (pendiente de implementar `StatusProvider`, ver "Pendiente").
 - ✅ `DISPAROS` — migrado ([1.4.3], selector decidido en [1.4.4]).
   Es un perfil que agrupa varios juegos (`games[]`, catálogo de
-  referencia que crecerá) bajo un único panel físico (`112FC103`,
-  llamado ahora simplemente "Zombies"). **Decidido (2026-09-03): el
-  botón siempre abre Steam Big Picture** (`launcher: "steam"`, tanto
-  en el perfil como en el panel) — la lista real de juegos de
-  disparos es una Colección de Steam que el usuario organiza a mano
-  dentro del propio Steam, no un menú de este proyecto. El panel
-  `56A1C003` (HOTD 2 Remake, un panel por juego) se retiró: ya no
-  hace falta un panel físico por juego.
+  referencia que crecerá) bajo un único panel físico (`56A1C003`,
+  llamado "Zombies"). **Decidido (2026-09-03): el botón siempre abre
+  Steam Big Picture** (`launcher: "steam"`, tanto en el perfil como en
+  el panel) — la lista real de juegos de disparos es una Colección de
+  Steam que el usuario organiza a mano dentro del propio Steam, no un
+  menú de este proyecto. El panel "un juego por panel" que existía
+  antes se retiró: ya no hace falta un panel físico por juego.
 - ✅ `AUTO` — implementado ([1.4.6]). `core/process_watcher.py`
   (`ProcessWatcher`, vía `psutil.process_iter()`, poll cada 5s por
   defecto) + campo opcional `auto_match` en cada perfil (hoy: `STEAM`
@@ -267,10 +266,8 @@ Estado de implementación (`software/config/profiles/`):
     ninguna de las dos (el nombre de los sensores de fan depende de la
     placa base, y la temperatura de GPU necesita el driver específico
     del fabricante) — mejor no mostrar un dato inventado.
-  - **Sin panel físico asignado todavía** — no hay UID en
-    `panel_database.json` para `MAINTENANCE`; el perfil existe y está
-    probado, pero no es alcanzable por NFC hasta que se le asigne un
-    panel real.
+  - **Panel físico asignado (2026-09-04): `112FC103`** — alcanzable
+    por NFC.
   - **El botón no lanza nada** (`launcher: null`) — comportamiento
     explícito, no un descuido; `_on_button()` lo reconoce y no
     muestra animación de error.
@@ -325,14 +322,23 @@ pantalla ahora):** `KODI` · `MUSIC` · `DESKTOP` · `NIGHT` · `DEMO`
   Colección de Steam que el usuario organiza a mano dentro del propio
   Steam. `games[]` en `disparos.json` queda como registro de
   referencia del catálogo, sin que ningún código lo lea. Como
-  consecuencia, el panel `56A1C003` (HOTD 2 Remake, un panel físico
-  por juego) se retiró de `panel_database.json` — ya no hace falta un
-  panel por juego, con uno solo (`112FC103`, "Zombies") basta.
+  consecuencia, se retiró de `panel_database.json` el panel que
+  lanzaba HOTD 2 Remake directamente — ya no hace falta un panel por
+  juego, con uno solo (`56A1C003`, "Zombies") basta.
 
 ---
 
 # Pendiente
 
+- **Campo `icon` de `panel_database.json` sin usar** — se guarda desde
+  el principio del proyecto, pero ningún código lo lee todavía.
+  `OLEDManager.show_logo()` tiene un `TODO` explícito: la OLED es solo
+  de texto (el protocolo del firmware no soporta bitmaps/iconos), así
+  que aproxima el logo con el nombre en mayúsculas. Para que `icon`
+  sirviera de algo de verdad haría falta (1) ampliar el protocolo del
+  firmware para poder enviar un bitmap 1-bit pequeño a la OLED, y (2)
+  crear entonces una carpeta real de recursos (p. ej.
+  `software/resources/icons/`) — ninguna de las dos existe hoy.
 - **Refresco en vivo de MAINTENANCE** — hoy es una foto fija tomada al
   detectar el panel; falta un mecanismo de actualización periódica
   mientras el panel siga puesto (afecta también a RETRO cuando se
