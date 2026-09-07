@@ -1,0 +1,15 @@
+{
+  "id": "MAINTENANCE",
+  "name": "Maintenance",
+  "launcher": null,
+  "led": {
+    "idle": "#FFFFFF",
+    "running": "#FFFFFF"
+  },
+  "oled": {
+    "idle": ["STEAM MACHINE", "MAINTENANCE"],
+    "idle_template": ["CPU {cpu_temp}C RAM{ram_percent}%", "{ram_used_gb}/{ram_total_gb}GB"]
+  },
+  "status_provider": "system_stats",
+  "note": "launcher=null a proposito: este perfil no lanza ningun programa, solo muestra telemetria. oled.idle_template se rellena una sola vez al detectar el panel (foto fija, no en vivo) - ver docs/12_Profile_System.md, 'Pendiente', para la version con refresco continuo. GPU y FAN no estan porque psutil no tiene una forma generica de leerlas en esta maquina - ver CHANGELOG."
+}

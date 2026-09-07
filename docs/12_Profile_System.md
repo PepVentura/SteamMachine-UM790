@@ -2,8 +2,10 @@
 
 # 12 - Profile System (panel = perfil, no panel = programa)
 
-Version: 0.1 (propuesta, sin implementar)
-Status: Draft — pendiente de validación antes de tocar código
+Version: 0.2 (decisión de AUTO tomada; resto sigue siendo propuesta,
+sin implementar)
+Status: Draft — el punto de precedencia NFC/AUTO ya está decidido; el
+resto sigue pendiente de validación antes de tocar código
 
 ---
 
@@ -54,8 +56,7 @@ capa, la organiza mejor.
   "launcher": "retrodeck",
   "led": {
     "idle": "#8800FF",
-    "running": "#8800FF",
-    "launch_animation": "launch"
+    "running": "#8800FF"
   },
   "oled": {
     "idle": ["STEAM MACHINE", "RETRO · SNES/PS2"],
@@ -70,11 +71,10 @@ capa, la organiza mejor.
 - `led.idle` / `led.running`: color en reposo y color mientras el
   programa está activo (hoy solo existe un color por panel; separarlo
   permite, por ejemplo, que LEDs cambien de color al empezar a jugar).
-  `led.launch_animation` debe ser uno de los nombres ya soportados por
-  el firmware (`ANIMATIONS` en `devices/led_manager.py`: idle, loading,
-  launch, rainbow, error, success, shutdown) — **no se inventan
-  animaciones nuevas en el perfil**, el perfil solo elige entre las que
-  ya existen.
+  La animación de lanzamiento (`_on_button()`) se queda fija en
+  `"launch"` para todos los perfiles — decidido explícitamente
+  (2026-09-03) en vez de hacerla configurable por perfil, ver
+  "Decisiones cerradas" al final.
 - `oled.idle`: líneas a mostrar mientras el panel está puesto pero el
   programa no se ha lanzado (o no se está monitorizando).
 - `oled.running_template`: líneas a mostrar mientras el programa está
@@ -137,35 +137,54 @@ lo doy por hecho aquí.
 No hace falta ampliar `LEDManager`: ya expone `set_color()` y
 `animation(name)` con el conjunto fijo de animaciones del firmware. El
 perfil simplemente **elige** entre lo que ya existe (`led.idle`,
-`led.running`, `led.launch_animation`), igual que hoy panel_database.json
-ya elige un color por panel — el único cambio es que ahora puede haber
-un color distinto para "reposo" y para "en marcha".
+`led.running`), igual que hoy panel_database.json ya elige un color
+por panel — el único cambio es que ahora puede haber un color distinto
+para "reposo" y para "en marcha". La animación de lanzamiento
+(`_on_button()`) NO es configurable por perfil — ver "Decisiones
+cerradas" al final.
 
 ---
 
 # Precedencia NFC físico vs. perfil AUTO
 
+**Decisión (2026-09-03, confirmada por el usuario): AUTO se activa
+cuando no hay ningún panel físico puesto — no es un panel propio con
+su propio tag NFC.**
+
 Con AUTO, hay dos fuentes que pueden decidir el estado de la máquina:
 el panel físico insertado y lo que Bazzite está ejecutando en cada
-momento. Regla propuesta, para no tener dos sistemas peleando por el
-control:
+momento. Regla:
 
-1. **Si hay un panel físico insertado y NO es el panel AUTO, ese panel
-   manda siempre.** AUTO no puede "override-ar" un panel físico puesto
-   a mano — si tienes el panel RETRO puesto y abres Kodi desde el
-   escritorio, la OLED/LEDs se quedan en modo RETRO. AUTO no vigila en
-   ese caso.
-2. **AUTO solo actúa cuando el panel insertado es el panel AUTO, o
-   cuando no hay ningún panel insertado** (a decidir cuál de las dos
-   — para v0.2 propongo la primera: AUTO es también un panel físico
-   propio, más simple y más predecible que "vigilar siempre que no
-   haya nada puesto").
+1. **Si hay un panel físico insertado, ese panel manda siempre.** AUTO
+   no puede "override-ar" un panel físico puesto a mano — si tienes el
+   panel RETRO puesto y abres Kodi desde el escritorio, la OLED/LEDs
+   se quedan en modo RETRO. AUTO no vigila en ese caso.
+2. **En cuanto se retira el panel (sin ninguno puesto), entra AUTO.**
+   No hace falta un tag NFC ni una entrada en `panel_database.json`
+   para AUTO — es el estado por defecto de "sin panel", no un perfil
+   seleccionable por NFC.
 3. Cuando AUTO está activo, un componente nuevo (`ProcessWatcher`,
    pendiente de diseñar) hace polling periódico de qué proceso relevante
    está corriendo en Bazzite (Steam, RetroArch, Kodi...) y dispara el
    perfil correspondiente — mismo mecanismo de "cargar perfil" que
    usa un panel físico, solo que el disparador es un proceso detectado
    en vez de un tag NFC.
+
+## Implicación en `core/application.py`
+
+Con esta decisión, el cambio de comportamiento cae directamente en
+`_on_tag_removed()` (hoy: `oled.sleep()` + `leds.fade(IDLE_COLOR)`, sin
+más) y en `_on_tag_detected()`:
+
+- `_on_tag_removed()` deja de ser un simple "apagar y esperar" — pasa a
+  **arrancar el `ProcessWatcher`** (entra en AUTO) en vez de solo poner
+  la OLED en reposo.
+- `_on_tag_detected()` sigue igual que ahora (carga el perfil del
+  panel), pero además debe **detener el `ProcessWatcher`** si estaba
+  corriendo, para que AUTO no siga compitiendo por la OLED/LEDs
+  mientras hay un panel físico puesto.
+- No se crea ninguna clave nueva en `panel_database.json` para AUTO —
+  AUTO no tiene UID, es lo que pasa cuando `_pending_panel` está vacío.
 
 ---
 
@@ -228,15 +247,31 @@ pantalla ahora):** `KODI` · `MUSIC` · `DESKTOP` · `NIGHT` · `DEMO`
 
 ---
 
+# Decisiones cerradas
+
+- **AUTO se activa sin panel puesto**, no como panel físico propio
+  (2026-09-03) — ver "Precedencia NFC físico vs. perfil AUTO" arriba.
+- **La animación de lanzamiento (`_on_button()`) no es configurable
+  por perfil** (2026-09-03) — se queda fija en `"launch"` para todos
+  los perfiles, igual que hoy. Se valoró añadir `led.launch_animation`
+  al esquema (permitiría, p. ej., `"loading"` para programas que
+  tardan más en arrancar), pero se descartó por no aportar beneficio
+  real mientras todos los perfiles usen la misma animación — más
+  complejidad sin necesidad concreta detrás. Si en el futuro hace
+  falta diferenciar, se puede añadir el campo entonces, sin que esto
+  bloquee nada de lo ya implementado.
+
+---
+
 # Pendiente
 
-- Decidir la regla exacta de activación de AUTO (punto 2 de
-  "Precedencia" — panel físico propio vs. "sin panel insertado").
 - Ampliar el protocolo/firmware de la OLED a más de 2 líneas si se
   quiere el formato de 5 líneas de los mockups originales — tarea de
   firmware, no de este documento.
-- Diseñar `ProcessWatcher` (qué procesos vigilar en Bazzite y cada
-  cuánto).
+- Diseñar `ProcessWatcher` (qué procesos vigilar en Bazzite, cada
+  cuánto, y cómo se arranca/para desde `_on_tag_removed()` /
+  `_on_tag_detected()` — ver "Implicación en `core/application.py`"
+  más arriba).
 - Implementar los `StatusProvider` de RetroArch (Network Commands,
   UDP 55355) y de sistema (`psutil`).
 - Contenido de OLED para los perfiles reservados (`KODI`, `MUSIC`,

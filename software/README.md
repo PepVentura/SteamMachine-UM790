@@ -113,12 +113,15 @@ hardware, ESP32 ni las plataformas reales para correrlos.
 ## Estructura
 
 ```
-core/        Application, ConfigurationManager, EventManager, logger
+core/        Application, ConfigurationManager, EventManager, logger,
+             ProfileManager (config/profiles/*.json)
 devices/     SerialManager (real) / SimulatedSerialManager, ESP32Controller
 database/    PanelDatabase (config/panel_database.json)
 launcher/    BasePlugin + SteamPlugin, RetroDeckPlugin, RetroArchPlugin,
              HotdRemakePlugin, Hotd2RemakePlugin
-config/      config.json, panel_database.json
+status/      StatusManager (registro), BaseStatusProvider, SystemStatsProvider
+             (CPU/RAM vía psutil — usado por el perfil MAINTENANCE)
+config/      config.json, panel_database.json, profiles/*.json
 ```
 
 ## Pendiente

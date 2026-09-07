@@ -1,0 +1,18 @@
+{
+  "id": "DISPAROS",
+  "name": "Disparos",
+  "launcher": "steam",
+  "selector": "steam_collection",
+  "selector_note": "El boton siempre abre Steam Big Picture (steam://open/bigpicture); la lista real de juegos de disparos es una Coleccion de Steam organizada a mano por el usuario dentro del propio Steam, no un menu de este proyecto. 'games' de aqui abajo es solo un registro de referencia, no lo lee ningun codigo.",
+  "games": [
+    { "name": "THE HOUSE OF THE DEAD: Remake", "launcher": "hotd_remake" },
+    { "name": "THE HOUSE OF THE DEAD 2: Remake", "launcher": "hotd2_remake" }
+  ],
+  "led": {
+    "idle": "#FF3300",
+    "running": "#FF3300"
+  },
+  "oled": {
+    "idle": ["STEAM MACHINE", "DISPAROS"]
+  }
+}

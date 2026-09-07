@@ -698,6 +698,16 @@ pasar de COM10 a COM7) — el Core lo detecta automáticamente por
 VID:PID, así que no debería ser un problema; a tener en cuenta si se
 fija el puerto a mano en `config.json`.
 
+Nota adicional (2026-09-06): esta prueba cubre el lado del firmware
+(el ESP32 arranca limpio). El lado del **Core en Python** tenía un
+fallo real y distinto en su propia lógica de reconexión
+(`SerialManager`), que solo se manifestó al arrancar por systemd sin
+el ESP32 todavía listo — ver CHANGELOG.md v1.2.3 para el diagnóstico
+completo y la corrección. Verificado con los tests existentes y una
+prueba dirigida que simula el escenario real, y confirmado en
+hardware real: tras actualizar el Core, un reinicio completo del
+mini PC deja el servicio `active (running)` sin caerse.
+
 
 
 \---

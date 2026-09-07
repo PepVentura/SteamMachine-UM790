@@ -15,11 +15,13 @@ import time
 from core.config import ConfigurationManager
 from core.events import Event, EventManager
 from core.logger import get_logger, setup_logger
+from core.profile_manager import ProfileManager
 from database.panel_database import PanelDatabase
 from devices.esp32_controller import ESP32Controller
 from devices.led_manager import LEDManager
 from devices.oled_manager import OLEDManager
 from launcher.launcher import Launcher
+from status.status_manager import StatusManager
 
 IDLE_COLOR = "#0055FF"
 
@@ -39,6 +41,8 @@ class Application:
         self._config = ConfigurationManager()
         self._events = EventManager()
         self._database = PanelDatabase()
+        self._profiles = ProfileManager()
+        self._status = StatusManager()
         self._esp32: ESP32Controller | None = None
         self._oled: OLEDManager | None = None
         self._leds: LEDManager | None = None
@@ -55,6 +59,7 @@ class Application:
         logger.info("SteamMachine Core iniciando...")
 
         self._database.load()
+        self._profiles.load()
         self._launcher = Launcher(self._config.get("platforms", {}))
         self._esp32 = ESP32Controller(self._config, self._events)
         self._oled = OLEDManager(self._esp32)
@@ -124,7 +129,45 @@ class Application:
             return
 
         self._pending_panel = panel
-        self._oled.show_text(panel["name"])
+
+        # docs/12_Profile_System.md: si el panel declara "profile", su
+        # perfil manda en la OLED de reposo (oled.idle, hasta 2 lineas).
+        # Retrocompatible: un panel sin "profile" (o con un id que no
+        # resuelve a ningun fichero de config/profiles/) sigue mostrando
+        # panel["name"] tal cual, exactamente como antes de que
+        # existiera ProfileManager.
+        profile = self._profiles.get(panel.get("profile"))
+        idle_lines = None
+
+        if profile:
+            template = profile.get("oled", {}).get("idle_template")
+            provider_name = profile.get("status_provider")
+            if template and provider_name:
+                # Perfil con datos en vivo (MAINTENANCE, docs/12): foto
+                # fija tomada AHORA, al detectar el panel - no hay
+                # refresco continuo todavia (ver "Pendiente" del
+                # documento de diseno). Si a la plantilla le falta una
+                # variable que el provider no da, se cae a oled.idle
+                # estatico en vez de reventar.
+                values = self._status.snapshot(provider_name)
+                try:
+                    idle_lines = [line.format(**values) for line in template]
+                except (KeyError, IndexError) as e:
+                    logger.warning(
+                        "Plantilla OLED del perfil '{}' con variable desconocida: {}",
+                        profile.get("id"), e,
+                    )
+            if not idle_lines:
+                idle_lines = profile.get("oled", {}).get("idle")
+
+        if idle_lines:
+            if len(idle_lines) >= 2:
+                self._oled.show_status(idle_lines[0], idle_lines[1])
+            else:
+                self._oled.show_text(idle_lines[0])
+        else:
+            self._oled.show_text(panel["name"])
+
         self._leds.fade(panel["led"])
         logger.info("Perfil '{}' listo. Esperando pulsador...", panel["name"])
 
@@ -139,7 +182,20 @@ class Application:
             logger.debug("Boton pulsado sin panel activo, se ignora")
             return
 
-        platform = self._pending_panel["launcher"]
+        platform = self._pending_panel.get("launcher")
+
+        if not platform:
+            # Perfiles informativos (MAINTENANCE, docs/12_Profile_System.md):
+            # no lanzan ningun programa a proposito. Sin esto, Launcher.launch()
+            # devolveria False por "plataforma desconocida" y se mostraria
+            # la animacion de error, dando a entender que algo ha fallado
+            # cuando en realidad es el comportamiento esperado.
+            logger.info(
+                "Panel '{}' no tiene programa que lanzar (perfil informativo); boton ignorado",
+                self._pending_panel.get("name"),
+            )
+            return
+
         logger.info("Lanzando plataforma: {}", platform)
         self._leds.animation("launch")
         self._oled.show_status(self._pending_panel["name"], "Launching...")

@@ -70,7 +70,7 @@ Cada fase deberá quedar completamente terminada antes de comenzar la siguiente.
 
 \- ✔ SteamMachine Core implementado, con tests unitarios
 
-\- ✔ Arranque automático documentado (systemd)
+\- ✔ Arranque automático confirmado en hardware real (systemd)
 
 
 
@@ -558,7 +558,7 @@ Estado
 
 
 
-Animaciones y diagnóstico completados. Arranque automático (systemd) documentado en software/README.md. Actualizaciones y plugins adicionales, pendientes.
+Animaciones y diagnóstico completados. Arranque automático (systemd) documentado en software/README.md y confirmado en hardware real (2026-09-06, mini PC con Bazzite: `systemctl --user status steammachine.service` → `active (running)`). Actualizaciones y plugins adicionales, pendientes.
 
 
 

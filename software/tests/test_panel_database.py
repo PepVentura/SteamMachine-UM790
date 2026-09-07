@@ -143,3 +143,26 @@ def test_save_then_reload_round_trips(db_path):
     db2.load()
 
     assert db2.find("04A1C8B2") == {"name": "Steam", "launcher": "steam", "led": "#0055FF", "icon": "steam.png"}
+
+
+# -- config/panel_database.json real (integridad del catalogo actual) -------
+#
+# A diferencia de los tests de arriba (fichero sintetico en tmp_path),
+# este carga el panel_database.json real del proyecto para detectar
+# regresiones de datos (UID retirado que reaparece, perfil mal escrito...)
+# sin necesidad de arrancar la Application completa.
+
+
+def test_default_database_disparos_panel_launches_steam_not_a_specific_game():
+    db = PanelDatabase()
+    db.load()
+
+    # 56A1C003 (Zombies - HOTD 2 Remake) se retiro el 2026-09-03: la
+    # idea de "un panel por juego" se sustituyo por un unico panel
+    # DISPAROS que abre Steam Big Picture (ver docs/12_Profile_System.md).
+    assert db.find("56A1C003") is None
+
+    zombies_panel = db.find("112FC103")
+    assert zombies_panel is not None
+    assert zombies_panel["profile"] == "DISPAROS"
+    assert zombies_panel["launcher"] == "steam"

@@ -7,7 +7,12 @@
 # Instalacion: ver "Arranque automatico" en software/README.md.
 #
 # Ajusta WorkingDirectory/ExecStart si tu ruta de instalacion no es
-# ~/SteamMachine-UM790/software.
+# ~/SteamMachine-UM790/software — por ejemplo, si el repo viene de
+# descargar un ZIP de GitHub en vez de clonarlo, la carpeta se llama
+# SteamMachine-UM790-main (con el sufijo "-main"), no
+# SteamMachine-UM790. Confirmado en hardware real (2026-09-06): con
+# una ruta que no coincide, el servicio se activa (systemctl enable)
+# pero falla al arrancar porque no encuentra main.py ni el .venv.
 
 [Unit]
 Description=SteamMachine Core (paneles NFC + OLED + LEDs + lanzador)
@@ -24,7 +29,7 @@ RestartSec=3
 # El ESP32 tarda un instante en enumerarse tras el arranque del sistema;
 # sin esto, el primer intento de conexion podria fallar antes de que el
 # dispositivo /dev/ttyUSB* exista todavia.
-ExecStartPre=/bin/sleep 2
+ExecStartPre=/usr/bin/sleep 2
 
 [Install]
 WantedBy=graphical-session.target

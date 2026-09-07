@@ -1,0 +1,12 @@
+{
+  "id": "STEAM",
+  "name": "Steam",
+  "launcher": "steam",
+  "led": {
+    "idle": "#0055FF",
+    "running": "#0055FF"
+  },
+  "oled": {
+    "idle": ["STEAM MACHINE", "Steam"]
+  }
+}

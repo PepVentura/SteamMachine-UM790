@@ -126,3 +126,13 @@ class FakeLauncher:
     def launch(self, platform):
         self.launch_calls.append(platform)
         return self.launch_result
+
+
+class FakeStatusManager:
+    """Doble de StatusManager para tests de Application: snapshot fijado a mano."""
+
+    def __init__(self, snapshots: dict | None = None):
+        self._snapshots = snapshots or {}
+
+    def snapshot(self, provider_name):
+        return self._snapshots.get(provider_name, {})

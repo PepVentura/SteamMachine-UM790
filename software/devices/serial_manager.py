@@ -50,6 +50,35 @@ class SerialManager:
     # -- API publica -------------------------------------------------
 
     def connect(self) -> bool:
+        if self.is_connected():
+            return True
+        opened_now = self._open_port()
+
+        # El hilo de lectura arranca siempre, haya tenido éxito o no este
+        # intento concreto — _read_loop() ya sabe reintentar por su
+        # cuenta mientras no este conectado (ver mas abajo). Sin esto, si
+        # el primer intento fallaba (p.ej. el ESP32 tarda en aparecer
+        # tras un arranque con systemd), Application.initialize() decia
+        # "reintentando en segundo plano" pero ningun hilo llegaba a
+        # arrancar nunca — confirmado en hardware real (2026-09-06).
+        if not self._thread or not self._thread.is_alive():
+            self._stop_event.clear()
+            self._thread = threading.Thread(target=self._read_loop, daemon=True)
+            self._thread.start()
+
+        return opened_now
+
+    def _open_port(self) -> bool:
+        """
+        Abre el puerto serie, sin tocar el hilo de lectura. Separado de
+        connect() para que _read_loop() pueda reabrir el puerto tras una
+        desconexion (reintento automatico) SIN arrancar un hilo nuevo —
+        connect() siempre crea+arranca un threading.Thread, así que
+        llamarlo desde dentro de _read_loop en cada reintento iba
+        acumulando un hilo nuevo por cada ciclo de desconexion/reconexion,
+        sin cerrar nunca los anteriores (confirmado en revisión de código,
+        2026-09-06, al corregir el fallo de autoarranque con systemd).
+        """
         import serial  # pyserial
 
         port = self._resolve_port()
@@ -60,20 +89,26 @@ class SerialManager:
         try:
             self._serial = serial.Serial(port, self._baudrate, timeout=1)
             logger.info("Conectado al ESP32 en {} @ {} bps", port, self._baudrate)
+            return True
         except Exception as e:
             logger.error("No se pudo abrir el puerto {}: {}", port, e)
             self._serial = None
             return False
 
-        self._stop_event.clear()
-        self._thread = threading.Thread(target=self._read_loop, daemon=True)
-        self._thread.start()
-        return True
-
     def disconnect(self) -> None:
         self._stop_event.set()
-        if self._thread:
+        self._close_serial()
+        if self._thread and threading.current_thread() is not self._thread:
             self._thread.join(timeout=2)
+
+    def _close_serial(self) -> None:
+        """
+        Cierra el puerto serie sin tocar _stop_event ni el hilo — para
+        usar dentro de _read_loop tras un error de lectura, donde
+        queremos reintentar la conexion, no detener el hilo del todo
+        (eso es lo que hace disconnect(), pensado para un cierre
+        intencional desde fuera del hilo).
+        """
         if self._serial:
             try:
                 self._serial.close()
@@ -117,7 +152,7 @@ class SerialManager:
             try:
                 if not self.is_connected():
                     time.sleep(self._reconnect_interval)
-                    self.connect()
+                    self._open_port()
                     continue
 
                 raw = self._serial.readline()
@@ -126,7 +161,13 @@ class SerialManager:
                 self._handle_line(raw)
             except Exception as e:
                 logger.error("Error en el hilo de lectura serie: {}", e)
-                self.disconnect()
+                # _close_serial(), no disconnect(): esto se ejecuta dentro
+                # del propio hilo de lectura, y disconnect() está pensado
+                # para un cierre intencional desde fuera de el (detiene el
+                # hilo del todo). Aqui solo cerramos el puerto para que el
+                # propio bucle reintente la conexion en la siguiente
+                # vuelta, sin salir de _read_loop.
+                self._close_serial()
                 time.sleep(self._reconnect_interval)
 
     def _handle_line(self, raw: bytes) -> None:

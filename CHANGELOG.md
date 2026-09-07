@@ -6,6 +6,786 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
+## [1.4.5] - 2026-09-03 — Perfil MAINTENANCE migrado: primer StatusProvider real (CPU/RAM, foto fija)
+
+### Añadido
+
+- `software/status/` (paquete nuevo): `base_provider.py`
+  (`BaseStatusProvider`, interfaz `snapshot() -> dict`),
+  `system_stats_provider.py` (`SystemStatsProvider`, vía `psutil`,
+  con `psutil` inyectable por constructor para poder testear sin
+  depender de los sensores reales de la máquina), `status_manager.py`
+  (`StatusManager`, registro `{"system_stats": SystemStatsProvider}`,
+  mismo patrón que `Launcher`/`PLUGIN_CLASSES`).
+- `software/config/profiles/maintenance.json`: `launcher: null`
+  (perfil informativo, no lanza nada — a propósito), `oled.idle_template:
+  ["CPU {cpu_temp}C RAM{ram_percent}%", "{ram_used_gb}/{ram_total_gb}GB"]`,
+  `status_provider: "system_stats"`.
+- `software/core/application.py`:
+  - `_on_tag_detected()`: si el perfil tiene `oled.idle_template` +
+    `status_provider`, se resuelve el snapshot vía `StatusManager` y
+    se rellena la plantilla con `.format(**values)`; si falta alguna
+    variable (`KeyError`/`IndexError`), se cae a `oled.idle` estático
+    en vez de reventar. Retrocompatible con STEAM/RETRO/DISPAROS (sin
+    `idle_template`, comportamiento idéntico a antes).
+  - `_on_button()`: si el panel/perfil no tiene `launcher` (caso de
+    MAINTENANCE), se ignora la pulsación sin animación de error —
+    antes habría intentado `Launcher.launch(None)` y mostrado
+    "error", dando a entender que algo había fallado.
+  - Nuevo `self._status = StatusManager()`.
+- `software/requirements.txt`: añadido `psutil`.
+- 12 tests nuevos (81 en total, todos en verde):
+  `test_system_stats_provider.py` (6 — snapshot sin psutil, lecturas
+  correctas de CPU/RAM, fallo de sensor no revienta el resto),
+  `test_status_manager.py` (3 — dispatch, provider desconocido,
+  provider ausente), y 4 de integración en `test_application.py`
+  (plantilla rellenada desde el provider; fallback a `oled.idle` si
+  falta una variable; botón sin `launcher` no hace nada).
+- `tests/fakes.py`: `FakeStatusManager`.
+
+### Alcance deliberadamente recortado (no es un descuido)
+
+- **Foto fija, no en vivo**: los valores se calculan una vez, al
+  detectar el panel. El refresco periódico mientras el panel sigue
+  puesto es una pieza aparte, sin implementar (ver "Pendiente").
+- **Sin GPU ni FAN**: `psutil` no tiene una API genérica para ninguna
+  de las dos en esta máquina — mejor "N/D" honesto que un dato
+  inventado con una etiqueta que no le corresponde.
+- **Sin fusionar el estado de `Application`** (conexión ESP32, último
+  NFC...) — el `StatusProvider` de esta entrega solo aporta métricas
+  de `psutil`.
+- **Sin panel físico asignado**: no hay ningún UID en
+  `panel_database.json` para MAINTENANCE todavía.
+
+### Documentación
+
+- `docs/12_Profile_System.md`: tabla de estado actualizada (MAINTENANCE
+  migrado, con sus límites); sección "Perfiles con contenido en vivo"
+  marca `system_stats` como implementado y `retroarch_network_commands`
+  como pendiente; "Pendiente" reorganizado con los puntos concretos
+  que deja abiertos este incremento.
+- `software/README.md`: añadido `status/` a la estructura de carpetas.
+
+---
+
+## [1.4.4] - 2026-09-03 — Decisión: DISPAROS abre siempre Steam Big Picture; retirado el panel por-juego
+
+### Decidido
+
+- El botón del panel DISPAROS **siempre abre Steam Big Picture** —
+  sin selector dentro del dispositivo. La lista real de juegos de
+  disparos es una Colección de Steam que el usuario organiza a mano
+  dentro del propio Steam, no un menú de este proyecto.
+- Retirado el panel `56A1C003` (Zombies - HOTD 2 Remake): ya no hace
+  falta un panel físico por juego, con el panel único de DISPAROS
+  basta.
+
+### Cambiado
+
+- `software/config/panel_database.json`: eliminada la entrada
+  `56A1C003`. El panel `112FC103` pasa a llamarse simplemente
+  `"Zombies"` (antes "Zombies - HOTD Remake"), `launcher` cambia de
+  `"hotd_remake"` a `"steam"`, `icon` a `"disparos.png"`.
+- `software/config/profiles/disparos.json`: `launcher` cambia a
+  `"steam"`; nuevos campos informativos `selector: "steam_collection"`
+  y `selector_note` explicando la decisión. `games[]` se mantiene
+  como catálogo de referencia (qué juegos se consideran parte de
+  "Disparos"), pero ningún código lo lee todavía.
+- `software/config/config.json`: `hotd_remake` y `hotd2_remake` se
+  mantienen tal cual (siguen siendo `launcher` válidos por si se
+  quieren lanzar directamente para pruebas), simplemente ya no los
+  referencia ningún panel.
+- Tests actualizados a la nueva realidad: el test que antes probaba
+  "el botón lanza el juego propio del panel" se sustituye por
+  `test_on_button_disparos_panel_always_opens_steam_big_picture`.
+  Nuevo `test_default_database_disparos_panel_launches_steam_not_a_specific_game`
+  en `test_panel_database.py`, que carga el `panel_database.json`
+  real y comprueba tanto que `56A1C003` ya no existe como que
+  `112FC103` lanza `"steam"` — para detectar si algún cambio futuro
+  reintroduce por error el panel retirado. 69 tests en total, todos
+  en verde.
+- `docs/12_Profile_System.md`: el punto de "Pendiente" sobre el
+  selector de DISPAROS se mueve a "Decisiones cerradas", con el
+  razonamiento.
+
+---
+
+## [1.4.3] - 2026-09-03 — Perfil DISPAROS migrado (agrupa varios juegos, sin selector en el dispositivo todavía)
+
+### Contexto
+
+- El usuario pidió explícitamente: "un perfil que activará un único
+  panel que debería dar acceso a los juegos de disparos que vayamos
+  incluyendo en alguna especie de listado" — a diferencia de
+  STEAM/RETRO (un perfil = un programa), DISPAROS agrupa varios
+  juegos bajo la misma identidad.
+
+### Añadido
+
+- `software/config/profiles/disparos.json`: `led.idle`/`led.running`
+  (`#FF3300`), `oled.idle: ["STEAM MACHINE", "DISPAROS"]`, y un campo
+  nuevo `games[]` (catálogo: nombre + `launcher` de cada juego —
+  hoy `hotd_remake` y `hotd2_remake`). El campo `launcher` a nivel de
+  perfil (`"hotd_remake"`) queda tan inerte como el `running_template`
+  de RETRO — `Application` sigue leyendo el `launcher` del PANEL, no
+  el del perfil (ver "Sin cambios de código" más abajo).
+- `software/config/panel_database.json`: los dos paneles Zombies
+  (`112FC103` → HOTD Remake, `56A1C003` → HOTD 2 Remake) ganan
+  `"profile": "DISPAROS"`. Su `launcher`/`led`/`icon` propios se
+  mantienen sin tocar.
+- 3 tests nuevos (68 en total, todos en verde):
+  `test_default_profiles_directory_has_disparos_with_games_catalog`
+  (valida el catálogo `games[]`), y dos de integración en
+  `test_application.py` — uno confirma que la OLED muestra "DISPAROS"
+  para un panel Zombies, y **el más importante**:
+  `test_on_button_disparos_panel_launches_its_own_game_not_a_fixed_one`,
+  que prueba explícitamente que pulsar el botón sigue lanzando el
+  juego propio del panel insertado (`hotd2_remake` en ese caso), no
+  un juego fijo del perfil — es la garantía de que unificar la OLED/
+  LEDs bajo DISPAROS no ha cambiado qué juego se lanza.
+
+### Sin cambios de código
+
+- Igual que con RETRO: no ha hecho falta tocar `ProfileManager` ni
+  `Application` — el mecanismo genérico de [1.4.0] ya cubre esto,
+  precisamente porque `_on_button()` lee `panel["launcher"]` (del
+  panel concreto), no del perfil. Eso es justo lo que hace que hoy
+  "compartir perfil" sea seguro sin selector: cada panel sigue
+  lanzando lo suyo.
+
+### Pendiente (documentado en `docs/12_Profile_System.md`)
+
+- El diseño real de "un único panel con una lista navegable" sigue
+  sin resolver — necesita una decisión de UX de un solo botón (corta
+  = siguiente, larga = lanzar; requiere ampliar el protocolo de
+  `BUTTON` con duración) o, alternativa sin tocar firmware, apoyarse
+  en una Colección de Steam organizada a mano. También queda abierto
+  si retirar el panel `56A1C003` ahora que la intención es un panel
+  único, o dejarlo como segunda entrada mientras no haya selector.
+
+---
+
+## [1.4.2] - 2026-09-03 — Perfil RETRO migrado (segundo perfil, mismo mecanismo genérico)
+
+### Añadido
+
+- `software/config/profiles/retro.json`: `launcher: "retrodeck"`,
+  `led.idle`/`led.running` (`#8800FF`), `oled.idle: ["STEAM MACHINE",
+  "RETRO"]`. Incluye también `oled.running_template` y
+  `status_provider: "retroarch_network_commands"` del esquema de
+  `docs/12_Profile_System.md`, pero **de momento quedan inertes** —
+  `Application` todavía no lee ninguno de los dos campos (no hay
+  `StatusProvider` implementado). Se dejan ya en el JSON para no
+  tener que volver a tocar el fichero cuando se implemente.
+- `software/config/panel_database.json`: panel RetroDECK (`E76DC103`)
+  gana el campo `"profile": "RETRO"`. `launcher`/`led`/`icon` se
+  mantienen igual.
+- 2 tests nuevos: `test_default_profiles_directory_has_steam_and_retro`
+  (carga la carpeta real `config/profiles/` y valida launcher + límite
+  de 2 líneas en `oled.idle` de ambos perfiles, para detectar erratas
+  sin necesidad de arrancar `Application`) y
+  `test_on_tag_detected_retro_panel_shows_profile_idle_lines` (mismo
+  mecanismo genérico que STEAM, verificado con un segundo perfil real
+  en vez de asumir que "si funcionó una vez, funciona siempre"). 65
+  tests en total, todos en verde.
+- `docs/12_Profile_System.md`: añadida una tabla de estado de
+  implementación en "Alcance propuesto para v0.2" (STEAM y RETRO
+  migrados; DISPAROS, MAINTENANCE, AUTO pendientes).
+
+### Sin cambios de código
+
+- No ha hecho falta tocar `ProfileManager` ni `Application` —
+  el mecanismo genérico de [1.4.0] (leer `oled.idle` cuando el panel
+  tiene `profile`, retrocompatible si no lo tiene) ya cubre RETRO sin
+  ninguna rama de código nueva. Es la señal de que el diseño de
+  [1.4.0] estaba bien planteado: añadir un perfil "estático" es
+  añadir un fichero, no tocar Python.
+
+---
+
+## [1.4.1] - 2026-09-03 — Decisión: sin animación de lanzamiento configurable por perfil
+
+### Decidido
+
+- El usuario eligió la opción B de las dos planteadas: no conectar
+  `led.launch_animation` a `_on_button()`. La animación de lanzamiento
+  se queda fija en `"launch"` para todos los perfiles, igual que
+  antes de que existiera `ProfileManager`.
+
+### Cambiado
+
+- `software/config/profiles/steam.json`: eliminado el campo
+  `led.launch_animation` (quedaba sin usar — `_on_button()` nunca
+  llegó a leerlo).
+- `docs/12_Profile_System.md`: quitado `launch_animation` del ejemplo
+  de esquema y de su explicación; nueva sección "Decisiones cerradas"
+  con el porqué (evitar complejidad sin necesidad real mientras todos
+  los perfiles compartan la misma animación) y con la decisión de
+  AUTO de [1.3.3] (que ya estaba resuelta pero seguía listada por
+  error en "Pendiente" — corregido de paso).
+- 63 tests siguen en verde (el campo no estaba conectado a ningún
+  test, cambio sin impacto funcional).
+
+---
+
+## [1.4.0] - 2026-09-03 — Implementado ProfileManager (primer paso del sistema de perfiles, `docs/12_Profile_System.md`)
+
+### Añadido
+
+- `software/core/profile_manager.py`: `ProfileManager` — carga cada
+  `.json` de `software/config/profiles/` (id = campo `"id"` del propio
+  fichero, o el nombre de fichero si falta), y expone `get(profile_id)`
+  / `all()`. Sigue el mismo patrón que `PanelDatabase` (carga desde
+  disco en `load()`, tolera fichero/carpeta ausente o JSON mal
+  formado sin reventar).
+- `software/config/profiles/steam.json`: primer perfil migrado al
+  nuevo esquema — `launcher: "steam"`, `led.idle`/`led.running`
+  (`#0055FF`), `led.launch_animation: "launch"`, `oled.idle: ["STEAM
+  MACHINE", "Steam"]` (2 líneas, dentro del límite real del firmware).
+- `software/config/panel_database.json`: panel Steam (`6739C003`)
+  gana el campo `"profile": "STEAM"`. `launcher`/`led`/`icon` se
+  mantienen tal cual — el resto de paneles (RetroDECK, Zombies x2) se
+  quedan sin `"profile"` por ahora, sin cambios en su comportamiento.
+- `software/core/application.py`, `_on_tag_detected()`: si el panel
+  tiene `"profile"` y `ProfileManager` lo resuelve, la OLED muestra
+  `oled.idle` del perfil (1 o 2 líneas) en vez de `panel["name"]`. Si
+  el panel no tiene `"profile"`, o el id no resuelve a ningún perfil
+  cargado, el comportamiento es **exactamente el de antes** —
+  retrocompatibilidad verificada con test dedicado.
+- 10 tests nuevos en `software/tests/test_profile_manager.py`
+  (carga, fichero/carpeta ausente, JSON malformado, `id` por nombre de
+  fichero, copia defensiva de `all()`) + 2 en `test_application.py`
+  (panel con perfil muestra `oled.idle`; panel con `profile` desconocido
+  cae al comportamiento antiguo). 63 tests en total, todos en verde.
+
+### Alcance de este paso
+
+- Solo `STEAM` está migrado — es el perfil más simple del catálogo de
+  `docs/12_Profile_System.md` (sin `status_provider`, sin animación de
+  "running" distinta de la de reposo), elegido a propósito para
+  validar el mecanismo antes de añadir `RETRO`, `DISPAROS` y
+  `MAINTENANCE`.
+- `_on_button()` no se ha tocado — sigue lanzando `panel["launcher"]`
+  igual que siempre; conectar `led.launch_animation` del perfil ahí
+  queda para el siguiente incremento.
+- `ProcessWatcher` y los `StatusProvider` (RetroArch, sistema) siguen
+  sin implementar — no hacían falta para este primer perfil.
+
+### Pendiente
+
+- Migrar `RetroDECK` → perfil `RETRO`, y los dos paneles Zombies →
+  perfil `DISPAROS` (con `led`/`icon` como override por panel, según
+  el esquema del documento de diseño).
+- Perfil `MAINTENANCE` (necesita el `StatusProvider` de sistema antes
+  de tener sentido).
+- Decidir si `led.launch_animation` del perfil sustituye a la
+  animación `"launch"` fija que usa hoy `_on_button()`.
+
+---
+
+## [1.3.3] - 2026-09-03 — Decisión: AUTO se activa sin panel puesto, no como panel propio
+
+### Decidido
+
+- El usuario resolvió el punto abierto de `docs/12_Profile_System.md`:
+  AUTO se activa cuando no hay ningún panel físico insertado — no es
+  un perfil seleccionable por su propio tag NFC.
+
+### Cambiado
+
+- `docs/12_Profile_System.md`: sección "Precedencia NFC físico vs.
+  perfil AUTO" actualizada de "a decidir" a regla firme; añadida
+  subsección "Implicación en `core/application.py`":
+  `_on_tag_removed()` pasa de solo apagar/reposar a arrancar el
+  `ProcessWatcher` (entra en AUTO); `_on_tag_detected()` debe pararlo
+  al detectar un panel físico. Sin clave nueva en
+  `panel_database.json` para AUTO.
+- Documento subido a versión 0.2 (queda un único punto de diseño
+  resuelto; el resto — `ProcessWatcher`, los `StatusProvider`, la
+  ampliación de la OLED a más líneas — sigue pendiente de
+  implementar).
+
+---
+
+## [1.3.2] - 2026-09-03 — Reconciliado con el zip subido por el usuario: UIDs reales conservados, correcciones OLED restauradas
+
+### Contexto
+
+- El usuario subió `SteamMachine-UM790-main__3_.zip` "por si no tenías
+  toda la información actualizada". Comparado con el estado de
+  trabajo de esta sesión, resultó tener contenido en ambas
+  direcciones: cosas más nuevas que yo no tenía, y cosas más viejas
+  que sobrescribían correcciones ya hechas hoy.
+
+### Encontrado en el zip del usuario (más nuevo que mi copia — conservado tal cual)
+
+- `software/config/panel_database.json`: los 3 UID de ejemplo/
+  placeholder (`04B2D9C3`, `04C3EAD4`, `0AAABBCC`) sustituidos por los
+  UID reales de los tags NFC del usuario (`E76DC103`, `112FC103`,
+  `56A1C003`) — mismos nombres/launcher/led/icon, solo cambian las
+  claves. Conservado sin tocar.
+- Carpeta `obsoletos/` (creada 2026-08-14 según su propio README, antes
+  de esta sesión): agrupa ficheros `.scad` ya sin uso
+  (`front_panel.scad`, `front_layout.scad`, `rc522_bracket_v1.scad`,
+  `virtual_assembly_v1.scad`, `front_panel_view.scad`,
+  `chassis_layout.scad`, `um790_reference.scad`), verificados sin
+  referencias entrantes antes de moverlos. Conservada.
+- `VERSION.md` y carpeta `G-Code/` (con `lower_panel.gcode`).
+  Conservados.
+- Piezas de chasis nuevas sin documentar en este CHANGELOG hasta
+  ahora: `openscad/parts/02_chassis/floor_flat.scad`, `foot.scad`,
+  `leftwall_flat.scad`, `rightwall_flat.scad`,
+  `openscad/parts/04_soportes/foot.scad`, y
+  `STL/rear_panel_horizontal.stl` + STL sueltos
+  (`floor_flat (1).stl`, `foot.stl`, `leftwall_flat.stl`,
+  `rightwall_flat.stl`). Conservados tal cual — no hay contexto en
+  este historial sobre su propósito o si vienen de otra sesión; sin
+  inventar una entrada de motivo, pendiente de que el usuario lo
+  aclare si quiere que se documenten.
+
+### Encontrado en el zip del usuario (más viejo que mi copia — restaurado desde esta sesión)
+
+- `openscad/parts/03_panels/lower_panel.scad`: el zip subido no tenía
+  ninguna de las correcciones de OLED de [1.2.2] a [1.3.0] de esta
+  misma sesión (ventana acoplada a los taladros M2 en vez de
+  desacoplada, rebaje de pines en la cara exterior en vez de la
+  interior, medidas de pantalla/separación de taladros sin la
+  medición real por calibre, sin el offset del canal LED). Restaurado
+  el fichero de esta sesión, que sí incluye todo lo anterior.
+- `openscad/reference/components/assembly_positions.scad`: mismo
+  contenido salvo el comentario explicativo del desacoplamiento de
+  [1.2.9], que faltaba. Restaurado.
+- `STL/lower_panel.stl`, `openscad/parts/03_panels/oled_bracket.stl`,
+  `STL/probetas/probeta_pines_oled.stl`: regenerados desde el
+  `lower_panel.scad` restaurado.
+- Añadidos también `openscad/parts/03_panels/nfc_panel_zombies.scad` y
+  `STL/nfc_panel_zombies_tumbado.stl` ([1.2.7]), que no estaban en el
+  zip subido.
+
+### Verificado
+
+- `openscad/parts/03_panels/lower_panel.scad` renderiza sin errores
+  (817 facetas, igual que la versión de esta sesión).
+- Los 53 tests de `software/tests/` pasan.
+- `panel_database.json`, `config.json`, `launcher.py` y los plugins de
+  `software/launcher/` ya coincidían entre ambas copias — sin cambios.
+
+---
+
+## [1.3.1] - 2026-08-30 — Documento de diseño: sistema de perfiles (panel = perfil, no solo panel = programa)
+
+### Añadido
+
+- `docs/12_Profile_System.md`: propuesta de diseño para generalizar
+  los paneles NFC de "panel = programa" (`launcher` directo) a
+  "panel = perfil" (app + comportamiento de OLED + LEDs, con un
+  perfil `AUTO` que detecta qué corre en Bazzite cuando no hay panel
+  físico dedicado puesto). Basada en una propuesta del usuario, con
+  tres correcciones respecto al planteamiento original:
+  1. Regla de precedencia explícita entre panel físico y AUTO (el
+     panel físico manda siempre; AUTO solo actúa como panel propio).
+  2. Señalado que el protocolo OLED actual solo admite 2 líneas
+     (`OLEDManager.show_status`), no las 5 líneas de los mockups
+     originales — el motor de plantillas de la v0.2 trabaja con listas
+     de 2 elementos; ampliar el firmware queda anotado como tarea
+     aparte.
+  3. Separados como componentes `StatusProvider` futuros (no incluidos
+     en esta entrega) la integración con RetroArch Network Commands
+     (UDP 55355, para nombre de juego + tiempo en RETRO) y las
+     métricas de sistema (CPU/GPU/RAM, para MAINTENANCE).
+- Esquema de datos propuesto: `software/config/profiles/*.json` (un
+  fichero por perfil) + campo opcional `profile` en
+  `panel_database.json`, retrocompatible con los paneles que ya usan
+  `launcher` directo.
+- Alcance v0.2 acotado a `STEAM · RETRO · DISPAROS · MAINTENANCE ·
+  AUTO` (con contenido de OLED definido); `KODI · MUSIC · DESKTOP ·
+  NIGHT · DEMO` quedan como huecos reservados en el esquema, sin
+  diseñar su pantalla todavía.
+- `DISPAROS` se documenta como el mismo concepto que el panel Zombies
+  ya existente (`hotd_remake`/`hotd2_remake`), no un nombre nuevo.
+
+### Pendiente
+
+- Todo el documento es una propuesta sin implementar — ver su propia
+  sección "Pendiente" para el desglose (`ProcessWatcher`, los dos
+  `StatusProvider`, y la decisión final sobre cuándo se activa AUTO).
+
+---
+
+## [1.3.0] - 2026-08-30 — Recalculado con medidas reales del módulo OLED: ventana, taladros M2 y rebaje de pines
+
+### Encontrado
+
+- Con foto de la impresión real, el usuario mostró la ventana
+  invadiendo el taladro M2 inferior ("¿No te parece que esto es una
+  chapuza?"). Confirmado por cálculo: el offset -4,0 de [1.2.8] hacía
+  que el corte recto de la ventana se solapara 0,85mm con el taladro
+  inferior, y el bisel 2,85mm.
+- El usuario decidió medir el módulo físico con calibre en vez de
+  seguir ajustando a ciegas — decisión correcta, ya que reveló que el
+  diseño llevaba varias suposiciones sin verificar.
+
+### Medidas reales (calibre, módulo instalado en la carcasa, pines hacia arriba)
+
+- Separación horizontal entre los 2 taladros M2 superiores: 23,0mm
+  (igual que se venía usando).
+- Separación VERTICAL entre taladro superior e inferior del mismo
+  lado: 23,5mm (antes se asumía igual que la horizontal, 23,0 — no es
+  un cuadrado exacto).
+- Pantalla: 26 x 15mm (ancho ya correcto; alto corregido de 14,5 a
+  15,0).
+- Del centro del taladro superior al borde superior de la pantalla:
+  2,0mm — la medida clave que faltaba.
+- Pines de soldadura: sobresalen 2,0mm por detrás de la placa (antes
+  se estimaba 1,5mm, insuficiente — no habrían cabido).
+
+### Causa raíz del zigzag de las rondas anteriores
+
+- Antes de [1.2.9], `oled_pos` movía a la vez los taladros M2 Y la
+  ventana — cualquier feedback visual del usuario sobre "la pantalla"
+  en realidad comparaba la ventana contra el botón/USB del panel, no
+  contra los taladros de la propia OLED (imposible verlo por
+  separado hasta que se desacoplaron). Por eso el offset empírico
+  (-4,0) apuntaba en la dirección contraria a la que da el cálculo
+  con datos reales (+2,25).
+
+### Cambiado
+
+- `openscad/parts/03_panels/lower_panel.scad`:
+  - `oled_mount_spacing` dividida en `oled_mount_spacing_x` (23,0) y
+    `oled_mount_spacing_z` (23,5) — ya no se asume un cuadrado.
+  - `oled_screen_height`: 14,5 → 15,0.
+  - `oled_gap_top_hole_to_screen = 2.0` (nueva constante, medida
+    real).
+  - `oled_window_z_offset` ahora se calcula con fórmula
+    (`oled_mount_spacing_z/2 - oled_gap_top_hole_to_screen -
+    oled_screen_height/2` = +2,25) en vez de un número fijo ajustado
+    a mano.
+  - `oled_pin_clearance_pocket_depth`: 1,5 → 2,0 (medida real; con el
+    valor anterior los pines no habrían cabido).
+  - Bisel de la ventana ahora asimétrico: `oled_bevel_margin_top =
+    0.4` (reducido, solo en el borde superior, para no invadir el
+    taladro con solo 2mm de holgura real) vs `oled_bevel_margin = 2.0`
+    en los otros tres lados.
+  - `oledMountHoles()` actualizado para usar `oled_mount_spacing_x`/
+    `_z` por separado en vez de la variable única.
+- Verificado por render (vista frontal + zoom a la zona superior):
+  los 4 taladros M2 aparecen limpios alrededor de la ventana, sin
+  solape con el bisel ni con el corte recto.
+- Regenerados y sustituidos `STL/lower_panel.stl`,
+  `openscad/parts/03_panels/oled_bracket.stl` y
+  `STL/probetas/probeta_pines_oled.stl`.
+
+### Pendiente
+
+- Nueva impresión de prueba — primera vez que la posición de la
+  ventana se calcula a partir de medidas reales en vez de prueba y
+  error, así que hay bastante confianza, pero toca confirmarlo en
+  mano.
+- El margen de bisel superior (0,4mm) es deliberadamente pequeño para
+  garantizar que no toque el taladro; visualmente será un chaflán
+  casi plano en ese borde, distinto de los otros tres lados — si no
+  gusta el resultado, se puede ajustar una vez impreso.
+
+---
+
+## [1.2.9] - 2026-08-30 — Desacoplada la ventana OLED de los taladros M2: eran fijos y no debían moverse
+
+### Encontrado
+
+- Con foto de la impresión real, el usuario señaló dos círculos junto
+  al hueco de la pantalla que parecían haberse movido, pese a haber
+  pedido explícitamente no tocar tornillos. Comparando renders, se
+  identificaron como los 4 taladros M2 propios de la placa OLED
+  (`oledMountHoles()`), no los M3 del panel contra la pared (esos
+  seguían intactos, verificado de nuevo). El usuario confirmó: "sí,
+  me refiero a los del propio OLED de métrica 2".
+
+### Causa raíz
+
+- Desde [1.2.2], `oled_pos` se usaba como referencia única tanto para
+  los taladros M2 (fijos, correctos desde el principio) como para la
+  ventana visible de la pantalla (la que el usuario pedía mover). Al
+  desplazar `oled_pos` para bajar la ventana, arrastraba también los
+  taladros M2 — que en el módulo OLED real NO se mueven, porque son
+  la fijación física de la placa; lo que está descentrado es el área
+  visible de la pantalla dentro de esa placa.
+
+### Corregido
+
+- `openscad/reference/components/assembly_positions.scad`:
+  `oled_pos` vuelve a su posición original (sin ningún offset) — pasa
+  a representar solo la placa/taladros M2/brida, que ya estaban bien
+  y no se tocan más.
+- `openscad/parts/03_panels/lower_panel.scad`, `oledCut()`: nuevo
+  `oled_window_z_offset = -4.0`, aplicado SOLO a la ventana visible
+  (el bisel y el hueco recto), no al resto. El rebaje de pines sigue
+  centrado en los taladros M2 (ahora fijos de nuevo), sin cambios en
+  su fórmula.
+- Verificado con `echo()`: `oled_pos` = Z 19 (taladros M2 en 7,5 /
+  30,5mm, igual que antes de [1.2.2]); taladros M3 del panel sin
+  cambios (7 / 26,5mm); ventana ahora en Z=15 (los -4mm pedidos por
+  el usuario, aplicados solo a ella).
+- Regenerados y sustituidos `STL/lower_panel.stl`,
+  `openscad/parts/03_panels/oled_bracket.stl` y
+  `STL/probetas/probeta_pines_oled.stl` (recorte ampliado para cubrir
+  desde los taladros M2 hasta la ventana, ahora más separadas).
+
+### Pendiente
+
+- Nueva impresión de prueba para confirmar que ahora sí encaja todo
+  correctamente: taladros M2 fijos + ventana 4mm más abajo.
+
+---
+
+## [1.2.8] - 2026-08-30 — Ventana OLED: 2mm adicionales hacia abajo (total -4mm)
+
+### Encontrado
+
+- Tras imprimir el panel inferior con el ajuste de [1.2.2] (-2mm),
+  el usuario reportó: "la pantalla sigue quedando dos milímetros
+  alta. Los orificios de los tornillos están correctamente
+  ubicados, pero el rectángulo de la pantalla debería bajar dos
+  milímetros [más]".
+
+### Cambiado
+
+- `openscad/reference/components/assembly_positions.scad`:
+  `oled_z_offset` de `-2.0` a `-4.0` (total acumulado desde la
+  posición original de antes de [1.2.2]). Confirmado por `echo()`
+  que los taladros de tornillo siguen exactamente en 7 / 26,5mm, sin
+  cambios — coincide con lo que el usuario validó ("correctamente
+  ubicados").
+- El rebaje de pines y los bosses de la brida (`oled_bracket.scad`)
+  se recalculan solos a partir de `oled_pos`, así que bajan con la
+  pantalla automáticamente, manteniéndose alineados entre sí.
+- Regenerados y sustituidos `STL/lower_panel.stl`,
+  `openscad/parts/03_panels/oled_bracket.stl` y
+  `STL/probetas/probeta_pines_oled.stl`.
+
+### Pendiente
+
+- Nueva impresión de prueba para confirmar que -4mm es ya la
+  posición correcta.
+
+---
+
+## [1.2.7] - 2026-08-30 — Nuevo panel NFC "Zombies": base en blanco + anagrama Gung, listo para imprimir tumbado
+
+### Añadido
+
+- `openscad/parts/03_panels/nfc_panel_zombies.scad`: nuevo panel NFC
+  del tema Zombies, siguiendo el mismo patrón que
+  `nfc_panel_Steam.scad` / `nfc_panel_retrobat.scad` (base compartida
+  de `nfc_panel.scad` + anagrama), con una diferencia: el anagrama no
+  es geometría 2D generada en OpenSCAD, es el STL ya modelado por el
+  usuario (`STL/Anagramas/Gung.stl`), importado y centrado.
+  - `nfcPanelZombies()`: base + anagrama en coordenadas globales del
+    caso (para previsualización/renders de galería, mismo criterio
+    que los paneles hermanos).
+  - `nfcPanelZombiesPrintable()`: el mismo conjunto rotado -90° sobre
+    X, para que el eje fino del panel (el grosor) quede en Z — lista
+    para laminar e imprimir tumbada directamente, sin reorientar nada
+    a mano.
+- `STL/nfc_panel_zombies_tumbado.stl`: exportado desde
+  `nfcPanelZombiesPrintable()`. Verificado por bounding box: huella
+  149 x 94,5mm, solo 5mm de alto — confirmado que queda tumbado.
+- Verificado visualmente por render que el anagrama Gung queda
+  centrado y con la orientación correcta (sin espejarse ni girarse)
+  sobre la base.
+
+### Nota
+
+- `STL/Anagramas/Gung.stl` (el anagrama suelto, para el flujo de
+  impresión en dos piezas + Loctite de [1.2.1]) no se ha tocado — este
+  panel combinado es una pieza única alternativa, útil para
+  previsualización o para imprimir de una sola vez si en algún
+  momento no se quiere pegar con Loctite.
+
+---
+
+## [1.2.6] - 2026-08-30 — Galería: renders de la carcasa montada con distintos anagramas
+
+### Añadido
+
+- 3 renders nuevos de la carcasa **completa montada** (chasis + tapa
+  superior + panel inferior + panel trasero + bandeja + panel NFC),
+  cada uno con un anagrama de panel NFC distinto: Steam, RetroBat y
+  en blanco. Todas las piezas ya estaban definidas en el mismo
+  sistema de coordenadas global (`assembly_positions.scad`), así que
+  el ensamblaje es una simple unión de los módulos de cada pieza sin
+  necesidad de calcular ninguna posición nueva.
+- Ficheros: `docs/img/render_ensamblaje_steam.png`,
+  `render_ensamblaje_retrobat.png`, `render_ensamblaje_blank.png`.
+- `README.md`: nueva sección "Carcasa montada, con distintos
+  anagramas de panel NFC" en la galería, antes de las piezas sueltas.
+
+### Nota
+
+- El anagrama del panel Zombies (`STL/Anagramas/Gung.stl`) no tiene
+  todavía un `.scad` paramétrico propio (como sí tienen Steam,
+  RetroBat y TeknoParrot) — está modelado como STL suelto en
+  coordenadas de su propia mesa de impresión, no en las coordenadas
+  globales del proyecto. Por eso no se ha podido incluir en el
+  render conjunto sin arriesgarse a una posición incorrecta. Si se
+  quiere en la galería, habría que crear
+  `openscad/parts/03_panels/nfc_panel_zombies.scad` a partir del
+  logo, siguiendo el mismo patrón que `nfc_panel_retrobat.scad`.
+
+---
+
+## [1.2.5] - 2026-08-30 — Galería del README con renders reales del diseño actual
+
+### Cambiado
+
+- `README.md`: sustituida la imagen genérica de la galería (mockup
+  subido a GitHub, sin relación directa con el CAD del proyecto) por
+  5 renders generados directamente desde los ficheros OpenSCAD
+  actuales — chasis, panel superior, panel inferior (ya con los
+  ajustes de [1.2.2]-[1.2.4]), panel trasero y bandeja interior.
+- Nuevos ficheros en `docs/img/`: `render_chasis.png`,
+  `render_panel_superior.png`, `render_panel_inferior.png`,
+  `render_panel_trasero.png`, `render_bandeja.png`. Generados con
+  `openscad --imgsize=900,700 --camera=0,0,0,55,0,35,0` sobre cada
+  `.scad` de pieza, usando su propio bloque `// PREVIEW` — se pueden
+  regenerar en cualquier momento con el mismo comando si el diseño
+  cambia.
+
+---
+
+## [1.2.4] - 2026-08-29 — Rebaje de pines OLED realineado a sus orificios de sujeción reales + probeta de comprobación
+
+### Encontrado
+
+- Tras [1.2.3], el usuario avisó: "el rebaje para los pines del OLED
+  aun tienen que subir hasta estar centrados verticalmente con los
+  orificios superiores de sujeción" — [1.2.3] lo había alineado con
+  `lower_panel_hole_z_high` (26,5mm), que son los taladros M3 del
+  panel contra la pared, no los "orificios de sujeción" a los que se
+  refería. Los orificios de sujeción reales son el par superior de
+  los 4 taladros M2 de `oledMountHoles()` (fijación de la propia
+  placa OLED), a Z = 28,5mm — 2mm más arriba, coincide con "aun
+  tienen que subir".
+
+### Corregido
+
+- `openscad/parts/03_panels/lower_panel.scad`, `oledCut()`: el rebaje
+  de pines se centra ahora en `oled_pos[2] + oled_mount_spacing/2`
+  (28,5mm) en vez de `lower_panel_hole_z_high` (26,5mm).
+- Regenerado y sustituido `STL/lower_panel.stl`.
+
+### Añadido
+
+- `STL/probetas/probeta_pines_oled.stl`: probeta de comprobación —
+  recorte pequeño y fino (32 x 3 x 10,25mm) del panel inferior,
+  limitado a la zona del rebaje de pines + orificios superiores de
+  sujeción del OLED, pensada para imprimir tumbada sobre la cama
+  (rápida, sin gastar tiempo/material en el panel completo). Generada
+  por intersección de `lowerPanel()` con una caja de recorte
+  paramétrica en `oled_pos[0]`, sin tocar el fichero fuente
+  `lower_panel.scad`.
+
+### Nota técnica (revisar en algún momento, no bloqueante hoy)
+
+- Se ha detectado que `oled_screen_width/height` está definido dos
+  veces con valores distintos: en `assembly_positions.scad` (27,0 x
+  20,0mm, usado por `oled_bracket.scad`) y localmente en
+  `lower_panel.scad` (26,0 x 14,5mm, el que realmente usa `oledCut()`
+  al ser la última asignación en el `include`). No afecta a los
+  cambios de hoy, pero conviene unificarlo para que la brida
+  (`oled_bracket.scad`) y la ventana (`lower_panel.scad`) usen
+  siempre la misma medida.
+
+---
+
+## [1.2.3] - 2026-08-29 — Corregido: rebaje de pines en la cara equivocada; confirmado que los tornillos no se movieron
+
+### Encontrado
+
+- El usuario avisó, tras revisar el cambio de [1.2.2]: "has vuelto a
+  poner el rebaje para los pines por fuera en lugar de por dentro" y
+  "has bajado los orificios para los tornillos... tienes que
+  devolverlos a su posición original".
+
+### Comprobado
+
+- Los taladros de tornillo (`lower_panel_hole_z_low/high`,
+  `lower_panel_screw_z_low/high`) **no se han movido**: sus fórmulas
+  dependen de `front_panel_lower_top` → `front_panel_cluster_z_high`
+  → `front_cluster_z`, ninguna de las cuales usa `oled_pos` ni el
+  rebaje de pines. Verificado numéricamente con `echo()` en OpenSCAD:
+  `lower_panel_hole_z_low = 7`, `lower_panel_hole_z_high = 26.5`,
+  `lower_panel_screw_z_low = 10`, `lower_panel_screw_z_high = 29.5` —
+  mismos valores antes y después de [1.2.2]. No ha hecho falta
+  ningún cambio de código en `lowerPanelScrewHoles()`.
+
+### Corregido
+
+- `openscad/parts/03_panels/lower_panel.scad`, `oledCut()` (rebaje de
+  pines): el cubo arrancaba en la cara EXTERIOR del panel
+  (`-case_depth/2`, la misma cara donde empieza el propio panel) y
+  cortaba hacia dentro — dejaba el hueco abierto por fuera (donde se
+  ve la pantalla) y cerrado justo donde están los pines (la cara
+  interior). Invertido: ahora arranca cerca de la cara interior
+  (`-case_depth/2 + front_panel_thickness - oled_pin_clearance_pocket_depth`)
+  y corta hacia el interior, dejando la piel sólida en la cara
+  exterior (donde no se nota) y el hueco abierto hacia el interior,
+  donde sobresalen los pines.
+- Regenerado y sustituido `STL/lower_panel.stl` (OpenSCAD 2021.01,
+  sin warnings ni errores).
+
+### Pendiente
+
+- Nueva impresión de prueba para confirmar que el rebaje de pines
+  encaja bien desde la cara interior antes de dar el panel por
+  definitivo.
+
+---
+
+## [1.2.2] - 2026-08-29 — Ajustes del panel inferior tras la primera impresión real
+
+### Encontrado
+
+- Tras imprimir y montar el panel inferior real, el usuario reportó
+  tres desajustes respecto al hardware:
+  1. El hueco rectangular de la pantalla OLED queda 2mm demasiado
+     alto.
+  2. El rebaje ciego para los pines de soldadura de la OLED debería
+     estar arriba del todo del panel, alineado con los orificios de
+     los tornillos superiores — no siguiendo la posición de la
+     pantalla como hasta ahora.
+  3. El soporte/canal de la tira LED debería subir 2mm.
+- Los taladros de tornillo (`lower_panel_hole_z_low/high`,
+  compartidos con los insertos ya impresos en la pared) se mantienen
+  sin tocar, tal y como pidió el usuario.
+
+### Cambiado
+
+- `openscad/reference/components/assembly_positions.scad`: nuevo
+  `oled_z_offset = -2.0`, aplicado a `oled_pos[2]` — baja la ventana
+  OLED 2mm sin mover nada más (los bosses de `oled_bracket_screw_positions`
+  se recalculan solos a partir de `oled_pos`, así que se mueven con
+  ella automáticamente).
+- `openscad/parts/03_panels/lower_panel.scad`, `oledCut()`: el rebaje
+  de los pines de soldadura ya no se calcula a partir de
+  `oled_pos[2] + oled_screen_height/2` — ahora se centra en
+  `lower_panel_hole_z_high` (misma Z que los taladros de tornillo
+  superiores).
+- `openscad/parts/03_panels/lower_panel.scad`, `ledChannelWalls()`:
+  nuevo `led_channel_z_offset = 2.0`, sumado a `channelZ` — sube el
+  canal/soporte de la tira LED 2mm.
+- Regenerados y sustituidos `STL/lower_panel.stl` y
+  `openscad/parts/03_panels/oled_bracket.stl` con los cambios
+  aplicados (renderizado con OpenSCAD 2021.01, sin warnings ni
+  errores).
+
+### Pendiente
+
+- Confirmar con una nueva impresión de prueba que los tres ajustes
+  encajan correctamente antes de dar el panel inferior por definitivo.
+
+---
+
 ## [1.2.1] - 2026-08-29 — Paneles NFC: impresión en dos piezas (base + anagrama pegado con Loctite)
 
 ### Cambiado

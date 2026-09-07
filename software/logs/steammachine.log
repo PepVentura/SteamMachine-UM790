@@ -343,3 +343,126 @@
 2026-08-25 20:01:16.431 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
 2026-08-25 20:01:18.396 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
 2026-08-25 20:01:18.396 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:30:45.666 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-09-05 22:30:45.689 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-09-05 22:30:45.689 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-09-05 22:30:45.689 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-09-05 22:30:45.689 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-09-05 22:30:45.689 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-09-05 22:30:45.760 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-09-05 22:30:45.762 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-09-05 22:31:28.511 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-09-05 22:31:28.512 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-09-05 22:31:28.520 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-09-05 22:31:33.483 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:31:33.484 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:31:35.189 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-09-05 22:31:35.189 | DEBUG    | core.application:_on_button:139 - Boton pulsado sin panel activo, se ignora
+2026-09-05 22:31:37.210 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-09-05 22:31:37.210 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-09-05 22:31:37.212 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-09-05 22:31:38.490 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-09-05 22:31:38.490 | INFO     | core.application:_on_button:143 - Lanzando plataforma: steam
+2026-09-05 22:31:38.502 | ERROR    | launcher.base_plugin:_spawn:62 - steam: comando no encontrado: steam
+2026-09-05 22:31:43.683 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:31:43.684 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:31:49.062 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-09-05 22:31:49.062 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-09-05 22:31:49.066 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-09-05 22:31:53.635 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-09-05 22:31:53.635 | INFO     | core.application:_on_button:143 - Lanzando plataforma: steam
+2026-09-05 22:31:53.644 | ERROR    | launcher.base_plugin:_spawn:62 - steam: comando no encontrado: steam
+2026-09-05 22:31:55.532 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:31:55.533 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:32:03.103 | ERROR    | devices.serial_manager:_read_loop:128 - Error en el hilo de lectura serie: GetOverlappedResult failed (PermissionError(13, 'Acceso denegado.', None, 5))
+2026-09-05 22:34:14.875 | INFO     | core.application:initialize:55 - SteamMachine Core iniciando...
+2026-09-05 22:34:14.877 | DEBUG    | core.events:subscribe:40 - Suscrito _on_boot a BOOT
+2026-09-05 22:34:14.878 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_detected a TAG_DETECTED
+2026-09-05 22:34:14.878 | DEBUG    | core.events:subscribe:40 - Suscrito _on_tag_removed a TAG_REMOVED
+2026-09-05 22:34:14.878 | DEBUG    | core.events:subscribe:40 - Suscrito _on_button a BUTTON
+2026-09-05 22:34:14.878 | DEBUG    | core.events:subscribe:40 - Suscrito _on_error a ERROR
+2026-09-05 22:34:14.954 | INFO     | devices.serial_manager:connect:62 - Conectado al ESP32 en COM7 @ 115200 bps
+2026-09-05 22:34:14.958 | INFO     | core.application:run:78 - SteamMachine Core listo. Esperando eventos...
+2026-09-05 22:34:17.706 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:34:17.706 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:34:20.234 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-09-05 22:34:20.235 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-09-05 22:34:20.237 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-09-05 22:34:23.105 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-09-05 22:34:23.105 | INFO     | core.application:_on_button:143 - Lanzando plataforma: steam
+2026-09-05 22:34:23.132 | ERROR    | launcher.base_plugin:_spawn:62 - steam: comando no encontrado: steam
+2026-09-05 22:34:31.506 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:34:31.506 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:34:35.085 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-09-05 22:34:35.085 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-09-05 22:34:35.089 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-09-05 22:34:36.757 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:34:36.757 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:34:59.384 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '56A1C003'}
+2026-09-05 22:34:59.384 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 56A1C003
+2026-09-05 22:34:59.386 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Zombies - HOTD 2 Remake' listo. Esperando pulsador...
+2026-09-05 22:35:02.556 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:35:02.557 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:35:06.584 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '112FC103'}
+2026-09-05 22:35:06.584 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 112FC103
+2026-09-05 22:35:06.586 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Zombies - HOTD Remake' listo. Esperando pulsador...
+2026-09-05 22:35:08.255 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:35:08.255 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:35:11.383 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': 'E76DC103'}
+2026-09-05 22:35:11.383 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: E76DC103
+2026-09-05 22:35:11.384 | INFO     | core.application:_on_tag_detected:129 - Perfil 'RetroDECK' listo. Esperando pulsador...
+2026-09-05 22:35:13.654 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:35:13.654 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:35:20.083 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-09-05 22:35:20.083 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-09-05 22:35:20.087 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-09-05 22:35:25.055 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:35:25.056 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:35:26.983 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': 'E76DC103'}
+2026-09-05 22:35:26.983 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: E76DC103
+2026-09-05 22:35:26.985 | INFO     | core.application:_on_tag_detected:129 - Perfil 'RetroDECK' listo. Esperando pulsador...
+2026-09-05 22:35:30.753 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:35:30.754 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:35:32.533 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-09-05 22:35:32.533 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-09-05 22:35:32.534 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-09-05 22:35:36.171 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-09-05 22:35:36.171 | INFO     | core.application:_on_button:143 - Lanzando plataforma: steam
+2026-09-05 22:35:36.177 | ERROR    | launcher.base_plugin:_spawn:62 - steam: comando no encontrado: steam
+2026-09-05 22:35:37.804 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:35:37.804 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:35:39.732 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': 'E76DC103'}
+2026-09-05 22:35:39.732 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: E76DC103
+2026-09-05 22:35:39.734 | INFO     | core.application:_on_tag_detected:129 - Perfil 'RetroDECK' listo. Esperando pulsador...
+2026-09-05 22:35:42.374 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-09-05 22:35:42.375 | INFO     | core.application:_on_button:143 - Lanzando plataforma: retrodeck
+2026-09-05 22:35:42.382 | ERROR    | launcher.base_plugin:_spawn:62 - retrodeck: comando no encontrado: flatpak
+2026-09-05 22:35:44.404 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:35:44.404 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:35:46.482 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '56A1C003'}
+2026-09-05 22:35:46.482 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 56A1C003
+2026-09-05 22:35:46.484 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Zombies - HOTD 2 Remake' listo. Esperando pulsador...
+2026-09-05 22:35:49.138 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-09-05 22:35:49.139 | INFO     | core.application:_on_button:143 - Lanzando plataforma: hotd2_remake
+2026-09-05 22:35:49.149 | ERROR    | launcher.base_plugin:_spawn:62 - hotd2_remake: comando no encontrado: steam
+2026-09-05 22:35:50.859 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:35:50.860 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:35:52.638 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '112FC103'}
+2026-09-05 22:35:52.638 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 112FC103
+2026-09-05 22:35:52.640 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Zombies - HOTD Remake' listo. Esperando pulsador...
+2026-09-05 22:35:56.619 | DEBUG    | core.events:publish:47 - Evento publicado: BUTTON {}
+2026-09-05 22:35:56.620 | INFO     | core.application:_on_button:143 - Lanzando plataforma: hotd_remake
+2026-09-05 22:35:56.629 | ERROR    | launcher.base_plugin:_spawn:62 - hotd_remake: comando no encontrado: steam
+2026-09-05 22:36:03.910 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:36:03.911 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:36:10.338 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': '6739C003'}
+2026-09-05 22:36:10.339 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: 6739C003
+2026-09-05 22:36:10.342 | INFO     | core.application:_on_tag_detected:129 - Perfil 'Steam' listo. Esperando pulsador...
+2026-09-05 22:36:14.409 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:36:14.410 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:36:16.937 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_DETECTED {'uid': 'E76DC103'}
+2026-09-05 22:36:16.938 | INFO     | core.application:_on_tag_detected:116 - Panel detectado: E76DC103
+2026-09-05 22:36:16.939 | INFO     | core.application:_on_tag_detected:129 - Perfil 'RetroDECK' listo. Esperando pulsador...
+2026-09-05 22:36:18.009 | DEBUG    | core.events:publish:47 - Evento publicado: TAG_REMOVED {}
+2026-09-05 22:36:18.010 | INFO     | core.application:_on_tag_removed:132 - Panel retirado
+2026-09-05 22:36:54.842 | ERROR    | devices.serial_manager:_read_loop:128 - Error en el hilo de lectura serie: GetOverlappedResult failed (PermissionError(13, 'Acceso denegado.', None, 5))

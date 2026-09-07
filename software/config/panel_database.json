@@ -1,26 +1,23 @@
 {
   "6739C003": {
     "name": "Steam",
+    "profile": "STEAM",
     "launcher": "steam",
     "led": "#0055FF",
     "icon": "steam.png"
   },
   "E76DC103": {
     "name": "RetroDECK",
+    "profile": "RETRO",
     "launcher": "retrodeck",
     "led": "#8800FF",
     "icon": "retrodeck.png"
   },
   "112FC103": {
-    "name": "Zombies - HOTD Remake",
-    "launcher": "hotd_remake",
+    "name": "Zombies",
+    "profile": "DISPAROS",
+    "launcher": "steam",
     "led": "#FF3300",
-    "icon": "hotd_remake.png"
-  },
-  "56A1C003": {
-    "name": "Zombies - HOTD 2 Remake",
-    "launcher": "hotd2_remake",
-    "led": "#CC0000",
-    "icon": "hotd2_remake.png"
+    "icon": "disparos.png"
   }
 }
