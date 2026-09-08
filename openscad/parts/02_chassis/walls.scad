@@ -438,13 +438,25 @@ module topInsertPad(dir, y)
     // llegaba hasta Z=shell_height+1, pasando la cara EXTERIOR de la
     // tapa (Z=shell_height) — la tapa no tenía sitio para su propio
     // material sin invadirlo, de ahí la gran muesca rectangular de
-    // alivio. Igual que con los imanes/tornillos frontales y
-    // traseros: el relleno ahora PARA en la cara INTERIOR de la tapa
-    // (Z=shell_height-top_thickness), no llega a la exterior.
+    // alivio.
+    //
+    // REAJUSTADO (2026-09-08, aviso del usuario: "los insertos...
+    // han quedado algo desplazados hacia abajo" respecto al borde
+    // superior real de la pared): esa corrección frenaba el relleno
+    // top_thickness (3mm) de más, en la cara INTERIOR de la tapa en
+    // vez de en el borde real de la pared. Pero la tapa es lisa, sin
+    // ningún reborde que aliviar — donde este relleno coincide en
+    // X/Y con la tapa, esta ya tiene su propio taladro de paso
+    // (topScrewHoles(), top.scad), no material macizo ahí. El
+    // relleno ahora llega hasta el borde superior real de la pared
+    // (Z=shell_height), igual que el resto de la pared
+    // (sideWallSolid() también llega hasta ahí) — la tapa
+    // simplemente se apoya encima, sin necesitar ningún hueco de
+    // alivio.
     extra = top_insert_pad_depth - wall_thickness;
     xStart = (dir>0) ? wall_thickness : -extra;
 
-    translate([xStart, y - side_boss_size/2, shell_height - top_thickness - side_boss_size])
+    translate([xStart, y - side_boss_size/2, shell_height - side_boss_size])
         cube([extra, side_boss_size, side_boss_size]);
 
 }
@@ -452,9 +464,9 @@ module topInsertPad(dir, y)
 module topScrewInsertCuts(dir)
 {
 
-    // CORREGIDO (2026-08-03): mismo criterio — el inserto abre ahora
-    // en la cara interior de la tapa (Z=shell_height-top_thickness),
-    // no más allá.
+    // REAJUSTADO (2026-09-08): mismo criterio que topInsertPad() —
+    // el inserto abre ahora en el borde superior real de la pared
+    // (Z=shell_height), no 3mm por debajo.
     cutX = sideBossCutX(dir, insert_diameter/2);
 
     for(z=[wall_thickness + top_screw_y_inset, case_depth - wall_thickness - top_screw_y_inset])
@@ -462,9 +474,54 @@ module topScrewInsertCuts(dir)
         translate([
             cutX,
             z,
-            shell_height - top_thickness - insert_depth
+            shell_height - insert_depth
         ])
 
+            cylinder(d = insert_diameter, h = insert_depth + 0.1);
+
+}
+
+
+//=============================================================================
+// INJERTO M3 SUELO-PARED — impresión plana (2026-09-08)
+//
+// PEDIDO POR EL USUARIO: unir el suelo y las paredes, ahora impresos
+// planos por separado, con injertos M3 — no existía ningún punto de
+// fijación entre ellos. Mismo patrón que rc522MountBoss()/
+// esp32MountBosses(): se llaman en coordenadas GLOBALES, fuera del
+// translate() local de cada pared.
+//
+// El macizo (floorWallGraftBoss) se une a sideWallSolid() igual que
+// el resto de rellenos (parte de la cara interior de la pared,
+// wallInnerX, y crece hacia dentro); el inserto ciego
+// (floorWallGraftInsertCuts) se abre hacia ABAJO (Z=0, la base de la
+// pared) para que el tornillo entre desde fuera, por debajo del
+// suelo — floorWallGraftClearanceHoles() en floor.scad abre el
+// taladro de paso correspondiente, mismas coordenadas X/Y
+// (floorWallGraftX(), assembly_positions.scad).
+//=============================================================================
+
+module floorWallGraftBoss(wallInnerX, dir)
+{
+
+    extra = floor_wall_graft_boss_depth - wall_thickness;
+    xStart = (dir>0) ? wallInnerX : wallInnerX - extra;
+
+    for(y = floor_wall_graft_y)
+
+        translate([xStart, y - floor_wall_graft_boss_size/2, 0])
+            cube([extra, floor_wall_graft_boss_size, floor_wall_graft_height]);
+
+}
+
+module floorWallGraftInsertCuts(side)
+{
+
+    cutX = floorWallGraftX(side);
+
+    for(y = floor_wall_graft_y)
+
+        translate([cutX, y, -0.1])
             cylinder(d = insert_diameter, h = insert_depth + 0.1);
 
 }
@@ -509,6 +566,12 @@ module leftWall()
 
     esp32MountBosses(-case_width/2 + wall_thickness);
 
+    difference()
+    {
+        floorWallGraftBoss(-case_width/2 + wall_thickness, +1);
+        floorWallGraftInsertCuts(-1);
+    }
+
 }
 
 
@@ -550,6 +613,12 @@ module rightWall()
     rc522MountBoss(case_width/2 - wall_thickness, -1);
 
     hubMountBosses(case_width/2 - wall_thickness);
+
+    difference()
+    {
+        floorWallGraftBoss(case_width/2 - wall_thickness, -1);
+        floorWallGraftInsertCuts(+1);
+    }
 
 }
 

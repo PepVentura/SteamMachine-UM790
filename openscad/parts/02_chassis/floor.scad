@@ -160,30 +160,56 @@ module traySupportPosts()
 
 
 //=============================================================================
-// PATAS EXTERNAS
+// PATAS EXTERNAS — RETIRADAS COMO PIEZA INTEGRADA (2026-09-08,
+// petición del usuario)
 //
 // CONFIRMADO por el usuario (2026-08-03): externas, 4 mm, por debajo
 // del cascarón (leg_height, 00_parametros.scad). Mismo criterio de
 // posición que openscad/reference/virtual_assembly_v1.scad
 // (externalLegs()) — 4 patas cuadradas en las esquinas.
+//
+// SUSTITUIDAS (2026-09-08) por un pie desmontable, atornillado
+// (openscad/parts/02_chassis/foot.scad /
+// openscad/parts/04_soportes/foot.scad): al tumbar el suelo para
+// imprimirlo plano, estas patas quedaban colgando en voladizo bajo
+// la placa y necesitaban soporte de impresión (el patrón de
+// "cuadrados o rombos" que describía el usuario). Las mismas 4
+// posiciones (leg_center_offset_x/y) se conservan — ahora llevan un
+// inserto M3 ciego en vez de una pata maciza (floorLegMountInserts()
+// más abajo); el pie se atornilla desde fuera una vez impreso.
+//
+// leg_footprint se conserva como referencia de tamaño en planta —
+// mismo diámetro que el pie (foot.scad, foot_diameter), para no
+// dejar hueco visible en el borde.
 //=============================================================================
 
-leg_footprint = 10.0;  // estimado, lado de cada pata cuadrada
+leg_footprint = 10.0;  // estimado, lado de cada pata cuadrada / diámetro del pie desmontable
 
-module floorLegs()
+leg_edge_margin = 2.0;  // margen entre el borde exterior del punto de anclaje y el borde de la carcasa
+leg_center_offset_x = case_width/2 - leg_footprint/2 - leg_edge_margin;
+leg_center_offset_y = case_depth/2 - leg_footprint/2 - leg_edge_margin;
+
+
+//=============================================================================
+// INSERTOS M3 DEL PIE DESMONTABLE
+//
+// Un poste corto que sube desde la cara INTERIOR del suelo
+// (Z=bottom_thickness), con un inserto M3 ciego abierto hacia ABAJO
+// (mismo lado por el que se atornilla el pie, desde fuera) — mismo
+// patrón que traySupportPosts(), pero accesible desde fuera en vez
+// de desde dentro.
+//
+// ALTURA DEL PIE: foot_height (openscad/parts/02_chassis/foot.scad)
+// = 4mm, IGUAL que leg_height — así la altura total del chasis
+// montado (shell_height + foot_height = 148+4 = 152mm) sigue siendo
+// exactamente case_height, sin superar la altura ya establecida.
+//=============================================================================
+
+floor_leg_mount_diameter = leg_footprint;      // mismo tamaño en planta que las patas antiguas
+floor_leg_mount_height   = insert_depth + 2.0;  // sube desde la cara interior del suelo lo justo para alojar el inserto M3 con margen de agarre
+
+module floorLegMountInserts()
 {
-
-    // FALLO CORREGIDO (2026-08-03): la fórmula anterior calculaba la
-    // posición como si cube() estuviera centrado, pero se llamaba con
-    // center=false (esquina, no centro) — la pata acababa 2 mm por
-    // fuera del borde real de la carcasa en X e Y (detectado en una
-    // captura del usuario: "hay pies que quedan por fuera de la
-    // base"). Ahora con center=true, leg_center_offset es
-    // directamente el centro real de la pata.
-
-    leg_edge_margin = 2.0;  // margen entre el borde exterior de la pata y el borde de la carcasa
-    leg_center_offset_x = case_width/2 - leg_footprint/2 - leg_edge_margin;
-    leg_center_offset_y = case_depth/2 - leg_footprint/2 - leg_edge_margin;
 
     for(ix=[-1,1])
     for(iy=[-1,1])
@@ -191,10 +217,68 @@ module floorLegs()
         translate([
             ix*leg_center_offset_x,
             iy*leg_center_offset_y,
-            -leg_height/2
+            bottom_thickness
         ])
 
-            cube([leg_footprint, leg_footprint, leg_height], center=true);
+            difference()
+            {
+
+                cylinder(d = floor_leg_mount_diameter, h = floor_leg_mount_height);
+
+                translate([0, 0, -0.1])
+                    cylinder(d = insert_diameter, h = insert_depth + 0.1);
+
+            }
+
+}
+
+// Isla sólida bajo cada punto de anclaje — sin esto, el patrón de la
+// rejilla (floorVentCut()) podría dejar el punto de anclaje sobre un
+// hueco en vez de sobre material macizo (mismo criterio que
+// fanBossClearance en top.scad, topVentCut()).
+floor_leg_relief_margin = 3.0;
+
+module floorLegVentRelief()
+{
+
+    for(ix=[-1,1])
+    for(iy=[-1,1])
+
+        translate([
+            ix*leg_center_offset_x - (leg_footprint/2 + floor_leg_relief_margin),
+            iy*leg_center_offset_y - (leg_footprint/2 + floor_leg_relief_margin),
+            -1
+        ])
+            cube([
+                leg_footprint + 2*floor_leg_relief_margin,
+                leg_footprint + 2*floor_leg_relief_margin,
+                bottom_thickness + 2
+            ]);
+
+}
+
+
+//=============================================================================
+// TALADROS DE PASO DEL INJERTO M3 SUELO-PARED
+//
+// PEDIDO POR EL USUARIO (2026-09-08): unir el suelo a las paredes
+// (impresas planas por separado) con injertos M3. El inserto ciego
+// vive en la pared (openscad/parts/02_chassis/walls.scad,
+// floorWallGraftInsertCuts()) — aquí solo el taladro de paso, mismas
+// coordenadas X/Y (floorWallGraftX()/floor_wall_graft_y,
+// assembly_positions.scad), para que el tornillo entre desde fuera,
+// por debajo del suelo.
+//=============================================================================
+
+module floorWallGraftClearanceHoles()
+{
+
+    for(side = [-1, 1])
+
+        for(y = floor_wall_graft_y)
+
+            translate([floorWallGraftX(side), y, -0.1])
+                cylinder(d = 3.4, h = bottom_thickness + 0.2);
 
 }
 
@@ -206,23 +290,34 @@ module floorLegs()
 module chassisFloor()
 {
 
-    union()
+    difference()
     {
 
-        difference()
+        union()
         {
 
-            floorPlate();
+            difference()
+            {
 
-            floorVentCut();
+                floorPlate();
 
-            frontClusterRelief();
+                difference()
+                {
+                    floorVentCut();
+                    floorLegVentRelief();
+                }
+
+                frontClusterRelief();
+
+            }
+
+            floorLegMountInserts();
+
+            traySupportPosts();
 
         }
 
-        floorLegs();
-
-        traySupportPosts();
+        floorWallGraftClearanceHoles();
 
     }
 

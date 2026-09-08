@@ -37,7 +37,7 @@ part_version = "1.0";
 //=============================================================================
 
 foot_diameter = 10.0;  // = leg_footprint en floor.scad, mismo tamaño que las patas originales
-foot_height   = 6.0;   // ESTIMADO — antes 4mm integrado; algo más de margen de ventilación al ser pieza aparte, ajustable sin tocar el suelo
+foot_height   = 4.0;   // AJUSTADO (2026-09-08): antes 6.0 — con shell_height=148, 6mm de pie da 154mm de altura total, 2mm por encima de case_height (152, "dato original, sin modificar"). Fijado a 4.0, IGUAL que leg_height, para no superar la altura ya establecida.
 
 foot_screw_clearance_diameter = 3.4;  // holgura de paso para M3
 foot_screw_csk_diameter = 6.5;  // ESTIMADO — igual que floor_mount_csk_diameter en floor.scad

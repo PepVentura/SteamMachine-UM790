@@ -261,6 +261,53 @@ rc522_mount_depth    = 6.0;
 
 
 //=============================================================================
+// INJERTO M3 SUELO-PARED — impresión plana (2026-09-08)
+//
+// PEDIDO POR EL USUARIO: el suelo y las paredes se imprimen ahora
+// planos por separado (openscad/parts/02_chassis/floor_flat.scad,
+// leftwall_flat.scad, rightwall_flat.scad) y se unen con injertos
+// M3 — hasta ahora NO había ningún punto de fijación entre el suelo
+// y las paredes (comprobado: no existía en ningún fichero).
+//
+// Un tornillo entra desde fuera, por debajo del suelo (taladro de
+// paso en floor.scad, floorWallGraftClearanceHoles()), atraviesa el
+// grosor del suelo y rosca en un inserto M3 ciego embebido en la
+// base de cada pared (walls.scad, floorWallGraftBoss()/
+// floorWallGraftInsertCuts()) — mismo patrón de inserto ciego que el
+// resto del proyecto (insert_diameter/insert_depth).
+//
+// Dos puntos por pared, en Y=±50 (GLOBAL, simétrico respecto al
+// centro), elegidos por quedar lejos de TODOS los insertos ya
+// existentes en esa misma zona de la pared:
+//   - Imanes/tornillo del panel inferior (front_magnet_z_low,
+//     lower_panel_screw_z_low): Y hasta ~-64 (front_panel_thickness
+//     + side_boss_size) — 14mm+ de margen.
+//   - ESP32 (pared izquierda) / HUB USB (pared derecha): Y hasta
+//     ±39 aprox (mitad del ancho de la placa, 78mm) — 11mm de
+//     margen (aunque coinciden en X, la separación en Y basta para
+//     que no haya colisión real en las 3 dimensiones a la vez).
+//   - Tornillos del panel trasero (rear_wall_screw): Y desde ~64.2
+//     — 14mm+ de margen.
+//=============================================================================
+
+floor_wall_graft_y          = [-50, 50];  // Y GLOBAL de cada punto, igual en las dos paredes
+floor_wall_graft_boss_depth = side_boss_depth;  // 10mm, mismo criterio que el resto de rellenos locales de la pared (>= insert_diameter + margen)
+floor_wall_graft_boss_size  = 12.0;  // lado del bloque en Y, a lo largo de la pared
+floor_wall_graft_height     = insert_depth + 3.0;  // sube desde la base de la pared (Z=0) lo justo para alojar el inserto con margen de agarre
+
+// X GLOBAL del taladro de paso/inserto, para un lado dado (side=-1
+// pared izquierda, side=+1 pared derecha) — fuente única, para que
+// floor.scad (taladro de paso) y walls.scad (inserto ciego)
+// coincidan exactamente, mismo criterio que sideBossCutX() pero en
+// coordenadas GLOBALES (estos dos módulos se llaman fuera del
+// translate() local de cada pared, igual que rc522MountBoss()).
+function floorWallGraftX(side) =
+    (side<0)
+        ? (-case_width/2 + wall_thickness) + (side_boss_margin + insert_diameter/2)
+        : (case_width/2  - wall_thickness) - (side_boss_margin + insert_diameter/2);
+
+
+//=============================================================================
 // ESP32 TERMINAL ADAPTER — lateral IZQUIERDO (docs/02_Mechanical_Layout.md,
 // sección ESP32: "Situado en el lateral izquierdo"), alojado en el
 // panel lateral: montado en VERTICAL contra la cara interior de la

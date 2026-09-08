@@ -284,6 +284,80 @@ module rc522BracketCradle()
 
 
 //=============================================================================
+// PANEL TRASERO — CIERRA LA VISTA AL INTERIOR DEL CHASIS
+//
+// PEDIDO POR EL USUARIO (con foto, 2026-09-07): el hueco alrededor
+// del lector queda totalmente abierto — sin nada detrás de los
+// brazos ni a los lados/arriba/abajo de la cuna, se ve directamente
+// el ventilador y el cableado del interior. Se añade una placa plana
+// justo donde termina la repisa trasera de la cuna (rc522_rear_edge_y),
+// que cierra el resto de la abertura del panel NFC.
+//
+// SIN COLISIÓN, verificado por separación de ejes a partir de las
+// cotas ya existentes en este mismo archivo (NO renderizado en
+// OpenSCAD — no disponible en esta sesión; confirmar visualmente
+// antes de imprimir):
+//   - Postes de pared (rc522MountBoss, walls.scad) y pletinas en L
+//     de este mismo soporte (rc522BracketEndPads): ambos en
+//     X 66-69/75 — esta placa se detiene en |X|<=66, mismo alcance
+//     que los brazos de la horquilla, sin solape.
+//   - ESP32 (esp32_pos) y HUB USB (hub_pos): X ~=+-73, fuera de
+//     |X|<=66.
+//   - Ventilador Noctua (fan_pos, Z 130-145, centrado en
+//     Y=um790_pos[1]=18): su Y está a más de 35mm de esta placa
+//     (Y -65,2 a -62,2) — sin solape en Y, aunque coincidan en Z.
+//   - Brazos de la horquilla (rc522BracketArms): Y -71,7 a -68,7,
+//     esta placa empieza en Y=-65,2 (rc522_rear_edge_y) — sin solape
+//     en Y.
+//
+// Mantiene el mismo hueco de salida de cables que
+// rc522ConnectorCutout() (mismo X/Z), para que el conector del lector
+// no quede tapado por la placa nueva.
+//=============================================================================
+
+rc522_backdrop_half_width = rc522_bracket_x_end - rc522_end_pad_thickness;  // 66 — mismo alcance que los brazos, se detiene justo antes de las pletinas en L
+rc522_backdrop_z_low      = nfc_panel_z_low;   // 51,5 — mismo límite inferior que la abertura del panel NFC
+rc522_backdrop_z_high     = nfc_panel_z_high;  // 146,0 — mismo límite superior
+rc522_backdrop_thickness  = rc522_bracket_thickness;  // 3mm, mismo grosor que el resto del soporte
+rc522_backdrop_y          = rc522_rear_edge_y;  // empieza justo donde termina la repisa trasera de la cuna
+
+module rc522BracketBackdrop()
+{
+
+    difference()
+    {
+
+        translate([
+            -rc522_backdrop_half_width,
+            rc522_backdrop_y,
+            rc522_backdrop_z_low
+        ])
+            cube([
+                2*rc522_backdrop_half_width,
+                rc522_backdrop_thickness,
+                rc522_backdrop_z_high - rc522_backdrop_z_low
+            ]);
+
+        // Mismo hueco que rc522ConnectorCutout(), extendido a todo el
+        // grosor de esta placa — si no, taparía la salida de cables
+        // del propio lector.
+        translate([
+            rc522_connector_hole_x - rc522_connector_hole_width/2,
+            rc522_backdrop_y - 0.1,
+            rc522_bracket_z - rc522_connector_hole_height/2
+        ])
+            cube([
+                rc522_connector_hole_width,
+                rc522_backdrop_thickness + 0.2,
+                rc522_connector_hole_height
+            ]);
+
+    }
+
+}
+
+
+//=============================================================================
 // SOPORTE COMPLETO
 //=============================================================================
 
@@ -298,6 +372,7 @@ module rc522BracketPrintable()
             rc522BracketArms();
             rc522BracketEndPads();
             rc522BracketCradle();
+            rc522BracketBackdrop();
         }
 
         rc522BracketScrewHoles();
