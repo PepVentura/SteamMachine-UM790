@@ -250,11 +250,15 @@ Instalar:
 
 
 
-\- insertos térmicos
+\- insertos térmicos M3 (postes de la bandeja, patas del pie desmontable, injerto suelo-pared)
 
-\- patas
+\- pie desmontable (openscad/parts/02_chassis/foot.scad — atornillado desde fuera, por debajo, a los insertos del suelo; ya NO son patas integradas de una pieza — ver CHANGELOG [1.5.2]/[1.5.3])
 
 \- soportes
+
+
+
+Antes de montar las paredes (paso siguiente): atornillar el suelo a cada pared por el injerto M3 suelo-pared (2 tornillos por lado, desde fuera y por debajo del suelo, roscando en el inserto ciego de la base de cada pared — CHANGELOG [1.5.2]).
 
 
 

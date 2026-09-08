@@ -6,6 +6,232 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
+## [1.5.4] - 2026-09-08 — Avellanado del injerto M3 suelo-pared; VERSION.md eliminado (redundante con este CHANGELOG); manual de montaje al día
+
+### Corregido
+
+- `floorWallGraftClearanceHoles()` ([1.5.2]): aviso del usuario ("los
+  orificios... parecen muy grandes y sin avellanado"). El diámetro
+  (Ø3,4mm) es la holgura M3 estándar ya usada en el resto del
+  proyecto, no un tamaño fuera de lo normal — pero le faltaba el
+  avellanado cónico que sí llevan el resto de tornillos que entran
+  desde una cara exterior (tapa, panel trasero, panel inferior, todos
+  Ø6mm). Añadido, mismo criterio.
+
+### Eliminado
+
+- `VERSION.md`: a petición del usuario ("si consideras que documentos
+  como VERSION.md no tienen sentido los podríamos eliminar"). Sin
+  referencias entrantes desde ningún otro fichero (verificado antes
+  de borrar). Es precisamente el fichero que estaba desincronizado
+  (v1.1.3) cuando destapamos el desajuste del ZIP en [1.4.9] — este
+  CHANGELOG ya hace de fuente única de verdad sobre el estado del
+  proyecto, sin necesidad de un "número de versión" aparte que
+  mantener sincronizado a mano.
+
+### Cambiado
+
+- `docs/11_Assembly_Manual.md`, Paso 1: "instalar patas" sustituido
+  por la secuencia real — pie desmontable atornillado desde fuera
+  ([1.5.2]/[1.5.3]) — y añadido el paso de atornillar el suelo a cada
+  pared por el injerto M3 antes de montar el resto ([1.5.2]).
+
+---
+
+## [1.5.3] - 2026-09-08 — Corregido: la rejilla del suelo no atravesaba la pieza; retirada a petición del usuario; patas reubicadas (colisión con insertos de pared)
+
+### Contexto
+
+- Sesión de revisión de `floor_flat.scad`/`leftwall_flat.scad`/
+  `rightwall_flat.scad`/`foot.scad` (impresión plana del chasis,
+  ver [1.5.2]). El usuario aportó capturas del visor de OpenSCAD que
+  destaparon dos fallos reales en `floor.scad`, no solo apariencia.
+
+### Corregido
+
+- `floorVentCut()`: `valvePattern()` (`lib/ventilation.scad`) usa
+  `cube(..., center=true)`, que centra el corte también en Z. Con el
+  `translate(Z=-1)` que tenía, el corte real quedaba entre Z=-3,5 y
+  Z=1,5, mientras el suelo ocupa Z=0 a `bottom_thickness`=3 — solo se
+  cortaba la mitad inferior, dejando 1,5mm de piel maciza sin cortar
+  en la cara de arriba de los ~60 rombos a la vez. Nunca atravesaron
+  la pieza. Corregido moviendo el punto de partida al centro real del
+  grosor de la placa (`bottom_thickness/2`); verificado con los
+  números que el nuevo rango (Z -1 a 4) cubre de sobra el suelo.
+- `floorLegMountInserts()` ([1.5.2]): el taladro del inserto M3 solo
+  abría dentro del propio poste (desde Z=2,9 hacia arriba) — nunca
+  atravesaba los 3mm de la placa del suelo. Visto desde la cara
+  exterior real (Z=0), los postes se veían macizos. Añadido
+  `floorLegScrewClearanceHoles()`: taladro de paso M3 (Ø3,4mm,
+  distinto del taladro del inserto) que sí atraviesa la placa entera,
+  restado a nivel de `chassisFloor()`.
+- `leg_center_offset_y` (patas del pie desmontable, [1.5.2]): a la Y
+  de la esquina real (74,2mm) el poste de la pata invadía el relleno
+  del tornillo del panel inferior en la pared (Z 3-17,
+  `lower_panel_screw_z_low`=10) — solape real de 8×9×7mm, confirmado
+  con las cotas exactas, no solo aparente en el visor. La esquina
+  trasera, a la misma Y en positivo, coincidía igual de lleno en X/Y
+  con el relleno del tornillo del panel trasero, pero se libraba solo
+  porque ese relleno vive a otra Z (20-34 y 123-137) — un margen de
+  seguridad accidental. Reubicadas las 4 patas a Y=±32: lejos de
+  ambos rellenos (27mm+ de margen) y del injerto suelo-pared
+  ([1.5.2], Y=±50 — 7mm de margen). Base de apoyo resultante: 64mm
+  delante-detrás × 142mm en X.
+
+### Cambiado
+
+- `chassisFloor()`: ya NO llama a `floorVentCut()` — petición del
+  usuario ("debilitaba mucho la pieza" + uno de los taladros del
+  injerto M3 suelo-pared coincidía con un rombo, área ocupada por la
+  rejilla hasta casi el borde). El módulo `floorVentCut()` se
+  conserva definido en el fichero, sin usarse, por si se retoma con
+  otra distribución.
+- Ventilación de entrada de aire: sin la rejilla, la entrada pasa a
+  ser el hueco ya existente bajo el clúster frontal
+  (`frontClusterRelief()`, pulsador/OLED/USB) — comprobado con el
+  usuario que da un área libre similar (6.526mm² vs 7.241mm² de la
+  rejilla retirada, ~90%) y solapa parcialmente (~14mm) con el borde
+  delantero de la placa del UM790, aunque no queda centrado bajo el
+  disipador como pretendía el diseño original de la rejilla. Sin
+  verificación térmica real — pendiente de comprobar con una
+  impresión y uso real; si hiciera falta más caudal, el usuario
+  propuso como plan B una rejilla que empiece a ~2cm del borde (fuera
+  ya del alcance de los taladros de los insertos).
+- Confirmado con el usuario (sin cambios de diseño): el ventilador
+  superior debe EXTRAER aire (no impulsarlo hacia dentro) — coincide
+  con `docs/DESIGN_RULES.md` ("Entrada inferior. Salida superior.")
+  y con como ya se le llamaba en un comentario de `top.scad`, "el
+  extractor".
+
+---
+
+## [1.5.2] - 2026-09-08 — Impresión plana del chasis: injerto M3 suelo-pared (nuevo), pie desmontable reconciliado, insertos de la tapa realineados
+
+### Contexto
+
+- El usuario pidió revisar `floor_flat.scad`/`leftwall_flat.scad`/
+  `rightwall_flat.scad`/`foot.scad` — preparados en otra sesión, sin
+  ninguna entrada en este CHANGELOG hasta ahora — contra 5
+  requisitos: impresión plana, unión por injertos M3, patas
+  desmontables con M3, altura total ≤ la original, suelo realmente
+  liso por abajo, y sin colisión entre insertos.
+
+### Añadido
+
+- **Injerto M3 suelo-pared** (`openscad/reference/components/assembly_positions.scad`,
+  `walls.scad`, `floor.scad`): no existía NINGÚN punto de fijación
+  entre el suelo y las paredes. Nuevo: `floorWallGraftBoss()`/
+  `floorWallGraftInsertCuts()` (pared, inserto M3 ciego) +
+  `floorWallGraftClearanceHoles()` (suelo, taladro de paso) — 2
+  puntos por pared, Y=±50 (global), elegidos por quedar lejos de
+  todos los insertos ya existentes en la pared (imanes/tornillos del
+  panel inferior y trasero, ESP32, HUB).
+- `floorLegMountInserts()` (`floor.scad`): sustituye a `floorLegs()`
+  — insertos M3 ciegos en las mismas 4 posiciones donde antes había
+  patas macizas integradas, para que `foot.scad` (pie desmontable,
+  atornillado) tenga dónde anclarse. `foot.scad` ya hablaba de este
+  módulo desde su creación, pero `floor.scad` nunca llegó a tenerlo
+  — desajuste real entre dos ficheros pensados para encajar.
+
+### Corregido
+
+- `foot.scad`: `foot_height` de 6,0 a 4,0mm — con 6mm, la altura
+  total montada (`shell_height` 148 + 6 = 154mm) superaba
+  `case_height` (152, "dato original, sin modificar"). A 4mm
+  (igual que `leg_height`) vuelve a dar exactamente 152mm.
+- `walls.scad`, `topInsertPad()`/`topScrewInsertCuts()`: el usuario
+  avisó de que los insertos M3 de la tapa quedaban desplazados hacia
+  abajo respecto al borde superior real de la pared. La corrección de
+  [entrada 2026-08-03] los frenaba `top_thickness` (3mm) de más, en la
+  cara interior de la tapa en vez de en el borde real — pero la tapa
+  es lisa, sin ningún reborde que aliviar (confirmado por el
+  usuario): donde el relleno coincide en X/Y con la tapa, esta ya
+  tiene su propio taladro de paso, no material macizo. El relleno
+  ahora llega hasta el borde superior real de la pared
+  (`shell_height`), sin necesitar ningún hueco de alivio en la tapa.
+
+### Verificado (por separación de ejes, sin OpenSCAD en esta sesión — pendiente de confirmar con render/impresión real)
+
+- Injerto suelo-pared sin colisión con: postes de pared existentes,
+  ESP32/HUB (por separación en Y), pletinas del RC522.
+- Patas (posición original, esquina) sin colisión con postes de
+  bandeja — el resto de colisiones de las patas se detectó y corrigió
+  en [1.5.3], con capturas reales del usuario.
+
+---
+
+## [1.5.1] - 2026-09-08 — Evaluado TeknoParrot vía Batocera-x86; descartado
+
+### Decisión
+
+- El usuario preguntó si el enfoque de un artículo de terceros
+  (Batocera-x86 + wrapper Wine/DXVK/VKD3D curado por el equipo de
+  Batocera para TeknoParrot) sería viable para el proyecto. Análisis:
+  es la misma tecnología de traducción que ya se probó y se descartó
+  vía Lutris ([1.4.4], DISPAROS ahora usa los remakes nativos de
+  Steam de House of the Dead) — Batocera solo la tiene mejor
+  empaquetada, no resuelve el problema de fondo, y además no es un
+  paquete instalable suelto: adoptarlo implicaría sustituir Bazzite
+  por Batocera-x86 como sistema operativo. Descartado — no hay
+  ningún cambio de código. Documentado aquí para no repetir la
+  evaluación más adelante.
+
+---
+
+## [1.5.0] - 2026-09-08 — Reconciliado: falta `auto_match` en steam.json/retro.json (AUTO no encontraba nada)
+
+### Corregido
+
+- El código de `Application`/`ProcessWatcher` ([1.4.6]) estaba
+  completo y correcto, pero `software/config/profiles/steam.json` y
+  `retro.json` nunca llegaron a tener el campo `"auto_match"` que esa
+  misma entrada decía haber añadido — la tabla de coincidencias del
+  perfil AUTO quedaba vacía en la práctica. Confirmado ejecutando la
+  suite real (no solo leyendo el changelog): 1 test en rojo
+  (`test_build_auto_match_table_reads_auto_match_from_loaded_profiles`).
+  Añadido `"auto_match": ["steam"]` a steam.json y
+  `"auto_match": ["retroarch", "retrodeck"]` a retro.json — 97/97
+  tests en verde, coincide con el recuento de [1.4.7].
+
+---
+
+## [1.4.9] - 2026-09-08 — Reconciliado con un ZIP desactualizado: ventana OLED/mecanizado del panel inferior, canal LED; panel trasero nuevo del RC522
+
+### Contexto
+
+- El usuario subió un ZIP para retomar el proyecto en un hilo nuevo.
+  `VERSION.md` decía v1.1.3, pero `CHANGELOG.md` incluía entradas
+  hasta [1.4.8] — el código real de
+  `openscad/parts/03_panels/lower_panel.scad` no tenía aplicado
+  ninguno de los cambios de OLED de [1.2.2] a [1.3.0] (ventana,
+  taladros M2, rebaje de pines, canal LED). Mismo patrón de desajuste
+  que ya describe [1.3.2], repetido.
+
+### Corregido (reconstruido a partir de las fórmulas ya documentadas en [1.2.2]-[1.3.0], sin inventar valores nuevos)
+
+- `lower_panel.scad`: ventana OLED (26,0×15,0mm reales, antes
+  14,5mm de alto), taladros M2 con separación horizontal/vertical
+  distinta (23,0×23,5mm), posición de la ventana por fórmula
+  (oled_window_z_offset=+2,25mm), bisel asimétrico (0,4mm arriba,
+  2mm en los otros tres lados), rebaje de pines realineado a los
+  taladros M2 fijos (profundidad 2,0mm), canal de la tira LED subido
+  2mm.
+
+### Añadido
+
+- `openscad/parts/04_soportes/rc522_bracket.scad`,
+  `rc522BracketBackdrop()`: petición del usuario (con foto) — el
+  soporte del RC522 dejaba ver el interior del chasis (ventilador,
+  cableado) por los huecos entre los brazos de la horquilla y
+  alrededor de la cuna. Placa plana integrada en la misma pieza
+  imprimible, justo detrás del lector, que cierra el resto de la
+  abertura del panel NFC — verificado sin colisión por separación de
+  ejes contra postes de pared, pletinas propias, ESP32/HUB y
+  ventilador Noctua (sin OpenSCAD en esta sesión para confirmarlo con
+  un render).
+
+---
+
 ## [1.4.8] - 2026-09-04 — Anotado: el campo `icon` de panel_database.json no se usa todavía
 
 ### Documentado

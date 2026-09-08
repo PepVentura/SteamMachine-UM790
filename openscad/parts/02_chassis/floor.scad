@@ -8,9 +8,12 @@
 // Fecha    : 2026-08-03
 // Autor    : Pep Ventura (asistido por Claude)
 //
-// Suelo del chasis principal fijo, con rejilla de ventilación de
-// entrada de aire (refrigeración vertical: entrada inferior, salida
-// superior — docs/DESIGN_RULES.md).
+// Suelo del chasis principal fijo. Llevaba una rejilla de
+// ventilación de entrada de aire (refrigeración vertical: entrada
+// inferior, salida superior — docs/DESIGN_RULES.md); retirada de
+// chassisFloor() el 2026-09-08 a petición del usuario (debilitaba la
+// pieza y chocaba con el injerto suelo-pared). Ver floorVentCut()
+// más abajo — el módulo sigue definido, solo no se llama.
 //
 // Sistema de coordenadas: igual que
 // openscad/reference/components/assembly_positions.scad — origen
@@ -42,7 +45,14 @@ module floorPlate()
 
 
 //=============================================================================
-// REJILLA DE VENTILACIÓN
+// REJILLA DE VENTILACIÓN — RETIRADA de chassisFloor() (2026-09-08,
+// petición del usuario: "mejor dejamos la base sin los rombos de
+// ventilación ya que debilitan mucho la pieza" + uno de los taladros
+// del injerto M3 suelo-pared coincidía con un rombo). El módulo se
+// conserva por si se retoma más adelante con otra distribución, pero
+// ya no se llama desde chassisFloor() — el suelo queda macizo salvo
+// los rebajes/taladros funcionales (clúster frontal, patas, injerto
+// suelo-pared, postes de la bandeja).
 //
 // Patrón tipo Valve (valvePattern, ya presente en ventilation.scad),
 // con el margen ya definido en 00_parametros.scad
@@ -237,6 +247,7 @@ leg_center_offset_y = 32.0;
 
 floor_leg_mount_diameter = leg_footprint;      // mismo tamaño en planta que las patas antiguas
 floor_leg_mount_height   = insert_depth + 2.0;  // sube desde la cara interior del suelo lo justo para alojar el inserto M3 con margen de agarre
+floor_leg_screw_clearance_diameter = 3.4;       // holgura de paso para M3
 
 module floorLegMountInserts()
 {
@@ -262,28 +273,28 @@ module floorLegMountInserts()
 
 }
 
-// Isla sólida bajo cada punto de anclaje — sin esto, el patrón de la
-// rejilla (floorVentCut()) podría dejar el punto de anclaje sobre un
-// hueco en vez de sobre material macizo (mismo criterio que
-// fanBossClearance en top.scad, topVentCut()).
-floor_leg_relief_margin = 3.0;
-
-module floorLegVentRelief()
+// FALLO CORREGIDO (2026-09-08, aviso del usuario: "los cilindros...
+// no se ven perforados, se ven macizos" visto desde abajo): el
+// taladro del inserto, dentro de floorLegMountInserts(), solo abría
+// DENTRO del propio poste (desde Z=bottom_thickness-0,1=2,9 hacia
+// arriba) — nunca atravesaba los bottom_thickness=3mm de la placa
+// del suelo. Visto desde la cara exterior real (Z=0), esos 2,9mm de
+// piel maciza tapaban el inserto por completo. Falta este taladro de
+// paso, más estrecho (solo holgura M3, no el diámetro del inserto),
+// que sí atraviesa la placa entera — se resta a nivel de
+// chassisFloor(), junto con floorWallGraftClearanceHoles().
+module floorLegScrewClearanceHoles()
 {
 
     for(ix=[-1,1])
     for(iy=[-1,1])
 
         translate([
-            ix*leg_center_offset_x - (leg_footprint/2 + floor_leg_relief_margin),
-            iy*leg_center_offset_y - (leg_footprint/2 + floor_leg_relief_margin),
-            -1
+            ix*leg_center_offset_x,
+            iy*leg_center_offset_y,
+            -0.1
         ])
-            cube([
-                leg_footprint + 2*floor_leg_relief_margin,
-                leg_footprint + 2*floor_leg_relief_margin,
-                bottom_thickness + 2
-            ]);
+            cylinder(d = floor_leg_screw_clearance_diameter, h = bottom_thickness + 0.2);
 
 }
 
@@ -300,15 +311,38 @@ module floorLegVentRelief()
 // por debajo del suelo.
 //=============================================================================
 
+// FALLO CORREGIDO (2026-09-08, aviso del usuario: "parecen muy
+// grandes y sin avellanado"): confirmado — Ø3,4mm es la holgura de
+// paso M3 estándar ya usada en el resto del proyecto (igual que
+// top_screw_diameter, el taladro del RC522...), no es un tamaño
+// fuera de lo normal, pero le faltaba el avellanado cónico que SÍ
+// llevan el resto de tornillos que entran desde una cara exterior
+// (tapa, panel trasero, panel inferior — top_screw_csk_diameter,
+// rear_csk_radius, lower_panel_csk_radius, todos Ø6mm) — sin él, la
+// cabeza del tornillo se queda sobresaliendo en vez de asentar a
+// ras, y visualmente es un simple taladro recto sin ningún bisel que
+// lo suavice.
+floor_wall_graft_csk_diameter = 6.0;  // mismo criterio que el resto de avellanados M3 del proyecto
+floor_wall_graft_csk_depth    = 1.8;  // dentro de los 3mm del suelo, mismo valor que top_screw_csk_depth
+
 module floorWallGraftClearanceHoles()
 {
 
     for(side = [-1, 1])
 
         for(y = floor_wall_graft_y)
+        {
 
+            // Taladro de paso, todo el grosor del suelo
             translate([floorWallGraftX(side), y, -0.1])
                 cylinder(d = 3.4, h = bottom_thickness + 0.2);
+
+            // Avellanado cónico, en la cara EXTERIOR (Z=0 — por donde
+            // entra el tornillo, desde fuera y por debajo)
+            translate([floorWallGraftX(side), y, -0.1])
+                cylinder(d1 = floor_wall_graft_csk_diameter, d2 = 3.4, h = floor_wall_graft_csk_depth + 0.1);
+
+        }
 
 }
 
@@ -331,12 +365,6 @@ module chassisFloor()
 
                 floorPlate();
 
-                difference()
-                {
-                    floorVentCut();
-                    floorLegVentRelief();
-                }
-
                 frontClusterRelief();
 
             }
@@ -348,6 +376,8 @@ module chassisFloor()
         }
 
         floorWallGraftClearanceHoles();
+
+        floorLegScrewClearanceHoles();
 
     }
 

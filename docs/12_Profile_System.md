@@ -325,6 +325,14 @@ pantalla ahora):** `KODI` · `MUSIC` · `DESKTOP` · `NIGHT` · `DEMO`
   consecuencia, se retiró de `panel_database.json` el panel que
   lanzaba HOTD 2 Remake directamente — ya no hace falta un panel por
   juego, con uno solo (`56A1C003`, "Zombies") basta.
+- **TeknoParrot vía Batocera-x86, descartado** (2026-09-08, ver
+  CHANGELOG [1.5.1]) — se evaluó el enfoque de un artículo de
+  terceros (wrapper Wine/DXVK/VKD3D curado por Batocera); es la misma
+  tecnología de traducción que ya se descartó vía Lutris, solo mejor
+  empaquetada — no resuelve el problema de fondo, y adoptarlo
+  implicaría sustituir Bazzite por Batocera-x86 como sistema
+  operativo. DISPAROS se queda como está, con los remakes nativos de
+  Steam.
 
 ---
 
