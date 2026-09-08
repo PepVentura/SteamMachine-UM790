@@ -58,10 +58,21 @@ module floorVentCut()
     ventDepth  = case_depth  - 2*bottom_grill_margin;
     ventDepthCut = bottom_thickness + 2;
 
+    // FALLO CORREGIDO (2026-09-08, pregunta del usuario: "si son para
+    // ventilación, ¿por qué no atraviesan la pieza?"): valvePattern()
+    // (openscad/lib/ventilation.scad) usa cube(..., center=true) —
+    // centra el corte TAMBIÉN en Z, no solo en X/Y. Con
+    // translate(Z=-1), el corte real quedaba entre Z=-3,5 y Z=1,5,
+    // mientras el suelo ocupa Z=0 a bottom_thickness=3 — solo se
+    // cortaba la mitad inferior, dejando 1,5mm de piel maciza sin
+    // cortar en la cara superior de TODO el suelo (verificado con los
+    // números exactos, no solo por el aspecto en el visor). El
+    // corte, al estar centrado, debe colocarse en el CENTRO real del
+    // grosor de la placa (bottom_thickness/2), no en -1.
     translate([
         -ventWidth/2,
         -ventDepth/2,
-        -1
+        bottom_thickness/2
     ])
 
         valvePattern(
@@ -187,7 +198,26 @@ leg_footprint = 10.0;  // estimado, lado de cada pata cuadrada / diámetro del p
 
 leg_edge_margin = 2.0;  // margen entre el borde exterior del punto de anclaje y el borde de la carcasa
 leg_center_offset_x = case_width/2 - leg_footprint/2 - leg_edge_margin;
-leg_center_offset_y = case_depth/2 - leg_footprint/2 - leg_edge_margin;
+
+// FALLO CORREGIDO (2026-09-08, aviso del usuario con captura: "creo
+// que tocarían con los insertos de los paneles laterales"):
+// confirmado con las cotas exactas — a la Y de la esquina real
+// (case_depth/2 - leg_footprint/2 - leg_edge_margin = 74,2), el
+// poste de la pata SÍ invade el relleno del tornillo del panel
+// inferior en la pared (lower_panel_screw_z_low=10, side_boss_size
+// centrado ahí: Z 3-17) — solape real de 8×9×7mm, no solo aparente
+// en el visor. El poste de la esquina trasera, a la misma Y en
+// positivo, coincide igual de lleno con el relleno del tornillo del
+// panel TRASERO en X/Y, pero se libra porque ese relleno vive a otra
+// Z (20-34 y 123-137, lejos de los 3-10mm del poste de la pata) —
+// solo por eso no chocaba también.
+//
+// Reubicadas las 4 patas a Y=±32 (ya no la esquina exacta): lejos de
+// ambos rellenos (front/rear, Y hasta ±64,2 — más de 27mm de margen)
+// y lejos del injerto suelo-pared (floor_wall_graft_y=±50 — 7mm de
+// margen). Sigue dando una base de apoyo razonablemente ancha
+// (64mm de separación delante-detrás, combinado con los ±71mm en X).
+leg_center_offset_y = 32.0;
 
 
 //=============================================================================
