@@ -559,9 +559,9 @@ OLED
 
 
 
-Brida de sujeción de la OLED (2 tornillos M2 en los insertos térmicos
-a los lados de la pantalla — ver CHANGELOG 2026-08-22 y
-`openscad/parts/03_panels/oled_bracket.scad`; sustituye al pegamento)
+OLED (4 tornillos directos a través de lower_panel.scad — oledMountHoles();
+sustituye al pegamento. La brida separada que se estudió en su momento
+[oled_bracket.scad] quedó descartada — ver CHANGELOG [1.5.5])
 
 
 

@@ -206,7 +206,16 @@ module traySupportPosts()
 
 leg_footprint = 10.0;  // estimado, lado de cada pata cuadrada / diámetro del pie desmontable
 
-leg_edge_margin = 2.0;  // margen entre el borde exterior del punto de anclaje y el borde de la carcasa
+// FALLO CORREGIDO (2026-09-09, aviso del usuario con captura: "los
+// soportes para los insertos siguen interfiriendo con los paneles
+// laterales"): leg_edge_margin (2mm) nunca tuvo en cuenta el grosor
+// de la propia pared (wall_thickness=3mm) — el poste de la pata
+// (Ø10mm) llegaba hasta X=76 en las 4 esquinas, invadiendo 1mm el
+// tramo macizo de la pared (X 75-78), no un inserto concreto, la
+// pared en sí. Confirmado con las cotas exactas. Subido a 4mm: el
+// poste ahora llega como mucho a X=74, dejando 1mm de margen limpio
+// respecto a la cara interior de la pared (X=75).
+leg_edge_margin = 4.0;
 leg_center_offset_x = case_width/2 - leg_footprint/2 - leg_edge_margin;
 
 // FALLO CORREGIDO (2026-09-08, aviso del usuario con captura: "creo

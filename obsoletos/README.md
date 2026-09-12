@@ -27,6 +27,14 @@ en subcarpetas.
   coincidía con el eje real del poste de anclaje). Sustituida por
   completo por la v2.0 en `openscad/parts/04_soportes/rc522_bracket.scad`,
   que es la que se usa realmente.
+- **oled_bracket.scad** (2026-09-08, confirmado por el usuario:
+  "solo fue un modelo para analizar pero está descartado") — brida
+  pensada para sujetar la OLED por detrás con 2 tornillos, sin
+  pegamento. Nunca llegó a tener sus bosses de anclaje construidos en
+  `lower_panel.scad` (quedó solo referenciado, `oledInsertBosses()`
+  nunca se escribió). La OLED se fija realmente con 4 tornillos
+  directos a través de `lower_panel.scad` (`oledMountHoles()`, ya
+  existía desde antes que esta brida).
 
 ## reference/
 

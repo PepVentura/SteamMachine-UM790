@@ -468,16 +468,17 @@ usb_front_pos = [
 oled_left_neighbour_edge  = pushbutton_x + pushbutton_cap_diameter/2;
 oled_right_neighbour_edge = usb_front_x  - usb_front_flange_diameter/2;
 
-// Medidas de la ventana de la OLED (antes solo en lower_panel.scad;
-// movidas aquí 2026-08-22 porque oled_bracket.scad, la brida de
-// sujeción, también las necesita — "use<>" no comparte variables
-// entre ficheros, solo módulos, así que deben vivir en el include
-// común). Ver histórico completo del ajuste 27x27→27x20 en
-// lower_panel.scad antes de este cambio.
-oled_screen_width  = 27.0;
-oled_screen_height = 20.0;
-oled_pin_clearance_height = 3.0;  // ESTIMADO — margen de los pines que sobresalen
-oled_pin_clearance_pocket_depth = 1.5;  // ESTIMADO — profundidad del rebaje ciego, dentro del grosor del panel
+// Medidas de la ventana de la OLED — ¡OJO!: esta era una copia
+// intencional para oled_bracket.scad (ver más abajo). lower_panel.scad
+// tiene su PROPIA copia local, con datos reales de calibre (26x15,
+// distinta de esta) — es la que manda, ver lower_panel.scad. Esta de
+// aquí ha quedado sin ningún consumidor activo desde que se descartó
+// oled_bracket.scad ([1.5.5]) — se deja comentada, sin borrar, como
+// referencia histórica de por qué llegó a haber dos copias.
+// oled_screen_width  = 27.0;
+// oled_screen_height = 20.0;
+// oled_pin_clearance_height = 3.0;  // ESTIMADO — margen de los pines que sobresalen
+// oled_pin_clearance_pocket_depth = 1.5;  // ESTIMADO — profundidad del rebaje ciego, dentro del grosor del panel
 
 oled_pos = [
     (oled_left_neighbour_edge + oled_right_neighbour_edge) / 2,
@@ -487,47 +488,34 @@ oled_pos = [
 
 
 //=============================================================================
-// BOSSES DE INSERTO PARA LA SUJECIÓN DE LA OLED (2026-08-22)
+// BOSSES DE INSERTO PARA LA SUJECIÓN DE LA OLED — DESCARTADO (2026-08-22 → 2026-09-08)
 //
-// PEDIDO POR EL USUARIO: fijación robusta y visible para la OLED, en
-// vez de fiarla a pegamento — inspirado en
-// https://www.thingiverse.com/thing:7296586 (carcasa + 2 insertos
-// M2x2,5x3,2 + 2 tornillos M2x3, que sujeta el módulo por detrás).
+// ⚠️ OBSOLETO: pensado para oled_bracket.scad, la brida de sujeción
+// de la OLED sin pegamento. Confirmado por el usuario (2026-09-08):
+// "solo fue un modelo para analizar pero está descartado" — la OLED
+// se fija realmente con 4 tornillos directos a través de
+// lower_panel.scad (oledMountHoles(), que ya existía desde antes de
+// esta brida y sigue siendo la usada). oled_bracket.scad, movido a
+// obsoletos/parts_03_panels/ — ver obsoletos/README.md y CHANGELOG
+// [1.5.5]. Los bosses de esta sección (oledInsertBosses()) nunca
+// llegaron a escribirse en lower_panel.scad, así que esto quedó solo
+// en parámetros, sin geometría real construida.
 //
-// Dos bosses en las esquinas inferiores del hueco del módulo OLED
-// (27x27mm, oled_module_width/height), lejos de los pines (que
-// sobresalen por el borde superior según lower_panel.scad). Compartido
-// entre lower_panel.scad (que imprime los bosses) y oled_bracket.scad
-// (la brida nueva, pieza separada, que se atornilla en ellos) — misma
-// fuente para que ninguna de las dos se quede desincronizada.
-//
-// Profundidad comprobada dentro del hueco ya reservado para la OLED
-// en el ensamblaje (oled_module_thickness + oled_module_pin_height =
-// 7.5mm desde la cara interior del panel) — no hace falta una
-// comprobación de colisiones nueva contra el resto de componentes.
+// Se deja todo el bloque comentado, sin borrar, como referencia
+// histórica del porqué y del criterio numérico ya comprobado en su
+// momento (por si se retoma una brida en el futuro).
 //=============================================================================
 
-// COMPROBADO NUMÉRICAMENTE (2026-08-22, exportando a STL y midiendo
-// cajas envolventes): la primera versión de este diseño ponía los dos
-// bosses en las esquinas INFERIORES del módulo (27x27mm) — pero la
-// pantalla (27x20mm) ya ocupa casi todo ese ancho, dejando un margen
-// de solo ~1,5mm entre el hueco de la ventana y el borde de la brida.
-// Insuficiente para un boss de 6mm de diámetro (se solapaban).
+// oled_bracket_insert_diameter = 3.2;   // Igual que el Thingiverse de referencia (M2x2,5x3,2)
+// oled_bracket_insert_depth    = 3.5;   // ESTIMADO — algo mayor que el inserto (2,5mm) para holgura
+// oled_bracket_boss_diameter   = 6.0;   // ESTIMADO — pared de ~1,4mm alrededor del inserto
+// oled_bracket_boss_length     = 4.0;   // ESTIMADO — protrusión desde la cara interior del panel; libra el grosor del módulo (1,5mm) con margen, dentro de los 7,5mm ya reservados
+// oled_bracket_boss_x_offset   = 19.0;  // distancia del centro del boss al centro de la pantalla — comprobado numericamente: deja ~1,5mm de hueco libre respecto al borde de la ventana (antes 18mm, tocaba justo con el margen de la ventana)
 //
-// Rediseño: los bosses van a los LADOS de la pantalla, a su misma
-// altura — ahí hay 47mm libres entre el pulsador y el USB
-// (oled_right_neighbour_edge - oled_left_neighbour_edge), de sobra
-// para separarlos del hueco de la ventana sin tocarlo.
-oled_bracket_insert_diameter = 3.2;   // Igual que el Thingiverse de referencia (M2x2,5x3,2)
-oled_bracket_insert_depth    = 3.5;   // ESTIMADO — algo mayor que el inserto (2,5mm) para holgura
-oled_bracket_boss_diameter   = 6.0;   // ESTIMADO — pared de ~1,4mm alrededor del inserto
-oled_bracket_boss_length     = 4.0;   // ESTIMADO — protrusión desde la cara interior del panel; libra el grosor del módulo (1,5mm) con margen, dentro de los 7,5mm ya reservados
-oled_bracket_boss_x_offset   = 19.0;  // distancia del centro del boss al centro de la pantalla — comprobado numericamente: deja ~1,5mm de hueco libre respecto al borde de la ventana (antes 18mm, tocaba justo con el margen de la ventana)
-
-oled_bracket_screw_positions = [
-    [oled_pos[0] - oled_bracket_boss_x_offset, oled_pos[2]],
-    [oled_pos[0] + oled_bracket_boss_x_offset, oled_pos[2]],
-];
+// oled_bracket_screw_positions = [
+//     [oled_pos[0] - oled_bracket_boss_x_offset, oled_pos[2]],
+//     [oled_pos[0] + oled_bracket_boss_x_offset, oled_pos[2]],
+// ];
 
 
 //=============================================================================

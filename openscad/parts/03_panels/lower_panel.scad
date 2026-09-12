@@ -165,25 +165,21 @@ module pushbuttonCut()
 // dentro del grosor de la propia placa) — corregido con un bisel
 // cónico (más ancho por fuera, estrechándose hasta el tamaño real
 // del cristal) para mejorar la visibilidad en ángulo.
-// MEDIDA REAL CONFIRMADA (2026-08-19, el usuario midió con calibre):
-// el cristal mide 26,0 x 14,5mm — sustituye la estimación anterior
-// de Gemini (23,0 x 12,0mm, sin verificar).
-//
-// RECALCULADO CON CALIBRE SOBRE EL MÓDULO YA MONTADO (2026-08-30,
-// reconstruido a partir de CHANGELOG.md [1.3.0] — el ZIP subido no
-// tenía este bloque aplicado, ver aviso al usuario en el chat): el
-// alto real es 15,0mm (no 14,5) y los 4 taladros M2 NO forman un
-// cuadrado exacto — separación horizontal 23,0mm, vertical 23,5mm.
-// También se midió la distancia del taladro superior al borde de la
-// pantalla (oled_gap_top_hole_to_screen), el dato que faltaba para
-// calcular oled_window_z_offset por fórmula en vez de a ojo.
-oled_screen_width  = 26.0;  // Real, medido por el usuario con calibre — antes 23.0 (estimado, Gemini)
-oled_screen_height = 15.0;  // Real, medido por el usuario con calibre (2026-08-30) — antes 14,5 (calibre, primera medición) y 12,0 (estimado, Gemini)
-oled_pcb_width     = 27.4;  // ESTIMADO (Gemini)
-oled_pcb_height    = 27.4;  // ESTIMADO (Gemini)
-oled_mount_spacing_x = 23.0;  // MEDIDA REAL (calibre, 2026-08-30) — separación horizontal entre los 2 taladros M2 de un mismo lado
-oled_mount_spacing_z = 23.5;  // MEDIDA REAL (calibre, 2026-08-30) — separación VERTICAL entre taladro superior e inferior; antes se asumía igual a la horizontal (23,0), no es un cuadrado exacto
-oled_gap_top_hole_to_screen = 2.0;  // MEDIDA REAL (calibre, 2026-08-30) — del centro del taladro M2 superior al borde superior de la pantalla
+// MEDIDA REAL CONFIRMADA (2026-08-30, el usuario midió con calibre
+// sobre el módulo físico, ya instalado en la carcasa con los pines
+// hacia arriba): pantalla 26,0 x 15,0mm (alto corregido de 14,5 a
+// 15,0); separación horizontal entre taladros M2 = 23,0mm (igual que
+// antes); separación VERTICAL entre taladro superior e inferior =
+// 23,5mm (antes se asumía igual que la horizontal, 23,0 — no es un
+// cuadrado exacto); del centro del taladro superior al borde superior
+// de la pantalla hay 2,0mm.
+oled_screen_width  = 26.0;  // Real, medido por el usuario con calibre
+oled_screen_height = 15.0;  // Real, medido por el usuario con calibre (antes 14.5)
+oled_pcb_width     = 27.4;  // ESTIMADO (Gemini) — sin verificar todavía
+oled_pcb_height    = 27.4;  // ESTIMADO (Gemini) — sin verificar todavía
+oled_mount_spacing_x = 23.0;  // Real, medido — separación horizontal entre los 2 taladros de una misma fila
+oled_mount_spacing_z = 23.5;  // Real, medido — separación vertical entre taladro superior e inferior del mismo lado (antes se usaba 23.0 para ambas)
+oled_gap_top_hole_to_screen = 2.0;  // Real, medido — del centro del taladro superior al borde superior de la pantalla
 oled_pcb_clearance_depth = oled_module_thickness + oled_module_pin_height + 2.0;  // ESTIMADO — profundidad del hueco de paso para el cuerpo de la placa, hasta detrás de los pines, con margen
 
 // CORREGIDO (2026-08-19, el usuario aclaró que me había explicado
@@ -195,86 +191,132 @@ oled_pcb_clearance_depth = oled_module_thickness + oled_module_pin_height + 2.0;
 // profundidad del bisel (oled_bevel_depth), condición exacta para
 // que la pendiente sea de 45°.
 oled_bevel_depth  = front_bezel_depth;  // el bisel ocupa toda la profundidad añadida por el bisel del panel (2mm)
-oled_bevel_margin = oled_bevel_depth;   // igual a la profundidad -> pendiente exacta de 45° (lados izq./der./inferior)
-
-// ASIMÉTRICO (reconstruido de CHANGELOG.md [1.3.0], 2026-08-30): con
-// solo 2mm reales entre el borde superior de la pantalla y el
-// taladro M2 (oled_gap_top_hole_to_screen), el margen normal del
-// bisel (2mm) invadía el taladro. Solo el borde SUPERIOR usa un
-// margen reducido; los otros tres siguen con oled_bevel_margin.
-oled_bevel_margin_top = 0.4;  // MEDIDA REAL — deliberadamente pequeño para no tocar el taladro M2 superior; visualmente un chaflán casi plano en ese borde
+oled_bevel_margin = oled_bevel_depth;   // igual a la profundidad -> pendiente exacta de 45° (margen normal, lados y abajo)
+// AJUSTADO (2026-08-30): con la medida real, la ventana queda a solo
+// 2,0mm del taladro M2 superior — el bisel normal (2mm de margen) por
+// ese lado tocaría directamente el taladro. Margen reducido SOLO en
+// el borde superior, para que el bisel no invada el taladro (holgura
+// de seguridad ~0,5mm hasta el borde del taladro, diámetro 2,2mm).
+oled_bevel_margin_top = 0.4;
 
 oled_pin_clearance_height       = 3.0;  // ESTIMADO — cuánto sobresalen hacia arriba los pines de soldadura, sobre el borde superior de la pantalla
-oled_pin_clearance_pocket_depth = 2.0;  // MEDIDA REAL (calibre, 2026-08-30) — antes 1,5 (estimado), insuficiente: los pines no habrían cabido
-
-// RECALCULADO POR FÓRMULA (reconstruido de CHANGELOG.md [1.3.0],
-// 2026-08-30) a partir de las medidas reales de calibre, en vez del
-// offset fijo ajustado a ojo de rondas anteriores (-2, luego -4):
-// la ventana se sitúa de forma que quede oled_gap_top_hole_to_screen
-// (2mm) por debajo del taladro M2 superior real.
-// oled_pos[2] sigue siendo SOLO la referencia de los 4 taladros M2 /
-// la brida (oled_bracket.scad) — no se mueve; el desplazamiento se
-// aplica aparte, solo a la ventana visible.
-oled_window_z_offset = oled_mount_spacing_z/2 - oled_gap_top_hole_to_screen - oled_screen_height/2;  // = +2,25mm
-oled_window_pos_z    = oled_pos[2] + oled_window_z_offset;
+// MEDIDA REAL CONFIRMADA (2026-08-30): "la pcb mide 1mm pero desde el
+// final de la placa hay 2mm hasta el final de los pines" — los pines
+// sobresalen 2,0mm por detrás de la placa (antes se estimaba 1,5mm,
+// insuficiente: los pines no habrían cabido).
+oled_pin_clearance_pocket_depth = 2.0;  // Real, medido por el usuario
 
 module oledCut()
 {
 
-    // Bisel real de 45° en 3 lados, chaflán reducido en el superior
-    // (oled_bevel_margin_top) para no invadir el taladro M2 de
-    // arriba. Construido con las esquinas explícitas de la ventana
-    // (winXmin/Xmax/Zmin/Zmax) y de la boca del bisel
-    // (outXmin/Xmax/Zmin/Zmax), en vez de un cube(center=true)
-    // simétrico — ya no vale porque el margen superior es distinto
-    // del resto.
-    winXmin = oled_pos[0] - oled_screen_width/2;
-    winXmax = oled_pos[0] + oled_screen_width/2;
-    winZmin = oled_window_pos_z - oled_screen_height/2;
-    winZmax = oled_window_pos_z + oled_screen_height/2;
+    // DESACOPLADO (2026-08-30, ver nota en assembly_positions.scad):
+    // el usuario confirmó que los taladros M2 de la propia OLED
+    // (oled_pos) están bien y no se deben mover — el desajuste es que
+    // la pantalla visible del módulo real no está centrada respecto a
+    // esos taladros.
+    // RECALCULADO (2026-08-30, con medida real por calibre, módulo
+    // instalado con los pines hacia arriba): del centro del taladro
+    // superior al borde superior de la pantalla hay 2,0mm
+    // (oled_gap_top_hole_to_screen). Esto da un offset POSITIVO (la
+    // pantalla sube respecto al centro de la placa), al contrario del
+    // -4,0 que se venía probando a ciegas antes de tener esta medida:
+    //   top_hole_z    = oled_pos[2] + oled_mount_spacing_z/2
+    //   window_center = top_hole_z - oled_gap_top_hole_to_screen - oled_screen_height/2
+    //   offset        = window_center - oled_pos[2] = +2,25mm
+    // Holgura resultante: 2,0mm hasta el taladro superior (por diseño,
+    // es la propia medida), 6,5mm hasta el inferior (de sobra).
+    oled_window_z_offset = oled_mount_spacing_z/2 - oled_gap_top_hole_to_screen - oled_screen_height/2;
+    oled_window_z = oled_pos[2] + oled_window_z_offset;
 
-    outXmin = winXmin - oled_bevel_margin;
-    outXmax = winXmax + oled_bevel_margin;
-    outZmin = winZmin - oled_bevel_margin;      // margen normal por debajo
-    outZmax = winZmax + oled_bevel_margin_top;  // margen reducido por arriba (taladro M2 cerca)
-
+    // Bisel real de 45°: boca ancha en la cara exterior del bisel
+    // del panel, estrechándose hasta el tamaño real del cristal
+    // justo al llegar a la cara frontal del propio panel — mejora la
+    // visibilidad en ángulo, en vez de mirar por un túnel recto.
+    // ASIMÉTRICO (2026-08-30): con solo 2,0mm de holgura hasta el
+    // taladro superior, el margen de bisel normal (2mm) tocaría el
+    // taladro — se usa oled_bevel_margin_top (0,4mm) solo en el borde
+    // de arriba; los otros tres lados mantienen el margen normal.
+    // hull() de dos cubos NO centrados (para poder dar un margen
+    // distinto por lado), en vez del cube(center=true) simétrico
+    // anterior.
     hull()
     {
 
-        translate([outXmin, -case_depth/2-oled_bevel_depth, outZmin])
-            cube([outXmax-outXmin, 0.1, outZmax-outZmin]);
+        translate([
+            oled_pos[0] - oled_screen_width/2 - oled_bevel_margin,
+            -case_depth/2-oled_bevel_depth,
+            oled_window_z - oled_screen_height/2 - oled_bevel_margin
+        ])
+            cube([
+                oled_screen_width + 2*oled_bevel_margin,
+                0.1,
+                oled_screen_height + oled_bevel_margin + oled_bevel_margin_top
+            ]);
 
-        translate([winXmin, -case_depth/2, winZmin])
-            cube([winXmax-winXmin, 0.1, winZmax-winZmin]);
+        translate([
+            oled_pos[0] - oled_screen_width/2,
+            -case_depth/2,
+            oled_window_z - oled_screen_height/2
+        ])
+            cube([oled_screen_width, 0.1, oled_screen_height]);
 
     }
 
     // Resto del hueco, a partir de donde termina el bisel (cara
     // frontal del panel, detrás del bisel) — recto, tamaño real del
     // cristal, hasta la cara trasera del panel.
-    translate([winXmin, -case_depth/2, winZmin])
+    translate([
+        oled_pos[0] - oled_screen_width/2,
+        -case_depth/2,
+        oled_window_z - oled_screen_height/2
+    ])
         cube([oled_screen_width, front_panel_thickness+0.1, oled_screen_height]);
 
     // RESTAURADO (2026-08-19, aviso del usuario: "se te ha olvidado
     // el rebaje que teníamos para los pines de soldadura que tiene
     // la pantalla en su parte superior") — se había perdido al
     // rediseñar el hueco a partir de los datos de Gemini. Rebaje
-    // CIEGO (no llega a la cara trasera del panel, a diferencia del
-    // hueco de la pantalla) por encima de la ventana, para los pines
-    // de soldadura que sobresalen ahí — sin este rebaje, el material
-    // sólido del panel (fuera del propio hueco de la pantalla)
-    // chocaría con ellos.
-    //
-    // REALINEADO (reconstruido de CHANGELOG.md [1.2.4]/[1.2.9],
-    // 2026-08-30): el rebaje ya NO sigue a la ventana (que ahora se
-    // mueve con oled_window_z_offset) — se centra en los taladros M2
-    // superiores (fijos, oled_mount_spacing_z), que es donde
-    // realmente sobresalen los pines de la placa.
-    pinCenterZ = oled_pos[2] + oled_mount_spacing_z/2;
+    // CIEGO para los pines de soldadura que sobresalen ahí — sin este
+    // rebaje, el material sólido del panel (fuera del propio hueco de
+    // la pantalla) chocaría con ellos.
+    // MOVIDO (2026-08-29, aviso del usuario tras imprimir el panel
+    // real): "el rebaje que has hecho para las soldaduras de los
+    // pines, debería estar arriba del todo, alineado con los
+    // orificios para los tornillos superiores" — antes seguía la
+    // posición de la pantalla (oled_pos[2] + oled_screen_height/2);
+    // ahora se alinea (centrado) con lower_panel_hole_z_high, la
+    // misma Z que usan los taladros de tornillo superiores en
+    // lowerPanelScrewHoles() — esos taladros NO se han tocado, siguen
+    // calculados exactamente igual que antes (comprobado: 7/26,5mm
+    // los "hole", 10/29,5mm los "screw" — ninguna fórmula de
+    // lowerPanelScrewHoles() depende de oled_pos ni de este rebaje).
+    // CORREGIDO (2026-08-29, segundo aviso del usuario: "has vuelto a
+    // poner el rebaje para los pines por fuera en lugar de por
+    // dentro"): el rebaje partía de la cara EXTERIOR del panel
+    // (-case_depth/2, la misma cara donde arranca el propio panel) y
+    // cortaba pocket_depth hacia dentro — dejaba el hueco abierto por
+    // fuera (donde se ve la pantalla) y CERRADO por dentro (justo
+    // donde están los pines, que es donde de verdad hace falta el
+    // hueco). Invertido: ahora arranca cerca de la cara INTERIOR
+    // (-case_depth/2 + front_panel_thickness - pocket_depth) y corta
+    // hacia dentro, dejando la piel sólida de front_panel_thickness -
+    // pocket_depth en la cara exterior (donde no se nota, al no
+    // alcanzarla) y el hueco abierto hacia el interior, donde
+    // sobresalen los pines.
+    // CORREGIDO (2026-08-29, tercer aviso del usuario, tras revisar la
+    // probeta): "el rebaje para los pines del OLED aun tienen que
+    // subir hasta estar centrados verticalmente con los orificios
+    // superiores de sujeción" — los verdaderos "orificios superiores
+    // de sujeción" son el par superior de los 4 taladros de fijación
+    // de la propia OLED (oledMountHoles(), M2). El rebaje se centra
+    // en esa Z.
+    // ACTUALIZADO (2026-08-30): usa oled_mount_spacing_z (separación
+    // vertical real, 23,5mm) en vez de la oled_mount_spacing única
+    // que se usaba antes (23,0, mezclando horizontal y vertical).
     translate([
         oled_pos[0] - oled_screen_width/2,
-        -case_depth/2,
-        pinCenterZ - oled_pin_clearance_height/2
+        -case_depth/2 + front_panel_thickness - oled_pin_clearance_pocket_depth,
+        oled_pos[2] + oled_mount_spacing_z/2 - oled_pin_clearance_height/2
     ])
         cube([oled_screen_width, oled_pin_clearance_pocket_depth+0.1, oled_pin_clearance_height]);
 
@@ -311,9 +353,6 @@ oled_m2_clearance_diameter = 2.2;   // holgura de paso para M2
 module oledMountHoles()
 {
 
-    // ACTUALIZADO (reconstruido de CHANGELOG.md [1.3.0], 2026-08-30):
-    // oled_mount_spacing_x/_z por separado — no es un cuadrado exacto
-    // (antes una sola variable oled_mount_spacing asumía que sí).
     for(ix=[-1,1])
     for(iz=[-1,1])
 
@@ -525,9 +564,9 @@ led_channel_wall_height    = 3.0;  // ESTIMADO — altura de cada pared del cana
 led_channel_wall_thickness = 15.0;  // antes 10.0 — petición del usuario (2026-08-19)
 led_channel_x_margin       = 8.0;  // igual que ledDiffuserZone(), mismo ancho de zona
 
-// PEDIDO POR EL USUARIO (reconstruido de CHANGELOG.md [1.2.2],
-// 2026-08-30): tras la primera impresión real, el canal/soporte de
-// la tira LED debía subir 2mm.
+// PEDIDO POR EL USUARIO (2026-08-29, tras imprimir y probar el panel
+// inferior real): "el soporte para la tira de leds, debería de subir
+// dos milímetros".
 led_channel_z_offset = 2.0;
 
 module ledChannelWalls()

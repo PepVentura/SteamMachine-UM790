@@ -6,6 +6,160 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
+## [1.5.8] - 2026-09-11 — Documentada la puesta en marcha de la Sinden Lightgun (Bazzite)
+
+### Contexto
+
+- Sesión completa (2026-09-10/11) llevando la Sinden Lightgun desde
+  "no se lee" hasta calibrada y jugando, en la propia Steam Machine
+  (Bazzite). Se intentó primero con un Wiimote + barra IR casera
+  (`cwiid`/`wminput`) — descartado por incompatibilidad de fondo entre
+  ese software (sin mantenimiento desde hace más de una década) y las
+  versiones actuales de BlueZ, confirmado con el mismo fallo en dos
+  versiones distintas de Debian.
+
+### Añadido
+
+- `docs/13_Sinden_Lightgun_Setup.md`: procedimiento completo,
+  documentado para no tener que redescubrirlo — traducción de las
+  instrucciones oficiales de Sinden (pensadas para Arch/SteamOS) a
+  Fedora/`rpm-ostree`; extracción manual de `libjpeg.so.8` desde un
+  `.deb` de Ubuntu (no está en Fedora); el fallo real de esta
+  instalación con el grupo `dialout` (vive fuera de `/etc/group`,
+  `usermod`/`gpasswd` no lo tocan sin editar el fichero a mano);
+  requisito de firmware v1.9 (con "joystick functionality" activada)
+  para que la calibración funcione; requisito de sala en penumbra
+  (confirmado en esta sesión: con luz ambiental la mira tiembla,
+  a oscuras queda estable); instalación del ArcadeMod de argonlefou
+  para THE HOUSE OF THE DEAD: Remake (con el aviso de descargarlo
+  desde la sección Releases del repositorio, no desde "Code → Download
+  ZIP", que da un `.exe` inexistente — error real cometido en esta
+  misma sesión).
+
+### Pendiente (anotado en el propio documento)
+
+- Confirmar que todo esto funciona igual dentro del Game Mode/Big
+  Picture real (gamescope), no solo en el escritorio de KDE.
+- Confirmar el ArcadeMod funcionando bajo Proton en la Steam Machine.
+- THE HOUSE OF THE DEAD 2: Remake usa un parche distinto, sin revisar
+  todavía.
+- **Confirmado: el marco blanco no aparece en Linux** fuera de la
+  utilidad de calibración (`sdl`) — ni en primer plano ni con
+  `mono-service` en segundo plano. A diferencia de Windows, el port a
+  Linux de Sinden no trae overlay de marco a nivel de sistema.
+- **Overlay propio en construcción, sin terminar** (`docs/13_Sinden_Lightgun_Setup.md`,
+  sección 8): programa en C++/Qt6 con `LayerShellQt` para dibujar el
+  marco por encima de todo bajo Wayland/KWin (confirmado que la sesión
+  de KDE aquí es Wayland, no X11). Ya corregidos dos fallos de
+  compilación reales (nombre del paquete CMake `LayerShellQt`, no
+  `LayerShellQtInterface`; conversión de `QFlags` en `setAnchors()`).
+  Queda por compilar y probar en pantalla — sesión cortada por falta
+  de tiempo antes de llegar a ese punto.
+
+---
+
+## [1.5.7] - 2026-09-09 — Corregido: los postes de las patas invadían 1mm el grosor macizo de la pared, en las 4 esquinas
+
+### Contexto
+
+- El usuario, con una captura de OpenSCAD (`floor_flat.scad`, 4
+  círculos rojos en las esquinas): "los soportes para los insertos
+  siguen interfiriendo con los paneles laterales".
+
+### Corregido
+
+- `floor.scad`, `leg_edge_margin`: nunca tuvo en cuenta el grosor de
+  la propia pared (`wall_thickness`=3mm) al calcular el margen desde
+  el borde de la carcasa — solo restaba 2mm. El poste de la pata
+  (Ø10mm) llegaba hasta X=76 en las 4 esquinas por igual, invadiendo
+  1mm el tramo macizo de la pared (X 75-78) — no un inserto
+  concreto de la pared, la pared en sí, en cualquier punto de su
+  longitud. Por eso "seguía" pasando tras el ajuste de [1.5.3], que
+  solo corrigió la posición en Y contra insertos concretos, no este
+  solape en X contra el grosor base. Subido `leg_edge_margin` de 2 a
+  4mm — el poste ahora llega como mucho a X=74, con 1mm de margen
+  limpio respecto a la cara interior de la pared (X=75). Verificado
+  que no introduce ningún solape nuevo (con tray posts, con el
+  injerto suelo-pared) — al mover el poste hacia el centro, solo
+  gana margen, nunca lo pierde.
+
+---
+
+## [1.5.6] - 2026-09-09 — Corregido: el rebaje de pines de la OLED abría por fuera en vez de por dentro
+
+### Contexto
+
+- El usuario adjuntó su propio `lower_panel.scad` ("el fichero
+  correcto es este") tras detectar que mi reconstrucción de [1.4.9]
+  tenía el rebaje de pines de la OLED abierto por la cara EXTERIOR
+  del panel en vez de por la INTERIOR.
+
+### Corregido
+
+- `oledCut()`: el rebaje ciego para los pines de soldadura arrancaba
+  en `-case_depth/2` (cara exterior, donde se ve la pantalla) y
+  cortaba `oled_pin_clearance_pocket_depth` hacia dentro — dejaba el
+  hueco abierto por fuera y cerrado justo donde están los pines (la
+  cara interior, contra la que apoya el módulo). Invertido: ahora
+  arranca cerca de la cara interior
+  (`-case_depth/2 + front_panel_thickness - oled_pin_clearance_pocket_depth`)
+  y corta hacia allí, dejando la piel sólida hacia fuera (no importa,
+  no la alcanza nada) y el hueco abierto hacia dentro, donde
+  sobresalen los pines de verdad.
+- `openscad/parts/03_panels/lower_panel.scad` sustituido entero por
+  el fichero del usuario, no solo el fragmento del rebaje — trae
+  además el historial real de esta corrección (varias rondas de
+  ida y vuelta el 2026-08-29, incluida una vez anterior en la que
+  también quedó "por fuera en lugar de por dentro") que mi
+  reconstrucción de [1.4.9], al venir del CHANGELOG y no de esa
+  sesión, no tenía capturado con el mismo detalle.
+
+---
+
+## [1.5.5] - 2026-09-08 — Descartado `oled_bracket.scad`; la OLED se fija con 4 tornillos directos
+
+### Contexto
+
+- Revisando el despiece pieza a pieza, el usuario confirmó: la brida
+  de sujeción de la OLED (`oled_bracket.scad`, [2026-08-22]) "solo
+  fue un modelo para analizar pero está descartado". La fijación real
+  es con 4 tornillos directos a través de `lower_panel.scad`
+  (`oledMountHoles()`, ya implementada desde antes que la brida y
+  nunca sustituida).
+
+### Descubierto de paso
+
+- La brida nunca llegó a tener sus bosses de anclaje
+  (`oledInsertBosses()`) realmente construidos en `lower_panel.scad`
+  — quedaron solo como parámetros reservados en
+  `assembly_positions.scad` (`oled_bracket_*`), sin ninguna geometría
+  que los usara. No había nada que desmontar en la pieza impresa real,
+  solo limpieza de datos muertos.
+
+### Eliminado / movido
+
+- `openscad/parts/03_panels/oled_bracket.scad` y su STL, movidos a
+  `obsoletos/parts_03_panels/` (mismo criterio ya establecido en
+  [2026-08-14] para piezas descartadas — conservados como referencia
+  histórica, marcados ⚠️ OBSOLETO, sin usarse). `obsoletos/README.md`
+  actualizado.
+- `assembly_positions.scad`: bloque `oled_bracket_*` (insertos, bosses,
+  posiciones de tornillo) y la copia de `oled_screen_width/height`
+  que solo consumía la brida — comentados, no borrados, con nota de
+  por qué existían (para no perder el criterio numérico ya
+  comprobado, por si se retoma en el futuro). `oled_pos` y el resto
+  de referencias que sí siguen en uso, intactos.
+
+### Corregido
+
+- `docs/11_Assembly_Manual.md`: paso de montaje de la OLED,
+  actualizado de "brida + 2 tornillos M2" a "4 tornillos directos a
+  través del panel inferior", que es lo que de verdad se monta.
+- Comentario suelto en `lower_panel.scad` que aún daba a entender que
+  la brida seguía activa, corregido.
+
+---
+
 ## [1.5.4] - 2026-09-08 — Avellanado del injerto M3 suelo-pared; VERSION.md eliminado (redundante con este CHANGELOG); manual de montaje al día
 
 ### Corregido
