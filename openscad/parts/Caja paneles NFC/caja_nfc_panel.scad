@@ -9,7 +9,6 @@
 //
 //  Material: PETG (ver docs/14_Caja_Paneles_NFC.md). Si la tapa queda
 //  dura, sube lid_clr a 0.4.
-//
 //  Impresión (sin soportes):
 //    - Caja: base apoyada en la cama.
 //    - Tapa: se imprime boca abajo (ya viene girada en part="print").
