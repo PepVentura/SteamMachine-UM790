@@ -56,6 +56,8 @@ render conjunto.
 - Diseño orientado a estética tipo consola Steam Machine.
 - Sistema de paneles frontales intercambiables.
 - Identificación NFC para cambio de modo.
+- Panel NFC **Apagar**: apagado ordenado del equipo (evita cortar la corriente de golpe).
+- Caja con tapa para guardar los paneles NFC cuando no están puestos.
 - Diseño preparado para expansión con nuevos paneles.
 
 ## 🎮 Sistema de paneles frontales NFC
@@ -82,6 +84,7 @@ Ejemplos de uso:
   con Wiimote como pistola, integración pendiente).
 - ⚙️ Panel Configuración → acceso a herramientas del sistema.
 - 🎵 Panel Multimedia → reproducción multimedia.
+- ⏻ Panel Apagar → apaga el equipo de forma ordenada (ver más abajo).
 
 ---
 
@@ -101,6 +104,27 @@ Las etiquetas NFC pueden programarse para ejecutar diferentes acciones:
 
 ---
 
+## ⏻ Apagado ordenado con el panel Apagar
+
+Cortar la corriente de golpe puede dejar Bazzite sin arrancar (por
+ejemplo, en el prompt `grub>`; ver [`GUIA_INICIO.md`](GUIA_INICIO.md),
+solución de problemas). Para evitarlo hay un panel **Apagar**: se coloca como
+cualquier otro y, al pulsar el botón, el equipo se apaga con
+`systemctl poweroff` (systemd cierra servicios y desmonta discos antes
+de cortar).
+
+1. Coloca el panel Apagar → la OLED muestra `APAGAR EQUIPO` y los LEDs
+   se ponen rojos. **Todavía no se ha apagado nada.**
+2. Pulsa el botón → la OLED pasa a `Apagando...`, los LEDs se
+   funden a negro y el equipo se apaga en unos segundos.
+
+Son dos gestos a propósito: un roce del tag no apaga la máquina. Si el
+sistema rechaza el apagado (p. ej. una actualización en curso), la OLED
+muestra `Error al apagar` y el equipo sigue encendido. Detalles en
+[`docs/12_Profile_System.md`](docs/12_Profile_System.md).
+
+---
+
 ## 🧩 Diseño modular
 
 Los paneles frontales están diseñados para poder sustituirse fácilmente:
@@ -110,7 +134,9 @@ Los paneles frontales están diseñados para poder sustituirse fácilmente:
 - Personalización mediante impresión 3D.
 - Posibilidad de crear paneles temáticos.
 
-El objetivo es que la SteamMachine pueda cambiar de función simplemente sustituyendo el panel frontal.---
+El objetivo es que la SteamMachine pueda cambiar de función simplemente sustituyendo el panel frontal.
+
+---
 
 ## 🖨️ Impresión 3D
 
@@ -121,11 +147,33 @@ Compatible con:
 - Anycubic Kobra X
 - Impresoras FDM con volumen similar
 
-### Material recomendado
+### Material: PETG
 
-- PLA para pruebas y prototipos.
-- PETG para versión definitiva.
-- ABS/ASA si se requiere mayor resistencia térmica.
+**Todas las piezas se imprimen en PETG.** El PLA (incluido el PLA+) se
+deforma con la temperatura: la carcasa envuelve un mini PC que expulsa
+aire caliente y el PLA se ablanda alrededor de los 55-60 °C, mientras
+que el PETG aguanta hasta unos 70-80 °C (valores orientativos; varían
+según la marca de filamento). Con PLA se ha comprobado que las piezas
+se deforman en uso real.
+
+- **PETG**: todas las piezas de la carcasa, los paneles frontales y los
+  soportes. La caja de paneles NFC (`docs/14_Caja_Paneles_NFC.md`) no
+  recibe calor de la máquina, así que PLA sería válido para ella, pero
+  se recomienda PETG por coherencia.
+- **PLA / PLA+**: solo para pruebas rápidas de encaje. No dejes una
+  pieza de PLA montada dentro del equipo.
+- **ABS/ASA**: opcional, si quieres más margen térmico todavía (más
+  difícil de imprimir: cerramiento y ventilación).
+- **Piezas a dos filamentos** (panel inferior, difusor LED translúcido):
+  los dos filamentos deben ser PETG. Mezclar PLA y PETG en la misma
+  pieza da una unión mala entre capas.
+- **Anagramas pegados con Loctite**: el cianoacrilato agarra algo peor
+  sobre PETG que sobre PLA. Lija ligeramente las dos caras, desengrasa
+  con alcohol isopropílico y pega; si aun así se despega, usa epoxi
+  de 5 minutos.
+- Las holguras y encajes del diseño se ajustaron con PLA+. Con PETG
+  revisa los encajes antes de montar (ver `docs/14_Caja_Paneles_NFC.md`
+  para la caja y la tapa).
 
 ### Parámetros orientativos
 
@@ -133,6 +181,9 @@ Compatible con:
 - Paredes: 3-4 perímetros
 - Relleno: 15-30 %
 - Soportes: según pieza
+- Temperaturas típicas de PETG: boquilla 230-250 °C, cama 70-85 °C,
+  ventilador de capa bajo (30-50 %). Parte del perfil PETG de tu
+  marca de filamento y ajusta; los puentes salen algo peor que en PLA.
 
 ---
 
@@ -148,6 +199,7 @@ SteamMachine-UM790/
 │   ├── parts/               Piezas por imprimir (chasis, paneles...)
 │   └── reference/            Componentes y posiciones del ensamblaje
 ├── STL/                    STL listos para imprimir
+│   ├── caja_nfc_panel_*.stl  Caja + tapa para guardar los paneles NFC
 │   └── Anagramas/            Panel NFC en blanco + anagramas sueltos,
 │                              para imprimir por separado y pegar con
 │                              Loctite (reduce el tiempo de impresión
@@ -157,7 +209,7 @@ SteamMachine-UM790/
 ├── software/                 Core en Python — corre en el mini PC
 │
 ├── Hardware/                 Conexiones eléctricas y cableado
-└── docs/                     Documentación técnica detallada (01 a 11)
+└── docs/                     Documentación técnica detallada (01 a 14)
 ```
 
 ---
@@ -201,10 +253,14 @@ Archivo principal: `openscad/00_parametros.scad`
 - [x] Probado en hardware real: lectura NFC, barra LED, pulsador frontal, pantalla OLED, recuperación tras reinicio del ESP32.
 - [x] Core (Python) probado de extremo a extremo contra el ESP32 real: detecta panel, reacciona OLED/LEDs y responde al botón lanzando la plataforma correspondiente.
 - [x] Guía de inicio completa para montarlo desde cero (`GUIA_INICIO.md`).
+- [x] Panel NFC **Apagar** (apagado ordenado, `docs/12_Profile_System.md`): implementado en el Core con tests; anagrama `STL/Anagramas/Apagar.stl`.
+- [x] Caja con tapa para guardar hasta 6 paneles NFC (`docs/14_Caja_Paneles_NFC.md`).
 - [x] Publicación de STL definitivos actualizados (incluye `STL/Anagramas/` — panel en blanco + anagramas sueltos para pegar con Loctite).
 
 ### Pendiente
 
+- [ ] Panel Apagar: escribir el tag NFC, poner su UID real en `software/config/panel_database.json` (ahora `UID_APAGAR_PENDIENTE`) y probar el apagado en el hardware real (`docs/10_Test_Plan.md`, T065).
+- [ ] Reimprimir en PETG las piezas que estén en PLA y validar la temperatura tras 24 h (`docs/10_Test_Plan.md`, T022).
 - [ ] Wiimote como pistola para el panel Zombies (Bluetooth + barra de sensor IR).
 - [ ] UID de tag NFC real para el panel Zombies - HOTD 2 Remake.
 

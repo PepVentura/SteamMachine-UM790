@@ -2,7 +2,7 @@
 
 # 12 - Profile System (panel = perfil, no panel = programa)
 
-Version: 0.3 (STEAM, RETRO, DISPAROS, MAINTENANCE y AUTO implementados;
+Version: 0.4 (STEAM, RETRO, DISPAROS, MAINTENANCE, APAGAR y AUTO implementados;
 KODI/MUSIC/DESKTOP/NIGHT/DEMO siguen siendo huecos reservados)
 Status: Implementado — alcance completo de la v0.2 original en código
 y con tests; ver "Pendiente" para los refinamientos que quedan
@@ -272,6 +272,29 @@ Estado de implementación (`software/config/profiles/`):
     explícito, no un descuido; `_on_button()` lo reconoce y no
     muestra animación de error.
 
+- ✅ `APAGAR` — implementado ([1.6.0]). Primer perfil con una **acción de
+  sistema** en vez de un programa: `apagar.json` lleva `"launcher": null`
+  y `"action": "poweroff"`. Al pulsar el botón con el panel puesto,
+  `Application` pide a `PowerManager` (`core/power_manager.py`) un
+  apagado ordenado (`systemctl poweroff`, comando configurable en
+  `power.poweroff_command`). Motivo: cortar la corriente de golpe a
+  veces deja Bazzite sin arrancar (ver `GUIA_INICIO.md`, `grub>`).
+  - **Dos gestos**: colocar el panel solo muestra `APAGAR EQUIPO`; hace
+    falta pulsar el botón. Un roce del tag no apaga nada.
+  - **Lista cerrada de acciones** (`KNOWN_ACTIONS`): un `action`
+    desconocido se ignora y se registra, nunca se interpreta.
+  - **Durante el apagado** el Core ignora paneles, botón y AUTO, para que
+    retirar el panel no deshaga el aviso `Apagando...`. Si el sistema
+    rechaza la orden (inhibidor, p. ej. una actualización en curso), se
+    muestra `Error al apagar` y el Core vuelve a aceptar eventos.
+  - **Modo simulado**: `PowerManager` va en `dry_run`; el apagado se
+    registra pero no se ejecuta.
+  - **Panel físico**: entrada `UID_APAGAR_PENDIENTE` en
+    `panel_database.json`, pendiente de sustituir por el UID real. Debe
+    conservar `"profile": "APAGAR"`. Anagrama: `STL/Anagramas/Apagar.stl`.
+  - **Sin verificar en hardware real** que polkit permita
+    `systemctl poweroff` desde el servicio de usuario (T065).
+
 `DISPAROS` es el mismo concepto que el panel **Zombies** ya existente
 en `panel_database.json` (`hotd_remake` / `hotd2_remake`) — incorpora
 esos dos paneles como `profile: "DISPAROS"` en vez de crear un nombre
@@ -325,6 +348,9 @@ pantalla ahora):** `KODI` · `MUSIC` · `DESKTOP` · `NIGHT` · `DEMO`
   consecuencia, se retiró de `panel_database.json` el panel que
   lanzaba HOTD 2 Remake directamente — ya no hace falta un panel por
   juego, con uno solo (`56A1C003`, "Zombies") basta.
+- **APAGAR: la acción vive en el perfil, no en el panel** (2026-09-21) —
+  `action` se lee de `config/profiles/*.json`. Un panel sin `profile` no
+  puede apagar el equipo aunque su `launcher` sea `null`.
 - **TeknoParrot vía Batocera-x86, descartado** (2026-09-08, ver
   CHANGELOG [1.5.1]) — se evaluó el enfoque de un artículo de
   terceros (wrapper Wine/DXVK/VKD3D curado por Batocera); es la misma

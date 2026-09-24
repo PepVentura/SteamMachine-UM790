@@ -484,7 +484,7 @@ Material
 
 
 
-PLA
+PETG (el PLA se deforma con la temperatura del equipo)
 
 
 
@@ -772,15 +772,43 @@ Mantener una circulación vertical continua.
 
 
 
-Material recomendado
+Material obligatorio (todas las piezas)
 
 
 
-PLA+
+PETG
 
 
 
-PETG (opcional)
+PLA / PLA+
+
+
+
+Solo pruebas de encaje. No montar dentro del equipo: se ablanda a ~55-60 °C y se deforma en uso real.
+
+
+
+ABS / ASA (opcional)
+
+
+
+Más margen térmico, más difícil de imprimir.
+
+
+
+Piezas a dos filamentos
+
+
+
+Ambos filamentos en PETG.
+
+
+
+Pegado de anagramas
+
+
+
+El cianoacrilato agarra peor en PETG: lijar, desengrasar; epoxi si se despega.
 
 
 

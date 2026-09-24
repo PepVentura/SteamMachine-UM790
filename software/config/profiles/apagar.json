@@ -1,0 +1,14 @@
+{
+  "id": "APAGAR",
+  "name": "Apagar",
+  "launcher": null,
+  "action": "poweroff",
+  "led": {
+    "idle": "#FF0000",
+    "running": "#FF0000"
+  },
+  "oled": {
+    "idle": ["APAGAR EQUIPO", "Pulsa para apagar"]
+  },
+  "note": "launcher=null y action=poweroff a proposito: este perfil no lanza ningun programa, pide al sistema un apagado ordenado (core/power_manager.py, 'systemctl poweroff') al pulsar el boton con el panel puesto. Hace falta panel + boton (dos gestos) para que un roce del tag no apague la maquina. Ver docs/12_Profile_System.md. Textos de la OLED sin tildes ni enyes: la fuente del SSD1306 no las tiene. Maximo 21 caracteres por linea."
+}

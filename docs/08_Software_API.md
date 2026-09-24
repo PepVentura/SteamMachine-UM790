@@ -436,6 +436,40 @@ status()
 
 
 
+\# Power Manager
+
+
+
+\## class PowerManager
+
+
+
+Responsabilidades
+
+
+
+Apagado ordenado del mini PC (panel APAGAR). Ejecuta `systemctl poweroff` (configurable en `power.poweroff_command`), nunca lanza excepciones y devuelve False si el sistema rechaza la orden. Con `dry_run` (ESP32 simulado) solo registra el apagado.
+
+
+
+Métodos
+
+
+
+```python
+
+poweroff()
+
+configuration()
+
+```
+
+
+
+\---
+
+
+
 \# Plugin Interface
 
 

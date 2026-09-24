@@ -4,7 +4,8 @@ Aplicacion Python que corre en el mini PC (Bazzite) y coordina el ESP32
 (paneles NFC + boton + OLED + LEDs) con el lanzador de plataformas
 (Steam, RetroDECK, RetroArch, y el panel de zombies/disparos con THE
 HOUSE OF THE DEAD: Remake y THE HOUSE OF THE DEAD 2: Remake, ambos
-nativos de Steam via Proton). Arquitectura y protocolo: ver `docs/03`,
+nativos de Steam via Proton) y, con el panel Apagar, apaga el equipo de
+forma ordenada. Arquitectura y protocolo: ver `docs/03`,
 `docs/04`, `docs/05`, `docs/08` en la raiz del repo.
 
 ## Instalar
@@ -67,6 +68,33 @@ reporte el firmware al leerlos (ver el checklist de
 tengas un segundo tag/panel fisico asignado a ese juego; hasta
 entonces, el panel de zombies (`04C3EAD4`) lanza HOTD Remake.
 
+## Panel Apagar (apagado ordenado)
+
+El perfil `APAGAR` (`config/profiles/apagar.json`, `"action": "poweroff"`)
+apaga el mini PC con `systemctl poweroff` al pulsar el boton con el panel
+puesto (`core/power_manager.py`). El comando se puede cambiar en
+`config/config.json`:
+
+```json
+"power": { "poweroff_command": ["systemctl", "poweroff"] }
+```
+
+- **Sin sudo**: en la sesion grafica local activa (la del servicio de
+  usuario `steammachine.service`) polkit permite apagar sin contrasena.
+  Compruebalo una vez a mano con `systemctl poweroff`.
+- Si el sistema rechaza el apagado (p. ej. bloqueo por una actualizacion
+  de Bazzite; `systemd-inhibit --list` muestra quien bloquea), la OLED
+  muestra `Error al apagar` y el motivo queda en el log.
+- **Modo simulado (`serial.simulate: true`)**: el apagado NUNCA se
+  ejecuta, solo se registra (`SIMULACION: apagado solicitado pero NO
+  ejecutado`). Asi teclear el UID del panel Apagar en la consola de
+  simulacion no apaga tu maquina de desarrollo.
+- La entrada del panel en `panel_database.json` se llama
+  `UID_APAGAR_PENDIENTE`: sustituyela por el UID real del tag. Debe
+  conservar `"profile": "APAGAR"`; sin el perfil el boton no hace nada.
+- Mientras dura el apagado el Core ignora paneles, boton y AUTO, para que
+  retirar el panel no deshaga el aviso `Apagando...`.
+
 ## Arranque automático (systemd)
 
 Para que el Core arranque solo con la sesión gráfica de Bazzite, sin
@@ -103,7 +131,10 @@ cancelacion mutua, y la aproximacion de `sleep`/`wake`), `Application`
 (logica de los eventos del protocolo — tag, tag_removed, button — con
 `OLEDManager`/`LEDManager`/`Launcher`/`PanelDatabase` sustituidos por
 dobles), `PanelDatabase` (carga/guardado, JSON malformado, mayus/minus
-en el UID) y `Launcher`/`BasePlugin` (lanzar, parar y consultar estado
+en el UID) `PowerManager` (apagado ordenado: exito, rechazo del sistema, comando
+inexistente, timeout, `dry_run` — con procesos `python -c` en vez de
+`systemctl poweroff`, que apagaria la maquina de los tests), el flujo
+APAGAR de `Application` y `Launcher`/`BasePlugin` (lanzar, parar y consultar estado
 de procesos reales de corta duracion — se usa `python -c "..."` en vez
 de steam/flatpak/lutris, que no estan instalados en este entorno).
 
@@ -115,7 +146,8 @@ hardware, ESP32 ni las plataformas reales para correrlos.
 ```
 core/        Application, ConfigurationManager, EventManager, logger,
              ProfileManager (config/profiles/*.json), ProcessWatcher
-             (detección de perfil AUTO por proceso en ejecución)
+             (detección de perfil AUTO por proceso en ejecución),
+             PowerManager (apagado ordenado, panel APAGAR)
 devices/     SerialManager (real) / SimulatedSerialManager, ESP32Controller
 database/    PanelDatabase (config/panel_database.json)
 launcher/    BasePlugin + SteamPlugin, RetroDeckPlugin, RetroArchPlugin,
@@ -130,6 +162,9 @@ config/      config.json, panel_database.json, profiles/*.json
 - Validar con hardware real (ver checklist en `firmware/README.md`,
   "Prueba de integración") — todo lo de arriba está probado con el
   ESP32 simulado, no con el físico.
+- Panel Apagar: poner el UID real de su tag (ahora `UID_APAGAR_PENDIENTE`)
+  y probar el apagado en el hardware real — solo esta probado con el
+  ESP32 simulado y con tests, no con `systemctl poweroff` real.
 - Actualizar `config/panel_database.json` con los UID reales de tus
   tags NFC en cuanto los leas del firmware (ahora mismo tiene UID de
   ejemplo).

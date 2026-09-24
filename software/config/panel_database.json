@@ -26,5 +26,12 @@
     "launcher": "steam",
     "led": "#FF3300",
     "icon": "disparos.png"
+  },
+  "UID_APAGAR_PENDIENTE": {
+    "name": "Apagar",
+    "profile": "APAGAR",
+    "launcher": null,
+    "led": "#FF0000",
+    "icon": "apagar.png"
   }
 }

@@ -6,6 +6,53 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
+## [1.6.0] - 2026-09-21 — Panel NFC Apagar (apagado ordenado), caja de paneles documentada y material a PETG
+
+### Contexto
+
+- Cuando el equipo se apaga de golpe, a veces Bazzite no vuelve a
+  arrancar y hay que restaurarlo desde la consola (ver `grub>` en
+  `GUIA_INICIO.md`). Se añade un panel NFC para apagar de forma ordenada.
+- El PLA se deforma con la temperatura del equipo: todas las piezas
+  pasan a imprimirse en PETG.
+
+### Añadido
+
+- `software/core/power_manager.py` (`PowerManager`): ejecuta
+  `systemctl poweroff` (configurable en `power.poweroff_command`), sin
+  excepciones; `dry_run` en modo simulado para no apagar la máquina de
+  desarrollo.
+- Perfil `APAGAR` (`config/profiles/apagar.json`, `action: "poweroff"`) y
+  entrada `UID_APAGAR_PENDIENTE` en `panel_database.json`.
+- `Application`: acciones de sistema por perfil (lista cerrada), aviso en
+  OLED/LEDs antes de apagar, error visible si el sistema rechaza la
+  orden, y el Core ignora eventos mientras se apaga. Al cerrarse el
+  servicio por el apagado, la OLED queda limpia.
+- 25 tests nuevos (122 en total). Los tests no tocan `logs/steammachine.log`.
+- `docs/14_Caja_Paneles_NFC.md`: la caja de paneles (6 ranuras) no
+  estaba documentada. Medidas comprobadas contra los STL.
+- `Apagar.stl` documentado (ya estaba en `STL/Anagramas/`).
+- Pruebas T022 (deformación térmica de las piezas) y T065 (apagado
+  ordenado) en `docs/10_Test_Plan.md`.
+
+### Cambiado
+
+- Material: PETG para todas las piezas (README, GUIA_INICIO, docs 07,
+  11, `Printing_Lower_Panel.md`, caja). Notas: los dos filamentos del
+  panel inferior deben ser PETG; el cianoacrilato agarra peor en PETG.
+- README: corregido un `---` pegado al final de una frase.
+
+### Pendiente
+
+- Sustituir `UID_APAGAR_PENDIENTE` por el UID real del tag.
+- Probar el apagado en el hardware real (T065); no verificado que polkit
+  permita `systemctl poweroff` desde el servicio de usuario.
+- Validar holguras de la caja/tapa y del resto de piezas en PETG (T022).
+- `Apagar.stl` no tiene `.scad` paramétrico (como `Gung.stl`).
+- `VERSION.md` sigue en v1.1.3, desfasado respecto a este CHANGELOG.
+
+---
+
 ## [1.5.8] - 2026-09-11 — Documentada la puesta en marcha de la Sinden Lightgun (Bazzite)
 
 ### Contexto

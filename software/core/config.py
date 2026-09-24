@@ -36,6 +36,11 @@ DEFAULT_CONFIG = {
         "retrodeck": {"command": ["flatpak", "run", "net.retrodeck.retrodeck"]},
         "teknoparrot": {"command": ["lutris", "lutris:rungame/teknoparrot"]},
     },
+    # Apagado ordenado (panel NFC APAGAR, core/power_manager.py). Sin sudo:
+    # polkit lo permite a la sesion grafica local activa.
+    "power": {
+        "poweroff_command": ["systemctl", "poweroff"],
+    },
 }
 
 

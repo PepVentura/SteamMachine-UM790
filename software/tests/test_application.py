@@ -10,6 +10,8 @@
 # LEDManager/OLEDManager, aplicada un nivel mas arriba.
 #
 
+from pathlib import Path
+
 import pytest
 
 from core.application import Application, IDLE_COLOR
@@ -18,6 +20,7 @@ from tests.fakes import (
     FakeLauncher,
     FakeLEDManager,
     FakeOLEDManager,
+    FakePowerManager,
     FakeProcessWatcher,
     FakeStatusManager,
 )
@@ -29,6 +32,7 @@ def app():
     application._oled = FakeOLEDManager()
     application._leds = FakeLEDManager()
     application._launcher = FakeLauncher()
+    application._power = FakePowerManager()
     application._database = FakeDatabase(
         {
             "04A1C8B2": {"name": "Steam", "launcher": "steam", "led": "#0055FF", "icon": ""},
@@ -357,3 +361,204 @@ def test_on_button_uses_pending_panels_launcher_key(app):
     app._on_button()
 
     assert app._launcher.launch_calls == ["retrodeck"]
+
+
+# -- APAGAR: apagado ordenado (docs/12_Profile_System.md) ---------------------
+
+APAGAR_PANEL = {
+    "name": "Apagar",
+    "profile": "APAGAR",
+    "launcher": None,
+    "led": "#FF0000",
+    "icon": "apagar.png",
+}
+
+
+@pytest.fixture
+def apagar_app(app):
+    """app con el panel APAGAR puesto (perfiles reales de config/profiles)."""
+    app._database = FakeDatabase({"AABB0001": APAGAR_PANEL})
+    app._profiles.load()
+    app._on_tag_detected("AABB0001")
+    return app
+
+
+def test_on_tag_detected_apagar_panel_shows_profile_idle_lines_and_red_led(app):
+    app._database = FakeDatabase({"AABB0001": APAGAR_PANEL})
+    app._profiles.load()
+
+    app._on_tag_detected("AABB0001")
+
+    assert app._oled.calls_of("show_status") == [("APAGAR EQUIPO", "Pulsa para apagar")]
+    assert app._leds.calls_of("fade") == [("#FF0000", 0.6, 20)]
+
+
+def test_placing_apagar_panel_alone_never_powers_off(apagar_app):
+    # Dos gestos a proposito: panel + boton. Un roce del tag no apaga nada.
+    assert apagar_app._power.poweroff_calls == 0
+    assert apagar_app._powering_off is False
+
+
+def test_on_button_apagar_panel_requests_poweroff_with_feedback(apagar_app):
+    apagar_app._oled.calls.clear()
+    apagar_app._leds.calls.clear()
+
+    apagar_app._on_button()
+
+    assert apagar_app._power.poweroff_calls == 1
+    assert apagar_app._launcher.launch_calls == []  # no lanza ninguna plataforma
+    assert apagar_app._oled.calls_of("show_status") == [("Apagando...", "No desenchufes")]
+    assert apagar_app._leds.calls_of("animation") == [("shutdown",)]
+    assert apagar_app._powering_off is True
+
+
+def test_on_button_apagar_panel_when_system_rejects_shows_error_and_recovers(apagar_app):
+    apagar_app._power.result = False
+    apagar_app._oled.calls.clear()
+    apagar_app._leds.calls.clear()
+
+    apagar_app._on_button()
+
+    assert apagar_app._power.poweroff_calls == 1
+    assert apagar_app._oled.calls_of("show_status")[-1] == ("Error al apagar", "Revisa el log")
+    assert apagar_app._leds.calls_of("animation") == [("shutdown",), ("error",)]
+    # La maquina sigue encendida: el Core vuelve a aceptar eventos y se puede reintentar.
+    assert apagar_app._powering_off is False
+    apagar_app._on_button()
+    assert apagar_app._power.poweroff_calls == 2
+
+
+def test_second_button_press_during_poweroff_is_ignored(apagar_app):
+    apagar_app._on_button()
+    apagar_app._on_button()
+
+    assert apagar_app._power.poweroff_calls == 1
+
+
+def test_removing_the_panel_during_poweroff_does_not_undo_the_shutdown_feedback(apagar_app):
+    apagar_app._on_button()
+    apagar_app._oled.calls.clear()
+    apagar_app._leds.calls.clear()
+    apagar_app._process_watcher = FakeProcessWatcher()
+
+    apagar_app._on_tag_removed()
+
+    assert apagar_app._oled.calls == []  # ni sleep() ni texto nuevo
+    assert apagar_app._leds.calls == []  # ni fade al azul de reposo
+    assert apagar_app._process_watcher.start_calls == 0  # AUTO no se reactiva
+
+
+def test_new_panel_during_poweroff_is_ignored(apagar_app):
+    apagar_app._on_button()
+    apagar_app._oled.calls.clear()
+
+    apagar_app._on_tag_detected("04A1C8B2")
+
+    assert apagar_app._oled.calls == []
+
+
+def test_auto_profile_change_during_poweroff_is_ignored(apagar_app):
+    apagar_app._on_button()
+    apagar_app._oled.calls.clear()
+    apagar_app._leds.calls.clear()
+
+    apagar_app._on_auto_profile_changed(None)
+
+    assert apagar_app._oled.calls == []
+    assert apagar_app._leds.calls == []
+
+
+def test_on_button_with_other_panel_never_powers_off(app):
+    app._pending_panel = {"name": "Steam", "launcher": "steam", "led": "#0055FF"}
+
+    app._on_button()
+
+    assert app._power.poweroff_calls == 0
+    assert app._launcher.launch_calls == ["steam"]
+
+
+def test_unknown_profile_action_is_ignored_and_never_powers_off(app):
+    # Defensivo: un perfil con un "action" que no esta en la lista cerrada
+    # (typo, perfil de otra version...) no debe apagar ni lanzar nada.
+    app._database = FakeDatabase({"AABB0002": {"name": "Raro", "profile": "RARO", "launcher": None, "led": "#FFFFFF"}})
+    app._profiles._profiles = {"RARO": {"id": "RARO", "action": "reboot"}}
+    app._on_tag_detected("AABB0002")
+
+    app._on_button()
+
+    assert app._power.poweroff_calls == 0
+    assert app._launcher.launch_calls == []
+    assert app._powering_off is False
+
+
+def test_poweroff_without_power_manager_does_nothing(apagar_app):
+    apagar_app._power = None
+
+    apagar_app._on_button()
+
+    assert apagar_app._powering_off is False
+
+
+def test_shutdown_clears_oled_only_when_the_system_is_powering_off(app):
+    # Cierre normal del servicio (systemctl restart, Ctrl+C...): la OLED no se toca.
+    app.shutdown()
+    assert app._oled.calls_of("clear") == []
+
+    # Cierre porque el sistema se apaga: OLED limpia, por si el USB sigue con corriente.
+    app._powering_off = True
+    app.shutdown()
+    assert app._oled.calls_of("clear") == [()]
+
+
+def test_shutdown_never_raises_if_clearing_the_oled_fails(app):
+    class BrokenOLED(FakeOLEDManager):
+        def clear(self):
+            raise OSError("puerto serie ya cerrado")
+
+    app._oled = BrokenOLED()
+    app._powering_off = True
+
+    app.shutdown()  # no debe propagar
+
+    assert app._running is False
+
+
+# -- initialize(): el modo simulado nunca apaga la maquina de verdad ----------
+
+
+def _initialized_app(tmp_path, monkeypatch, simulate: bool):
+    import json
+
+    import core.application as application_module
+    from core.config import ConfigurationManager
+
+    # initialize() llama a setup_logger(): reconfigura el logger global de
+    # loguru y abre logs/steammachine.log. En tests no queremos ni lo uno
+    # ni lo otro (ensuciaria el log real del proyecto).
+    monkeypatch.setattr(application_module, "setup_logger", lambda *_args, **_kwargs: None)
+
+    config = json.load(open(Path(__file__).resolve().parent.parent / "config" / "config.json", encoding="utf-8"))
+    config["serial"]["simulate"] = simulate
+    path = tmp_path / "config.json"
+    path.write_text(json.dumps(config), encoding="utf-8")
+
+    application = Application()
+    application._config = ConfigurationManager(path)
+    application.initialize()
+    return application
+
+
+def test_initialize_with_simulated_esp32_makes_poweroff_a_dry_run(tmp_path, monkeypatch):
+    application = _initialized_app(tmp_path, monkeypatch, simulate=True)
+    try:
+        assert application._power.configuration()["dry_run"] is True
+    finally:
+        application.shutdown()
+
+
+def test_initialize_reads_poweroff_command_from_config(tmp_path, monkeypatch):
+    application = _initialized_app(tmp_path, monkeypatch, simulate=True)
+    try:
+        assert application._power.configuration()["command"] == ["systemctl", "poweroff"]
+    finally:
+        application.shutdown()

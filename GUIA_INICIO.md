@@ -6,7 +6,7 @@ falta ningún conocimiento previo — cada paso explica qué estás haciendo
 y por qué. Si en algún momento algo no funciona, ve directo a la
 sección [10. Solución de problemas](#10-solución-de-problemas).
 
-Los documentos técnicos detallados (`docs/01` a `docs/11`) siguen ahí
+Los documentos técnicos detallados (`docs/01` a `docs/14`) siguen ahí
 para quien quiera profundizar; esta guía es el camino corto para llegar
 a tenerlo funcionando.
 
@@ -34,8 +34,9 @@ cada panel lleva una etiqueta NFC escondida, y al acercarlo a un lector
 y pulsar un botón, el PC lanza automáticamente Steam, tu colección
 retro (RetroDECK / RetroArch) o el panel de disparos/zombies (THE
 HOUSE OF THE DEAD: Remake y THE HOUSE OF THE DEAD 2: Remake, ambos
-nativos de Steam vía Proton). Una pantalla OLED y una barra de LEDs te
-muestran qué panel has puesto.
+nativos de Steam vía Proton). Hay también un panel **Apagar** que
+apaga el equipo de forma ordenada. Una pantalla OLED y una barra de
+LEDs te muestran qué panel has puesto.
 
 Tres piezas hacen que esto funcione:
 
@@ -71,7 +72,7 @@ probarse.
 | Tags NFC (uno por panel) | Los que vayas a esconder en cada panel intercambiable |
 | Tornillería M2, M2.5, M3, M4, M5, M6, M8 e insertos roscados | Según pieza — ver `docs/07_Hardware_Specification.md` |
 | Imanes de neodimio 3×2mm y 6×2mm | Fijan los paneles intercambiables |
-| Filamento PLA+ (pruebas) y PETG (pieza definitiva) | Impresión 3D |
+| Filamento **PETG** (todas las piezas; el PLA se deforma con el calor del equipo) | Impresión 3D. PLA solo para pruebas de encaje, nunca montado |
 | Loctite (cianoacrilato tipo 401/454) | Pegar los anagramas sueltos de `STL/Anagramas/` sobre el panel NFC en blanco |
 
 ### Herramientas
@@ -103,23 +104,38 @@ Linux.
    `STL/Anagramas/` trae el panel en blanco (`nfc_panel_blank.stl`) y
    cada anagrama por separado (`Steam.stl`, `Retrobat.stl`,
    `Parrot.stl`, `engranaje.stl`, `Gung.stl` — este último es el
-   anagrama del panel Zombies) para imprimirlos como piezas independientes en vez de la pieza única con el emblema
+   anagrama del panel Zombies —, y `Apagar.stl`, el del panel Apagar)
+   para imprimirlos como piezas independientes en vez de la pieza única con el emblema
    integrado. Imprime el panel en blanco y el anagrama que quieras por
    separado, y pégalos con **Loctite** (un cianoacrilato tipo Loctite
-   401/454 va bien en PLA/PETG). Este método baja el tiempo de
+   401/454). Sobre PETG el cianoacrilato agarra algo peor que sobre PLA:
+   lija ligeramente las dos caras y desengrasa con alcohol isopropílico
+   antes de pegar; si se despega, usa epoxi de 5 minutos. Este método baja el tiempo de
    impresión de ~6 horas (pieza única con el emblema en relieve) a
    ~1 hora, porque el anagrama es una pieza pequeña y plana que no
    necesita soportes ni tantas capas del panel completo debajo.
    Los STL de un único bloque (con el emblema ya integrado, sin pegar)
    siguen disponibles directamente en `STL/` y en
    `openscad/parts/03_panels/` si prefieres esa vía.
+   **Caja para guardar los paneles**: `STL/caja_nfc_panel_caja.stl` y
+   `STL/caja_nfc_panel_tapa.stl` (o `caja_nfc_panel_caja_y_tapa.stl`,
+   las dos piezas en una sola placa). Guarda hasta 6 paneles de canto;
+   ver `docs/14_Caja_Paneles_NFC.md`.
 3. Si quieres ajustar medidas (por ejemplo, si tu mini PC no es
    exactamente un UM790 Pro), el diseño paramétrico está en
    `openscad/` y `00_parametros.scad`, hecho con
    [OpenSCAD](https://openscad.org/) (gratuito).
-4. Parámetros de impresión orientativos: altura de capa 0.20mm, 3-4
-   perímetros, relleno 15-30%. PLA+ para probar encajes, PETG para la
-   pieza final.
+4. **Material: PETG para todas las piezas.** El PLA (y el PLA+) se
+   deforma con la temperatura del mini PC, así que no lo dejes montado
+   dentro del equipo; úsalo solo para probar encajes. Si una pieza lleva
+   dos filamentos (el panel inferior, con el difusor LED translúcido),
+   los dos deben ser PETG. Parámetros orientativos: altura de capa
+   0.20mm, 3-4 perímetros, relleno 15-30%; PETG con boquilla a
+   230-250 °C, cama a 70-85 °C y ventilador de capa bajo (30-50%) —
+   parte del perfil PETG de tu marca de filamento. Más detalle en el
+   [README](README.md#material-petg).
+   Las holguras del diseño se ajustaron con PLA+: con PETG revisa los
+   encajes antes de montar.
 5. El montaje mecánico paso a paso (con checklist) está en
    `docs/11_Assembly_Manual.md`. Termina el montaje físico completo
    (carcasa, mini PC, ventilador, soportes) antes de pasar al cableado.
@@ -337,7 +353,8 @@ USB).
      "04A1C8B2": { "name": "Steam", "launcher": "steam", "led": "#0055FF", "icon": "steam.png" },
      "04B2D9C3": { "name": "RetroDECK", "launcher": "retrodeck", "led": "#8800FF", "icon": "retrodeck.png" },
      "04C3EAD4": { "name": "Zombies - HOTD Remake", "launcher": "hotd_remake", "led": "#FF3300", "icon": "hotd_remake.png" },
-     "0AAABBCC": { "name": "Zombies - HOTD 2 Remake", "launcher": "hotd2_remake", "led": "#CC0000", "icon": "hotd2_remake.png" }
+     "0AAABBCC": { "name": "Zombies - HOTD 2 Remake", "launcher": "hotd2_remake", "led": "#CC0000", "icon": "hotd2_remake.png" },
+     "04E5A0F6": { "name": "Apagar", "profile": "APAGAR", "launcher": null, "led": "#FF0000", "icon": "apagar.png" }
    }
    ```
    Sustituye esas claves (`04A1C8B2`, etc.) por los UID de tus tags
@@ -346,6 +363,15 @@ USB).
    hasta que tengas un segundo tag/panel físico dedicado a ese juego;
    mientras tanto, un solo panel puede apuntar a `hotd_remake` y
    cambiar de juego se hace a mano desde Steam.
+
+   **Panel Apagar**: el fichero real trae su entrada con la clave
+   `UID_APAGAR_PENDIENTE`. Sustitúyela por el UID del tag que metas en
+   ese panel (el mismo procedimiento que con los demás). Es importante
+   que la entrada conserve `"profile": "APAGAR"`: es el perfil
+   (`config/profiles/apagar.json`) el que le dice al Core que ese panel
+   apaga el equipo; sin él, el botón no hace nada. En el modo simulado
+   del Core el apagado nunca se ejecuta de verdad, solo se registra en
+   el log.
 5. Arranca el Core:
    ```bash
    python main.py
@@ -372,6 +398,20 @@ Con el Core corriendo (`python main.py`), acerca un panel al lector:
    zombies correspondiente según el panel.
 4. Retira el panel → la pantalla se apaga y el LED vuelve al azul de
    reposo.
+
+**Prueba del panel Apagar** (hazla con el equipo ya en su sitio y sin
+nada importante abierto: apaga el mini PC de verdad). Antes, comprueba
+en una terminal que tu usuario puede apagar sin contraseña — el panel
+usa exactamente el mismo comando:
+
+```bash
+systemctl poweroff
+```
+
+Si eso apaga el equipo sin pedir nada, el panel también podrá.
+Arranca de nuevo y prueba con el panel: al colocarlo, la OLED debe
+mostrar `APAGAR EQUIPO` (todavía sin apagar); al pulsar el botón, pasa a
+`Apagando...`, los LEDs se funden a negro y el equipo se apaga.
 
 Si algo de esto no pasa, revisa primero que el [Paso 4](#6-paso-4--programar-el-esp32-firmware)
 funcionó por sí solo (con el monitor serie) — si el firmware ya
@@ -486,6 +526,9 @@ Si nada de esto lo resuelve, el firmware tiene un canal de depuración
 más detallado por Serial2 — ver "Depuración" en `firmware/README.md`.
 
 **El mini PC se queda en un prompt `grub>` en vez de arrancar Bazzite**
+*Prevención: apaga siempre con el panel Apagar (o desde el menú de
+Bazzite) en vez de cortar la corriente de golpe.*
+
 Es la consola de rescate de GRUB — aparece cuando el firmware UEFI
 pierde la referencia al fichero de arranque, normalmente por un corte
 de corriente justo durante un arranque anterior (no es un fallo del
@@ -517,6 +560,23 @@ recuperarlo sin perder nada:
    vuelve a fallar, hay un comando (`sudo bootupctl`) para reescribir
    la entrada de arranque de forma permanente.
 
+**El panel Apagar muestra `Error al apagar` (o el botón no hace nada)**
+- `Error al apagar`: el sistema ha rechazado la orden y el equipo sigue
+  encendido. Mira el motivo en `journalctl --user -u steammachine.service -n 30`.
+  Lo más habitual es un bloqueo de apagado (p. ej. una actualización de
+  Bazzite en curso). Comprueba qué lo bloquea con
+  `systemd-inhibit --list`, y prueba `systemctl poweroff` a mano para
+  ver el mensaje completo.
+- El botón no hace nada con el panel puesto: la entrada del panel en
+  `panel_database.json` no lleva `"profile": "APAGAR"` (o falta
+  `config/profiles/apagar.json`). Sin perfil, el Core lo trata como un
+  panel informativo y no hace nada.
+- La OLED dice `Panel no reconocido`: el UID del tag no está en
+  `panel_database.json`; sustituye `UID_APAGAR_PENDIENTE` por el real.
+
+**Las piezas impresas se han deformado con el calor**
+Están en PLA. Reimprímelas en PETG (ver [Paso 1](#3-paso-1--imprimir-y-montar-la-carcasa)).
+
 ---
 
 ## 11. Mapa del repositorio
@@ -524,7 +584,7 @@ recuperarlo sin perder nada:
 ```
 GUIA_INICIO.md        Esta guía
 README.md              Presentación general del proyecto
-docs/                  Documentación técnica detallada (01 a 11)
+docs/                  Documentación técnica detallada (01 a 14)
 openscad/, STL/         Diseño e impresión 3D de la carcasa
 firmware/               Código C++ del ESP32 (ver firmware/README.md)
 software/               Código Python del Core, corre en el mini PC (ver software/README.md)
@@ -534,8 +594,9 @@ Para profundizar en cualquier pieza, los documentos técnicos son la
 referencia completa: `docs/04_Communication_Protocol.md` (cómo hablan
 el ESP32 y el PC entre sí), `docs/05_Firmware_Architecture.md` y
 `docs/08_Software_API.md` (arquitectura interna de cada lado),
-`docs/07_Hardware_Specification.md` (lista de materiales completa) y
-`docs/11_Assembly_Manual.md` (montaje mecánico paso a paso).
+`docs/07_Hardware_Specification.md` (lista de materiales completa),
+`docs/11_Assembly_Manual.md` (montaje mecánico paso a paso) y
+`docs/14_Caja_Paneles_NFC.md` (caja para guardar los paneles).
 
 ---
 

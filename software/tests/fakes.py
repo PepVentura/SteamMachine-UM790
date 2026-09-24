@@ -150,3 +150,15 @@ class FakeProcessWatcher:
 
     def stop(self):
         self.stop_calls += 1
+
+
+class FakePowerManager:
+    """Doble de PowerManager para tests de Application: no apaga nada de verdad."""
+
+    def __init__(self, result: bool = True):
+        self.result = result
+        self.poweroff_calls = 0
+
+    def poweroff(self):
+        self.poweroff_calls += 1
+        return self.result

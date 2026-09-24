@@ -206,7 +206,8 @@ Antes de comenzar:
 
 
 
-□ Todas las piezas impresas sin deformaciones.
+□ Todas las piezas impresas sin deformaciones, y todas en PETG (el PLA se
+deforma con el calor del equipo; solo vale para pruebas de encaje).
 
 
 
@@ -828,7 +829,8 @@ Base del panel (STL/Anagramas/nfc\_panel\_blank.stl)
 
 
 Anagrama suelto (STL/Anagramas/Steam.stl, Retrobat.stl, Parrot.stl,
-engranaje.stl, Gung.stl para el panel Zombies — según el panel)
+engranaje.stl, Gung.stl para el panel Zombies, Apagar.stl para el panel
+Apagar — según el panel)
 
 
 
@@ -837,7 +839,9 @@ engranaje.stl, Gung.stl para el panel Zombies — según el panel)
 
 
 Pegar el anagrama sobre la base con Loctite (cianoacrilato tipo
-401/454, compatible con PLA/PETG)
+401/454). En PETG agarra peor que en PLA: lijar ligeramente las dos
+caras y desengrasar con alcohol isopropílico antes de pegar; si se
+despega, usar epoxi de 5 minutos
 
 
 

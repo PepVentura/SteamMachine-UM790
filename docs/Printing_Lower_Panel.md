@@ -33,6 +33,14 @@ y multi-material/AMS.
 
 ---
 
+> ⚠️ **Material: PETG (2026-09-21).** El PLA se deforma con la
+> temperatura del equipo, así que esta pieza se imprime en PETG. **Los
+> dos filamentos deben ser PETG** (también el translúcido del difusor):
+> mezclar PLA y PETG en una pieza da mala unión entre capas. El PETG
+> hace puentes algo peor que el PLA: comprueba las costillas del canal
+> LED (sección 5). Los consumos de la sección 6.1 son de una laminación
+> con PLA/PLA+; hay que volver a laminar con los perfiles PETG.
+
 ## 3. Orientación de la pieza
 
 Orientar la pieza **de pie**, con su eje Z hacia arriba, apoyada

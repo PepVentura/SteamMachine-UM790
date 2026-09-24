@@ -15,6 +15,7 @@ import time
 from core.config import ConfigurationManager
 from core.events import Event, EventManager
 from core.logger import get_logger, setup_logger
+from core.power_manager import PowerManager
 from core.process_watcher import ProcessWatcher
 from core.profile_manager import ProfileManager
 from database.panel_database import PanelDatabase
@@ -25,6 +26,12 @@ from launcher.launcher import Launcher
 from status.status_manager import StatusManager
 
 IDLE_COLOR = "#0055FF"
+
+# Acciones de sistema que un perfil puede pedir con el campo "action"
+# (docs/12_Profile_System.md). Lista cerrada a proposito: un valor
+# desconocido se ignora y se registra, nunca se interpreta.
+ACTION_POWEROFF = "poweroff"
+KNOWN_ACTIONS = {ACTION_POWEROFF}
 
 logger = get_logger()
 
@@ -49,8 +56,10 @@ class Application:
         self._leds: LEDManager | None = None
         self._launcher: Launcher | None = None
         self._process_watcher: ProcessWatcher | None = None
+        self._power: PowerManager | None = None
 
         self._running = False
+        self._powering_off = False  # apagado ordenado en curso: se ignora todo evento nuevo
         self._pending_panel: dict | None = None  # panel detectado, a la espera del boton
 
     # -- Ciclo de vida -----------------------------------------------
@@ -67,6 +76,12 @@ class Application:
         self._oled = OLEDManager(self._esp32)
         self._leds = LEDManager(self._esp32)
         self._process_watcher = ProcessWatcher(self._build_auto_match_table(), self._on_auto_profile_changed)
+        # Con el ESP32 simulado el apagado es solo de mentira (dry_run):
+        # ver core/power_manager.py.
+        self._power = PowerManager(
+            self._config.get("power.poweroff_command"),
+            dry_run=self._esp32.simulated,
+        )
 
         self._subscribe_events()
 
@@ -97,6 +112,16 @@ class Application:
     def shutdown(self) -> None:
         logger.info("Cerrando SteamMachine Core...")
         self._running = False
+        if self._powering_off:
+            # Nos cierra systemd porque el sistema se esta apagando: si el
+            # USB del mini PC sigue con corriente tras el apagado (depende
+            # de la BIOS), el ESP32 se quedaria mostrando "Apagando..."
+            # para siempre. Se deja la OLED limpia. Nunca debe impedir el cierre.
+            try:
+                if self._oled:
+                    self._oled.clear()
+            except Exception as e:
+                logger.warning("No se pudo limpiar la OLED al apagar: {}", e)
         if self._process_watcher:
             self._process_watcher.stop()
         if self._esp32:
@@ -127,6 +152,10 @@ class Application:
         self._leds.set_color(IDLE_COLOR)
 
     def _on_tag_detected(self, uid: str) -> None:
+        if self._powering_off:
+            logger.debug("Apagado en curso, se ignora el panel {}", uid)
+            return
+
         logger.info("Panel detectado: {}", uid)
 
         # AUTO (docs/12_Profile_System.md): un panel fisico manda
@@ -189,6 +218,12 @@ class Application:
         logger.info("Perfil '{}' listo. Esperando pulsador...", panel["name"])
 
     def _on_tag_removed(self) -> None:
+        if self._powering_off:
+            # Retirar el panel APAGAR tras pulsar no debe pisar el aviso
+            # "Apagando..." ni volver al azul de reposo.
+            logger.debug("Apagado en curso, se ignora la retirada del panel")
+            return
+
         logger.info("Panel retirado")
         self._pending_panel = None
         self._oled.sleep()
@@ -218,6 +253,9 @@ class Application:
         - AUTO actualiza OLED/LEDs, pero no hay panel fisico del que
         lanzar nada al pulsar el boton.
         """
+        if self._powering_off:
+            return
+
         if not profile_id:
             logger.info("AUTO: nada relevante en ejecucion")
             self._oled.sleep()
@@ -240,8 +278,19 @@ class Application:
         self._leds.fade(led_color)
 
     def _on_button(self) -> None:
+        if self._powering_off:
+            logger.debug("Apagado ya en curso, se ignora el boton")
+            return
+
         if not self._pending_panel:
             logger.debug("Boton pulsado sin panel activo, se ignora")
+            return
+
+        # Acciones de sistema (perfil con "action", p.ej. APAGAR): van
+        # antes que el launcher porque no lanzan ninguna plataforma.
+        action = self._panel_action(self._pending_panel)
+        if action:
+            self._run_action(action, self._pending_panel)
             return
 
         platform = self._pending_panel.get("launcher")
@@ -264,6 +313,47 @@ class Application:
 
         ok = self._launcher.launch(platform)
         self._leds.animation("success" if ok else "error")
+
+    def _panel_action(self, panel: dict) -> str | None:
+        """
+        Accion de sistema del perfil del panel ("poweroff"...), o None.
+        Se consulta con .all() para no repetir aqui el aviso de "Perfil
+        desconocido" que ProfileManager.get() ya dio al detectar el panel.
+        """
+        profile = self._profiles.all().get(panel.get("profile") or "")
+        return profile.get("action") if profile else None
+
+    def _run_action(self, action: str, panel: dict) -> None:
+        if action not in KNOWN_ACTIONS:
+            logger.error("Panel '{}': accion desconocida '{}', se ignora", panel.get("name"), action)
+            return
+
+        if action == ACTION_POWEROFF:
+            self._power_off(panel)
+
+    def _power_off(self, panel: dict) -> None:
+        """
+        Apagado ordenado del mini PC. Primero se avisa en OLED/LEDs (el
+        propio apagado puede cortar el USB del ESP32 en cuanto termine el
+        sistema), luego se pide el apagado. Si el sistema lo rechaza, se
+        vuelve a un estado usable y se avisa del error.
+        """
+        if not self._power:
+            logger.error("Apagado solicitado pero PowerManager no esta inicializado")
+            return
+
+        logger.info("Apagado ordenado solicitado desde el panel '{}'", panel.get("name"))
+        self._powering_off = True
+        self._oled.show_status("Apagando...", "No desenchufes")
+        self._leds.animation("shutdown")
+
+        if self._power.poweroff():
+            return
+
+        # El sistema no acepto la orden: la maquina sigue encendida.
+        self._powering_off = False
+        self._oled.show_status("Error al apagar", "Revisa el log")
+        self._leds.animation("error")
 
     def _on_error(self, code: int = None) -> None:
         logger.error("Error reportado por el ESP32 (codigo {})", code)

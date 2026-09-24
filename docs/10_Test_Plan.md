@@ -416,6 +416,28 @@ Ruido
 
 
 
+\## T022 — Deformación de las piezas (PETG)
+
+
+
+Durante T021 y T070, medir con termómetro IR la temperatura de las piezas más
+expuestas (junto a la salida de aire y pegadas al mini PC).
+
+
+
+Resultado esperado
+
+
+
+Sin deformación visible ni holguras nuevas tras 24 h. Temperatura de la
+pieza claramente por debajo del ablandamiento del PETG (~70-80 °C).
+
+
+
+\---
+
+
+
 \## Límites
 
 
@@ -957,6 +979,32 @@ Repetir
 
 
 Sin errores.
+
+
+
+\---
+
+
+
+\## T065
+
+
+
+Apagado ordenado con el panel Apagar.
+
+
+
+1. Colocar el panel: la OLED muestra APAGAR EQUIPO y NO se apaga nada.
+
+2. Pulsar el botón: OLED Apagando..., LEDs a negro, el equipo se apaga.
+
+3. Encender de nuevo: Bazzite debe arrancar sin pasar por grub>.
+
+4. Repetir con una actualización de Bazzite en curso: debe salir Error al apagar y el equipo seguir encendido.
+
+
+
+Previo: `systemctl poweroff` a mano debe apagar sin pedir contraseña.
 
 
 
