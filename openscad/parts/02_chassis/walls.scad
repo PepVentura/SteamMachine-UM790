@@ -265,42 +265,54 @@ module esp32MountBosses(wallInnerX)
 
 
 //=============================================================================
-// POSTES DE ANCLAJE DEL HUB USB (4x, huella cuadrada)
+// POSTES DE ANCLAJE DEL HUB USB (4x M2)
 //
-// Con el giro aplicado en assembly_instances.scad
-// (rotate([0,-90,0])), los taladros (a usb_hub_mount_hole de cada
-// borde, con 4 mm de margen — ver hubUsbMountHoles() en
-// hub_usb.scad) quedan en el plano Y/Z.
+// SUSTITUIDO (2026-10-05, petición del usuario): hub nuevo de placa
+// alargada (68,7 x 18,2 mm, 4x USB-A arriba) en lugar del CJMCU-204
+// (postes 36,1 x 21 mm, Ø3). Placa en horizontal: taladros separados
+// usb_hub_hole_spacing_y a lo largo (eje Y) y usb_hub_hole_spacing_x
+// a lo ancho (eje Z), centrados en hub_pos.
 //
-// Se llama solo desde la pared DERECHA (rightWall()): debe crecer
-// hacia -X (hacia el interior). FALLO CORREGIDO (2026-08-03): usaba
-// el mismo rotate([0,90,0]) que el poste del ESP32 (pared izquierda),
-// así que crecía hacia fuera — mismo fallo que rc522MountBoss(),
-// detectado en una captura del usuario.
+// Se llama solo desde la pared DERECHA (rightWall()): crece hacia -X
+// (hacia el interior), igual que antes.
+//
+// Postes macizos (cylinder): el agujero piloto lo abre
+// hubMountHoleCuts(), que también entra usb_hub_mount_hole_wall en la
+// propia pared para que quepa un tornillo M2x6.
 //=============================================================================
 
-module hubMountBosses(wallInnerX)
+module hubMountBossPositions(wallInnerX)
 {
-
-    h = usb_hub_width/2  - usb_hub_mount_inset_z;
-    d = usb_hub_depth/2  - usb_hub_mount_inset_y;
 
     for(iy=[-1,1])
     for(iz=[-1,1])
 
         translate([
             wallInnerX,
-            hub_pos[1] + iy*d,
-            hub_pos[2] + iz*h
+            hub_pos[1] + iy*usb_hub_hole_spacing_y/2,
+            hub_pos[2] + iz*usb_hub_hole_spacing_x/2
         ])
 
             rotate([0,-90,0])
 
-                tube(
-                    outerDiameter = side_mount_diameter,
-                    innerDiameter = usb_hub_mount_hole,
-                    height        = side_mount_depth
-                );
+                children();
+
+}
+
+module hubMountBosses(wallInnerX)
+{
+
+    hubMountBossPositions(wallInnerX)
+        cylinder(d = usb_hub_mount_diameter, h = usb_hub_standoff);
+
+}
+
+module hubMountHoleCuts(wallInnerX)
+{
+
+    hubMountBossPositions(wallInnerX)
+        translate([0, 0, -usb_hub_mount_hole_wall])
+            cylinder(d = usb_hub_mount_hole, h = usb_hub_mount_hole_wall + usb_hub_standoff + 0.1);
 
 }
 
@@ -582,42 +594,56 @@ module leftWall()
 module rightWall()
 {
 
-    translate([case_width/2-wall_thickness, -case_depth/2, 0])
+    // Envuelto en difference() (2026-10-05) solo para abrir los
+    // pilotos M2 del hub, que atraviesan poste y parte de la pared.
+    difference()
+    {
 
-        difference()
+        union()
         {
 
-            union()
+            translate([case_width/2-wall_thickness, -case_depth/2, 0])
+
+                difference()
+                {
+
+                    union()
+                    {
+                        sideWallSolid();
+                        sideBossPad(-1, front_magnet_z_low);
+                        sideBossPad(-1, front_magnet_z_high);
+                        sideBossPad(-1, lower_panel_screw_z_low);
+                        sideBossPad(-1, lower_panel_screw_z_high);
+                        topInsertPad(-1, wall_thickness + top_screw_y_inset);
+                        topInsertPad(-1, case_depth - wall_thickness - top_screw_y_inset);
+                        rearBossPad(-1, rear_wall_screw_z_low);
+                        rearBossPad(-1, rear_wall_screw_z_high);
+                    }
+
+                    frontMagnetCuts(-1);
+
+                    lowerPanelScrewCuts(-1);
+
+                    topScrewInsertCuts(-1);
+
+                    rearWallScrewCuts(-1);
+
+                }
+
+            rc522MountBoss(case_width/2 - wall_thickness, -1);
+
+            hubMountBosses(case_width/2 - wall_thickness);
+
+            difference()
             {
-                sideWallSolid();
-                sideBossPad(-1, front_magnet_z_low);
-                sideBossPad(-1, front_magnet_z_high);
-                sideBossPad(-1, lower_panel_screw_z_low);
-                sideBossPad(-1, lower_panel_screw_z_high);
-                topInsertPad(-1, wall_thickness + top_screw_y_inset);
-                topInsertPad(-1, case_depth - wall_thickness - top_screw_y_inset);
-                rearBossPad(-1, rear_wall_screw_z_low);
-                rearBossPad(-1, rear_wall_screw_z_high);
+                floorWallGraftBoss(case_width/2 - wall_thickness, -1);
+                floorWallGraftInsertCuts(+1);
             }
-
-            frontMagnetCuts(-1);
-
-            lowerPanelScrewCuts(-1);
-
-            topScrewInsertCuts(-1);
-
-            rearWallScrewCuts(-1);
 
         }
 
-    rc522MountBoss(case_width/2 - wall_thickness, -1);
+        hubMountHoleCuts(case_width/2 - wall_thickness);
 
-    hubMountBosses(case_width/2 - wall_thickness);
-
-    difference()
-    {
-        floorWallGraftBoss(case_width/2 - wall_thickness, -1);
-        floorWallGraftInsertCuts(+1);
     }
 
 }

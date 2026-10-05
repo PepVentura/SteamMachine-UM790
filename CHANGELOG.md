@@ -6,6 +6,36 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
 
 ---
 
+## [Sin publicar] - 2026-10-05 — Hub USB nuevo (placa alargada 4x USB-A) en la pared derecha
+
+### Cambiado
+
+- El hub USB CJMCU-204 (44,1 x 44,1 mm, postes Ø3 a 36,1 x 21 mm) se
+  sustituye por una placa alargada de 68,7 x 18,2 mm con 4 bocas USB-A
+  en un lado largo y entrada USB-C en un extremo.
+- Se monta en la pared DERECHA, en horizontal, con las bocas USB-A
+  hacia ARRIBA. Centro en Y=0, Z=82 (`usb_hub_mount_z`), más bajo que
+  antes (97,8) para dejar ~57 mm libres por encima para las clavijas.
+- `hubMountBosses()` (walls.scad): 4 postes Ø5 x 4 mm (antes Ø8 x 2 mm)
+  a 64,7 x 14,2 mm, con piloto Ø1,8 para tornillo M2x6 autorroscante
+  (entra 1,5 mm en la pared, queda 1,5 mm de piel exterior). Los 4
+  postes antiguos desaparecen.
+- `00_parametros.scad`: `usb_hub_*` redefinidos;
+  `usb_hub_mount_inset_z/y` sustituidos por
+  `usb_hub_hole_spacing_x/y`. `hub_pos` usa ahora `usb_hub_standoff` y
+  `usb_hub_mount_z`.
+- `hub_usb.scad` v2.0: modelo de referencia del hub nuevo; el volumen
+  de cableado está ahora por encima de las bocas (40 mm).
+- `STL/rightwall_flat2.stl` regenerado (misma posición en la cama que
+  el anterior). Comprobado: estanco, 1 solo cuerpo; 28/28 pares sin
+  colisión en el ensamblaje virtual.
+
+### Pendiente
+
+- Medidas del hub tomadas de fotos con cinta métrica: confirmar con
+  calibre la separación entre taladros (64,7 x 14,2 mm) antes de
+  imprimir.
+
 ## [1.6.0] - 2026-09-21 — Panel NFC Apagar (apagado ordenado), caja de paneles documentada y material a PETG
 
 ### Contexto

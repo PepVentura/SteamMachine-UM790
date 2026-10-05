@@ -312,31 +312,53 @@ nfc_reader_height = 40.0;
 nfc_reader_depth  = 10.0;
 
 //=============================================================================
-// HUB USB (CJMCU-204)
+// HUB USB — placa alargada 4x USB-A + entrada USB-C (2026-10-05)
 //=============================================================================
 
-// FALLO CORREGIDO (2026-08-15, aviso del usuario con fotos del hub
-// montado en la pared real): la separación VERTICAL entre postes
-// (eje Z en la pared — ver hubMountBosses() en walls.scad) estaba
-// mal, calculaba 36,1mm entre los postes de arriba y abajo, cuando
-// la separación real es 21mm (los dos postes de abajo, ya
-// atornillados en la pieza real, estaban bien; los de arriba no).
-// La separación horizontal (36,1mm, entre columnas de USB) es
-// correcta, confirmada por el usuario.
+// SUSTITUYE al CJMCU-204 (44,1 x 44,1 mm, postes 36,1 x 21 mm), a
+// petición del usuario. Placa "V1.0 2025/02/25": 4 bocas USB-A
+// horizontales en un lado largo y la entrada USB-C en un extremo.
 //
-// USB_HUB_WIDTH define TAMBIÉN el tamaño físico exterior de la
-// placa (usado en hub_usb.scad para el cuerpo/keepout) — no se debe
-// tocar solo para ajustar la separación de postes, o se encogería
-// la placa entera por error. La separación de postes en el eje
-// vertical se ajusta con un inset distinto en hubMountBosses() y
-// hubUsbMountHoles() (usb_hub_mount_inset_z), no aquí.
-usb_hub_width  = 44.1;
-usb_hub_depth  = 44.1;
-usb_hub_height = 12.0;
+// Medidas tomadas de las fotos del usuario con cinta métrica (dos
+// fotos, coinciden entre sí en ±0,2 mm). CONVIENE CONFIRMARLAS con
+// calibre antes de imprimir la pared — sobre todo la separación de
+// taladros (usb_hub_hole_spacing_*).
+//
+// Montaje: plana contra la cara interior de la pared DERECHA, con el
+// lado largo en horizontal (eje Y, profundidad) y las bocas USB-A
+// mirando hacia ARRIBA (hacia la tapa). Los 4 taladros son simétricos
+// respecto al centro de la placa: el USB-C puede quedar hacia el
+// frontal o hacia atrás sin cambiar la pared.
+//
+// Sistema LOCAL de la placa (hub_usb.scad): X = ancho (18,2), Y =
+// largo (68,7), Z = grosor/componentes. Con el giro de
+// assembly_instances.scad (rotate([0,-90,0])) X local → Z global,
+// Y local → Y global.
+usb_hub_width  = 18.2;   // ancho de la placa (queda en vertical, eje Z global)
+usb_hub_depth  = 68.7;   // largo de la placa (queda en horizontal, eje Y global)
+usb_hub_pcb_thickness = 1.6;
+usb_hub_height = 8.6;    // PCB + carcasa USB-A (~7 mm) — estimado
 
-usb_hub_mount_hole = 3.0;
-usb_hub_mount_inset_z = 11.55;  // separación vertical real entre postes = 21mm (44.1/2 - 11.55 = 10.5, x2 = 21)
-usb_hub_mount_inset_y = 4.0;    // separación horizontal = 36.1mm, sin cambios (confirmada correcta por el usuario)
+usb_hub_hole_spacing_x = 14.2;  // entre taladros, a lo ancho (Z global)
+usb_hub_hole_spacing_y = 64.7;  // entre taladros, a lo largo (Y global)
+usb_hub_board_hole     = 2.2;   // taladro real de la placa (M2) — solo visual
+
+// Postes de la pared: tornillo M2 autorroscante en el plástico.
+// usb_hub_standoff = 4 mm (antes 2 mm, side_wall_standoff) para que
+// las patillas pasantes de las carcasas USB-A (asoman ~1,5 mm por
+// detrás de la placa) no toquen la pared.
+usb_hub_mount_hole      = 1.8;   // agujero piloto M2 autorroscante (PETG)
+usb_hub_mount_diameter  = 5.0;   // diámetro del poste (cabe en la esquina de la placa)
+usb_hub_standoff        = 4.0;   // altura del poste = separación pared-placa
+usb_hub_mount_hole_wall = 1.5;   // el piloto entra también 1,5 mm en la pared (queda 1,5 mm de piel exterior) → tornillo M2x6
+
+// Altura (Z global) del centro de la placa. Más bajo que la franja
+// común del ESP32 (side_mount_z = 97,8) para dejar sitio por encima a
+// las clavijas USB-A y a la curva de sus cables antes de la tapa
+// (Z=148): borde superior de la placa a ~91 mm → ~57 mm libres.
+// Borde inferior a ~73 mm, por encima del disipador (z_cooler_top =
+// 65,6).
+usb_hub_mount_z = 82.0;
 
 // Mediremos estas distancias directamente del STL
 usb_port_pitch_x = 0;
@@ -466,7 +488,7 @@ rc522_bracket_thickness = 3.0;   // Estimado, brazos de soporte a los laterales 
 rc522_bracket_width     = 10.0;  // Estimado, ancho de cada brazo
 
 //-----------------------------------------------------------------------
-// Hub USB CJMCU-204 (usb_hub_* ya existían) — sin parámetros nuevos
+// Hub USB (usb_hub_* definidos arriba, sección HUB USB)
 //-----------------------------------------------------------------------
 
 //-----------------------------------------------------------------------

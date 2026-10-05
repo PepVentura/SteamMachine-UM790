@@ -342,10 +342,14 @@ esp32_pos = [
 // el ESP32.
 //=============================================================================
 
+// SUSTITUIDO (2026-10-05): hub nuevo de 4x USB-A, placa alargada
+// (ver usb_hub_* en 00_parametros.scad). X = cara trasera de la placa
+// (separada usb_hub_standoff de la pared); Z propio
+// (usb_hub_mount_z), ya no comparte side_mount_z con el ESP32.
 hub_pos = [
-    +(case_width/2 - wall_thickness) - side_wall_standoff,
+    +(case_width/2 - wall_thickness) - usb_hub_standoff,
     0,
-    side_mount_z
+    usb_hub_mount_z
 ];
 
 
