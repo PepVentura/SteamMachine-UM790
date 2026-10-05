@@ -190,6 +190,25 @@ module frontMagnetCuts(dir)
                     clearance = magnet_clearance
                 );
 
+    // CORREGIDO (2026-10-05, aviso del usuario con su STL de
+    // referencia, leftwall_flat2.stl): el rebaje del imán no debe
+    // quedarse solo en el relleno — se prolonga también por la propia
+    // pared, desde el borde frontal (Y=0) hasta el relleno
+    // (Y=front_panel_thickness), mismo diámetro y misma posición. En
+    // la pared queda un canal semicircular de ~2 mm de hondo (1 mm de
+    // piel en la cara exterior).
+    for(z=[front_magnet_z_low, front_magnet_z_high])
+
+        translate([cutX, 0, z])
+
+            rotate([-90,0,0])
+
+                magnetSocket(
+                    diameter  = magnet_diameter,
+                    height    = front_panel_thickness,
+                    clearance = magnet_clearance
+                );
+
 }
 
 

@@ -30,6 +30,16 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
   el anterior). Comprobado: estanco, 1 solo cuerpo; 28/28 pares sin
   colisión en el ensamblaje virtual.
 
+### Corregido
+
+- Rebaje de los imanes del panel frontal (`frontMagnetCuts()`,
+  walls.scad): no se quedaba solo en el relleno, ahora se prolonga
+  también por la pared, desde el borde frontal hasta el relleno (canal
+  semicircular de ~2 mm, 1 mm de piel exterior), como en el
+  `leftwall_flat2.stl` de referencia del usuario. La fuente reproduce
+  ahora ese STL (diferencia < 1 mm³, solo facetado).
+  `STL/rightwall_flat2.stl` regenerado con el rebaje.
+
 ### Pendiente
 
 - Medidas del hub tomadas de fotos con cinta métrica: confirmar con
