@@ -40,11 +40,10 @@ El formato está inspirado en [Keep a Changelog](https://keepachangelog.com/) y 
   ahora ese STL (diferencia < 1 mm³, solo facetado).
   `STL/rightwall_flat2.stl` regenerado con el rebaje.
 
-### Pendiente
-
-- Medidas del hub tomadas de fotos con cinta métrica: confirmar con
-  calibre la separación entre taladros (64,7 x 14,2 mm) antes de
-  imprimir.
+- Separación de taladros del hub a lo largo corregida a 68 mm entre
+  centros (medida real del usuario; la foto daba 64,7 mm). A lo ancho,
+  14,2 mm confirmado. Largo de placa recalculado a 72 mm.
+  `STL/rightwall_flat2.stl` regenerado; 28/28 pares sin colisión.
 
 ## [1.6.0] - 2026-09-21 — Panel NFC Apagar (apagado ordenado), caja de paneles documentada y material a PETG
 

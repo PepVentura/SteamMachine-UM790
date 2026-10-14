@@ -287,7 +287,7 @@ module esp32MountBosses(wallInnerX)
 // POSTES DE ANCLAJE DEL HUB USB (4x M2)
 //
 // SUSTITUIDO (2026-10-05, petición del usuario): hub nuevo de placa
-// alargada (68,7 x 18,2 mm, 4x USB-A arriba) en lugar del CJMCU-204
+// alargada (72 x 18,2 mm, 4x USB-A arriba) en lugar del CJMCU-204
 // (postes 36,1 x 21 mm, Ø3). Placa en horizontal: taladros separados
 // usb_hub_hole_spacing_y a lo largo (eje Y) y usb_hub_hole_spacing_x
 // a lo ancho (eje Z), centrados en hub_pos.
