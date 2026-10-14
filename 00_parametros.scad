@@ -319,10 +319,12 @@ nfc_reader_depth  = 10.0;
 // petición del usuario. Placa "V1.0 2025/02/25": 4 bocas USB-A
 // horizontales en un lado largo y la entrada USB-C en un extremo.
 //
-// Medidas tomadas de las fotos del usuario con cinta métrica (dos
-// fotos, coinciden entre sí en ±0,2 mm). CONVIENE CONFIRMARLAS con
-// calibre antes de imprimir la pared — sobre todo la separación de
-// taladros (usb_hub_hole_spacing_*).
+// Medidas tomadas de las fotos del usuario con cinta métrica.
+// CORREGIDO (2026-10-14, medida real del usuario): la separación a lo
+// largo entre centros de taladros es 68 mm (la foto daba 64,7 mm por
+// la perspectiva). A lo ancho, 14,2 mm confirmado por el usuario. El
+// largo de la placa se recalcula con el mismo margen de ~2 mm por
+// extremo (72 mm).
 //
 // Montaje: plana contra la cara interior de la pared DERECHA, con el
 // lado largo en horizontal (eje Y, profundidad) y las bocas USB-A
@@ -331,16 +333,16 @@ nfc_reader_depth  = 10.0;
 // frontal o hacia atrás sin cambiar la pared.
 //
 // Sistema LOCAL de la placa (hub_usb.scad): X = ancho (18,2), Y =
-// largo (68,7), Z = grosor/componentes. Con el giro de
+// largo (72), Z = grosor/componentes. Con el giro de
 // assembly_instances.scad (rotate([0,-90,0])) X local → Z global,
 // Y local → Y global.
 usb_hub_width  = 18.2;   // ancho de la placa (queda en vertical, eje Z global)
-usb_hub_depth  = 68.7;   // largo de la placa (queda en horizontal, eje Y global)
+usb_hub_depth  = 72.0;   // largo de la placa (queda en horizontal, eje Y global)
 usb_hub_pcb_thickness = 1.6;
 usb_hub_height = 8.6;    // PCB + carcasa USB-A (~7 mm) — estimado
 
-usb_hub_hole_spacing_x = 14.2;  // entre taladros, a lo ancho (Z global)
-usb_hub_hole_spacing_y = 64.7;  // entre taladros, a lo largo (Y global)
+usb_hub_hole_spacing_x = 14.2;  // entre taladros, a lo ancho (Z global) — confirmado por el usuario
+usb_hub_hole_spacing_y = 68.0;  // entre taladros, a lo largo (Y global) — medido por el usuario
 usb_hub_board_hole     = 2.2;   // taladro real de la placa (M2) — solo visual
 
 // Postes de la pared: tornillo M2 autorroscante en el plástico.

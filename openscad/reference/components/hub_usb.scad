@@ -11,7 +11,7 @@
 // virtual v1.
 //
 // v2.0 (2026-10-05): SUSTITUYE al CJMCU-204 (44,1 x 44,1 x 12 mm).
-// Hub nuevo de placa alargada (68,7 x 18,2 mm): 4 bocas USB-A
+// Hub nuevo de placa alargada (72 x 18,2 mm): 4 bocas USB-A
 // horizontales en un lado largo (+X local) y entrada USB-C en un
 // extremo (-Y local). Medidas tomadas de fotos — ver usb_hub_* en
 // 00_parametros.scad.
@@ -98,13 +98,14 @@ module hubUsbMountHoles()
 //=============================================================================
 // CONECTORES (4x USB-A en el lado +X, USB-C en el extremo -Y)
 //
-// Posiciones a lo largo (Y) medidas en las fotos: centros de las
-// bocas a -19,5 / -4,9 / +10,0 / +24,4 mm del centro de la placa
-// (paso ~14,6 mm). Carcasa USB-A ~13,1 x 10 x 7 mm, asomando 0,7 mm
+// Posiciones a lo largo (Y) medidas en las fotos y reescaladas
+// (x1,051) con la medida real entre taladros (68 mm): centros de las
+// bocas a -20,5 / -5,2 / +10,5 / +25,6 mm del centro de la placa
+// (paso ~15,4 mm). Carcasa USB-A ~13,1 x 10 x 7 mm, asomando 0,7 mm
 // por el borde +X. USB-C ~9 x 7,4 x 3,2 mm, asomando 1,4 mm por -Y.
 //=============================================================================
 
-hub_port_y        = [-19.5, -4.9, 10.0, 24.4];
+hub_port_y        = [-20.5, -5.2, 10.5, 25.6];
 hub_port_width    = 13.1;
 hub_port_length   = 10.0;
 hub_port_overhang = 0.7;
